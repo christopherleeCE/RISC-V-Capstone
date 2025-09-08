@@ -1,0 +1,57 @@
+//this is a cheat sheet for using git
+
+before starting work/making changes do the following
+====================================================
+<git status>
+    -confirm that your local branch is up to date
+    -if it is not up to date and you have code/changes
+        on the local that you dont want to lose, save 
+        to a local txt file outside the project directory,
+        so that it does not get erased when you <git pull>
+
+<git pull>
+    -update you local branch to the current branch on the repo
+
+before SAVING changes to the main branch on github
+==================================================
+    -make sure your changes dont break anything
+
+<git status>
+    -confirm that no changes have been made to the main branch
+    on github while you were making changes to your local branch
+    -if changes have been made follow the instrututions below
+    labeled "if local is out of date"
+
+<git add .>
+    -adds all files in the current directory (folder) to the local
+    branch, this saves all of your changes to the local branch
+    before the commit
+    
+<git commit -m "COMMIT MESSAGE">
+    -this "commits" your local branch to be ready to be pushed to
+    the main branch on github. this does no push the changes
+    -use a meaningfull commit message, doesnt have to be long
+
+<git push>
+    -pushes the commited files/changes to the main branch
+    -git commit (or push idk im not comsci) may give you an error,
+    possibly because the main branch has been updated after your
+    inital pull, if this happens it will say something along the
+    lines of "local branch is out of date", if this happens see
+    instrututions below labeled "if local is out of date" 
+    -if it pushes succsessfully, your changes are changed, you can go
+    to the github website "https://github.com/christopherleeCE/RISC-V-Capstone"
+    -you should be able to the you commit message next to the updated files
+
+if local is out of date
+=======================
+    -find any code that you modified/added, in vscode (and possibly other editors
+    that have some sort of git extension installed) lines of code will be color coded,
+    for a dithered blue verticle bar next to the code indicates changes were made to
+    that line, and a solid green indicates that this is a new line of code, you can
+    also hover your cursor over the bar and it shoul explain the meaning
+    -take the code and save it outside of the project directory, <git pull> to update
+    your branch, modify the updated repo with the code you set aside, and then follow
+    this instructions under "before SAVING changes to the main branch on github", if
+    you run into an issue dm me (chris) or possible holden for help.
+    -DO NOT USE -force, before pushing make sure that your commit doesnt break anything
