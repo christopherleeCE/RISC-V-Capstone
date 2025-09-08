@@ -1,7 +1,0 @@
-this is a test
-
-pringf("a", a);
-pringf("b", b);
-pringf("c", c);
-pringf("d", d);
-
