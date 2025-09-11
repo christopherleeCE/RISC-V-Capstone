@@ -10,6 +10,7 @@ before starting work/making changes do the following
         so that it does not get erased when you <git pull>
 
 <git pull>
+
     -update you local branch to the current branch on the repo
 
 before SAVING changes to the main branch on github
