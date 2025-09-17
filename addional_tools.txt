@@ -1,0 +1,10 @@
+GCC & GAS
+=========
+- GCC is the GNU C compiler, the one we will be using to compile C to machine code
+- GCC also uses an assembler, which we can access directly called GAS
+- To run these on windows its (IMO) easier just to use WSL
+
+WSL
+===
+- Windows Subsystem for Linux, this is just a lighweight virtual machine for windows that runs linux
+- Very easy install, just get it off the microsoft store
