@@ -8,3 +8,4 @@ WSL
 ===
 - Windows Subsystem for Linux, this is just a lighweight virtual machine for windows that runs linux
 - Very easy install, just get it off the microsoft store
+- there is a vscode extension that will allow you to run the wsl terminal in vscodes consol window
