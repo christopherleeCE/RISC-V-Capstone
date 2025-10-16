@@ -1,0 +1,83 @@
+By Edgar
+
+This is a rough guide to simulating using QuestaSim based on my experience and research, and
+is likely not the most efficient method. Some information may not be fully accurate, but I try
+to include only what has worked for me so far. Please feel free to modify/erase/expand as needed!
+
+Installation
+1. Download and setup Quartus Prime
+    -Questa should be included with your Quartus Download.
+    -I believe Lab 0 from EEE333 (in Ed Discussion resources for Abraham's class)
+    goes into detail on the installation
+    -Trying to open the software will likely not work as you need a license, so...
+2. Obtain the license from Intel's Self Service Licensing Center
+    -You will have to make an account, but the license should be free
+    -Instructions here:
+    https://www.intel.com/content/www/us/en/docs/programmable/683472/22-1/and-software-license.html
+
+Note - You might be able to obtain QuestaSim as a standalone software, but this is how I obtained
+it. Feel free to describe other approaches!
+
+Simulation (for Windows Users)
+Before starting, make sure the DUT and TB are in the same directory (maybe their own folder).
+Note this directory will also hold the work library for your compiled designs.
+
+1. Open the Command Prompt
+2. With the prompt, navigate to the directory with the DUT and TB (I use "cd filepath")
+3. Enter this command: 
+
+    vsim
+
+    -The Questa GUI should open.
+4. Locate the tcl shell at the bottom of the GUI. It should be titled "Transcript".
+    - If it doesn't appear, navigate to "Layout" on the taskbar and click "Reset"
+5. Create the "work" library if you have not done so. Type this in the shell:
+
+    vlib work
+
+   -The work library should appear in the directory you are in
+   -QuestaSim will compile to the library named "work" by default. It is possible to change the
+    default library if desired, but I chose to stick with this.
+   - I believe you only have to do this once if you use the same directory.
+
+6. Compile your designs with the following command in the shell:
+
+    vlog nameofdut.sv nameoftb.sv
+
+    -Replace with the names of your design and testbench
+    -If there is any errors in your Verilog, you will get an error message. Fix these and try
+    running this command again.
+    -I believe you have to recompile if you make changes to either file.
+
+NOTE: There are tcl commands that should allow you to do everything that follows in the shell.
+However, I was not able to run these successfully. Here's how I did get it working:
+
+7. In the "Library" window, click on the plus sign to the left of the work library
+8. In the drop down under the work library, you should see both compiled files. Right click on the
+   TESTBENCH file (not the design!!) and click on "Simulate" (first option)
+
+FOR VIEWING WAVEFORMS
+
+1. Right click inside the "Objects" window, select "Add to", then "Wave", then "Signals in Region".
+   OR try running this command:
+
+    add wave sim:/nameoftb/*
+
+   -You should see all your signals appear in the "Wave" window.
+
+
+2. In the terminal, use the following command. You can run it for any time period(10 ns, 5 ms, etc.):
+
+    run 1us
+
+3. Adjust the waveforms by right clicking and changing zoom if necessary (Zoom Full is neat)
+
+TO QUIT
+1. type the following in the shell:
+
+    quit -sim
+
+TO EXIT THE GUI
+1. type this in the shell and select yes (or just exit out with X on top):
+
+    exit
