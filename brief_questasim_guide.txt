@@ -1,0 +1,98 @@
+Here are some shortcuts I've used when working with QuestaSim. These are only a small selection of
+the functions Questa offers. I try to include only what has worked for me so far, please feel free
+to modify/erase/expand as needed!
+
+INSTALLATION
+1. Download and setup Quartus Prime
+    -QuestaSim should be included with your Quartus Download.
+    -Trying to open Questa may not work as you need a license, so...
+2. Obtain the license for QuestaSim from Intel's Self Service Licensing Center
+    -You will have to make an account, but the license should be free
+    -Instructions here:
+    https://www.intel.com/content/www/us/en/docs/programmable/683472/22-1/and-software-license.html
+
+
+Here is how I ran a simulation in QuestaSim after creating the modules in VSCode:
+
+(for Windows Users)
+Before starting, make sure the DUT and TB are in the same directory. Since this directory will
+also hold the work library for your compiled designs, it might be a good idea to keep this
+separate from your working Github directory to reduce clutter and not risk overwriting anything.
+
+1. Open the Command Prompt
+
+2. With the prompt, navigate to the directory with the DUT and TB (cd filepath)
+
+3. Enter this command: 
+
+    vsim
+
+    -The Questa GUI should open.
+
+4. Locate the tcl shell at the bottom of the GUI. It should be titled "Transcript".
+    - If it doesn't appear, navigate to "Layout" on the taskbar and click "Reset"
+
+5. Create the "work" library if you have not done so. Type this in the shell:
+
+    vlib work
+
+   -The work library should appear in the directory you are in. It will be empty.
+   -QuestaSim will compile to the library named "work" by default. It is possible to change the
+    default library if desired, but I chose to stick with this.
+   - I believe you only have to do this once if you use the same directory (yet to test).
+
+6. Compile your designs with the following command in the shell:
+
+    vlog nameofdut.sv nameoftb.sv
+
+    -Replace with the names of your design and testbench
+    -If there are any errors in your Verilog, you will get an error message. Fix these and try
+    running this command again.
+    -I believe you have to recompile if you make changes to either file.
+
+7. In the "Library" window, click on the plus sign to the left of the work library
+
+8. In the drop down under the work library, you should see both compiled files. Right click on the
+   TESTBENCH file (not the design!!) and click on "Simulate" (first option)
+
+
+FOR VIEWING WAVEFORMS
+1. Right click inside the "Objects" window, select "Add to", then "Wave", then "Signals in Region".
+   OR try running this command for inividual signals:
+
+    add wave sim:/nameoftb/nameofsignal
+
+   ...or for all signals:
+
+    add wave sim:/nameoftb/*
+
+   -You should see all your signals appear in the "Wave" window.
+
+
+RUNNING THE SIMULATION
+1. In the terminal, use the following command. You can run it for any time period(10ns, 5ms, etc.):
+
+    run 1us
+
+2. Adjust the waveforms by right clicking and changing zoom if necessary (Zoom Full/Zoom Cursor)
+
+
+ASSERTIONS
+1. If you use these statements in your top file...
+
+    assert(condition) else $error("error message")
+
+   ...then a message will display in the shell if said condition is not met
+   -Great for troubleshooting!
+
+
+TO QUIT
+1. Type the following in the shell:
+
+    quit -sim
+
+
+TO EXIT THE GUI
+1. Exit out with X on top of the GUI or type this in the shell and select yes:
+
+    exit
