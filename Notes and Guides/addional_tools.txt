@@ -1,0 +1,16 @@
+GCC & GAS
+=========
+- GCC is the GNU C compiler, the one we will be using to compile C to machine code
+- GCC also uses an assembler, which we can access directly called GAS
+- To run these on windows its (IMO) easier just to use WSL
+
+WSL
+===
+- Windows Subsystem for Linux, this is just a lighweight virtual machine for windows that runs linux
+- Very easy install, just get it off the microsoft store
+- there is a vscode extension that will allow you to run the wsl terminal in vscodes consol window
+
+Usage
+=====
+riscv64-unknown-elf-as -march=rv32im test.s -o test.o
+riscv64-unknown-elf-objdump -d test.o

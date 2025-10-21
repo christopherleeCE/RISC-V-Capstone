@@ -1,0 +1,11 @@
+Coding Standard - Group 7
+*expand as needed
+
+Naming Convention
+-camel case (flipFlop) or snake case (flip_flop) preferred
+-abbreviations okay, just choose wisely
+
+Parameters
+-be flexible when possible (ex. variable bit size)
+
+
