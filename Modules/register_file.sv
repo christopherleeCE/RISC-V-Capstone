@@ -4,9 +4,7 @@ module register_file
 (
     input logic [width-1:0] write_data
     input logic [31:0] write_addr, read_addr_a, read_addr_b,
-    input logic rf_en,
-    input logic clk,
-    input logic rst,
+    input logic rf_en, clk, rst,
     output logic [width-1:0] read_data_a, read_data_b
 
 );
