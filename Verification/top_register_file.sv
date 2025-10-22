@@ -2,13 +2,13 @@
 module top_register_file#(parameter int width = 32)();
 
 logic [width-1:0] write_data;
-logic [31:0] write_addr, read_addr_a, read_addr_b;
+logic [4:0] write_addr, read_addr_a, read_addr_b;
 logic rf_en, clk, rst;
 logic [width-1:0] read_data_a, read_data_b;
 
 
 // instantiate the module
-register_file#(size) dut_register_file(.*);
+register_file#(width) dut_register_file(.*);
 
 // create clock signal for register file
 initial begin
@@ -26,5 +26,9 @@ initial begin
     rst = 1'b1; // reset disabled
 end
 
+//create values
+always @(negedge clk) begin
+    write_data = $random();
+end
 
 endmodule

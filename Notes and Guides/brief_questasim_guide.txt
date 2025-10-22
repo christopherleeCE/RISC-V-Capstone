@@ -76,6 +76,10 @@ RUNNING THE SIMULATION
 
 2. Adjust the waveforms by right clicking and changing zoom if necessary (Zoom Full/Zoom Cursor)
 
+3. To restart the simulation and clear the window, type:
+
+    restart
+
 
 ASSERTIONS
 1. If you use these statements in your top file...
