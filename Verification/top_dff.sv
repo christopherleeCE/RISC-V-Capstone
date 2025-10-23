@@ -1,8 +1,3 @@
-/* 
-By Edgar G.
-I created this top file to practice writing verification, learn QuestaSim, and test the dff.
-*/
-
 `timescale 1ns/1ns // timescale for simulator, 1 ns as time unit, 1ns precision
 
 module top_dff#(parameter int size = 8)();
@@ -10,7 +5,7 @@ module top_dff#(parameter int size = 8)();
 logic [size-1:0] d, q;
 logic clk, rst, en;
 
-logic [size] h; // for holding last random value
+logic [size] h; // used to model ideal flip flop (golden model)
 
 // instantiate the module
 dff#(size) my_dff(.*);
@@ -24,16 +19,14 @@ initial begin
     end
 end
 
-// Note the signals changing on the falling edge.
-// This takes the set-up and hold time of the dff into account.
-// testing the reset
+// reset test - enable reset then disable
 initial begin
-    rst = 1'b0; // reset enabled
+    rst = 1'b0; // reset enabled for several clock cycles
     repeat(10)@(negedge clk); // reset releases on negative edge
     rst = 1'b1; // reset disabled
 end
 
-//testing the enable
+// testing the enable - alternate between both states
 initial begin
     while (1'b1) begin
         en = 1'b1; // enable the flip-flop
@@ -43,20 +36,32 @@ initial begin
     end
 end
 
-//creating random values to input into the flip-flop
+// creating random values to input into the dff
 always @(negedge clk) begin
     d = $random();
 end
 
+// golden reference model - expected behavior for dff
 always @(posedge clk) begin
-    h <= d;
-    #5 // short delay for setup/hold
+    if (!rst)
+        h <= '0; // reset active
+    else if (en)
+        h <= d; // reset not active, dff enabled
+    else
+        h <= h; // reset not active, dff not enabled
+end
+
+// evaluating dff output
+always @(posedge clk) begin
+    #5 // brief delay for setup
     unique case (1'b1)
-        //check flip-flop doesn't change when disabled
-        (rst && !en): assert(h != q) else $error("q changing when dff is disabled");
-        //checks flip-flop changes when enabled
-        (rst && en): assert(h == q) else $error("dff not accepting values");
-        //checks reset is working
+        // check dff doesn't change when disabled
+        (rst && !en): 
+                assert(h == q) else $error("q changing when dff is disabled");
+        // checks dff changes when enabled
+        (rst && en):
+                assert(h == q) else $error("dff not accepting values");
+        // checks reset is working
         default: assert(q == '0) else $error("dff is not resetting");
     endcase
 end
