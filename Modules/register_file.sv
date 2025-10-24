@@ -14,7 +14,7 @@ logic [data_width-1:0] rf_out [31:0]; //output array of buses from each register
 
 
 // //decoder: enables register based on write address
-assign reg_en = rf_en ? 32'b1 << write_addr : '0;
+assign reg_en = rf_en ? 32'd1 << write_addr : '0;
 
 //initializing 32 registers for the register files\
 genvar i;
@@ -34,5 +34,6 @@ assign read_data_a = rf_out[read_addr_a];
 
 //mux: read out data for read address B
 assign read_data_b = rf_out[read_addr_b];
+
 
 endmodule

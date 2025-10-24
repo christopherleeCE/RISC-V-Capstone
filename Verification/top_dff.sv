@@ -22,17 +22,17 @@ end
 // reset test - enable reset then disable
 initial begin
     rst = 1'b0; // reset enabled for several clock cycles
-    repeat(10)@(negedge clk); // reset releases on negative edge
+    repeat(10)@(posedge clk); // repeat for a few more clock cycles
     rst = 1'b1; // reset disabled
 end
 
 // testing the enable - alternate between both states
 initial begin
-    while (1'b1) begin
+    while (1'b1) begin // cycle indefinitely
         en = 1'b1; // enable the flip-flop
-        repeat(5)@(negedge clk);
+        repeat(5)@(posedge clk);
         en = 1'b0; // disable the flip-flop
-        repeat(5)@(negedge clk);
+        repeat(5)@(posedge clk);
     end
 end
 
@@ -53,7 +53,7 @@ end
 
 // evaluating dff output
 always @(posedge clk) begin
-    #5 // brief delay for setup
+    #10 // brief delay for setup
     unique case (1'b1)
         // check dff doesn't change when disabled
         (rst && !en): 
