@@ -22,7 +22,7 @@ end
 // reset test - enable reset then disable
 initial begin
     rst = 1'b0; // reset enabled for several clock cycles
-    repeat(10)@(posedge clk); // repeat for a few more clock cycles
+    repeat(10)@(negedge clk); // repeat for a few more clock cycles
     rst = 1'b1; // reset disabled
 end
 
@@ -30,9 +30,9 @@ end
 initial begin
     while (1'b1) begin // cycle indefinitely
         en = 1'b1; // enable the flip-flop
-        repeat(5)@(posedge clk);
+        repeat(5)@(negedge clk);
         en = 1'b0; // disable the flip-flop
-        repeat(5)@(posedge clk);
+        repeat(5)@(negedge clk);
     end
 end
 
@@ -43,12 +43,13 @@ end
 
 // golden reference model - expected behavior for dff
 always @(posedge clk) begin
-    if (!rst)
+    if (!rst) begin
         h <= '0; // reset active
-    else if (en)
+    end else if (en) begin
         h <= d; // reset not active, dff enabled
-    else
+    end else begin
         h <= h; // reset not active, dff not enabled
+    end
 end
 
 // evaluating dff output

@@ -20,12 +20,13 @@ assign reg_en = rf_en ? 32'd1 << write_addr : '0;
 genvar i;
 generate
     for(i = 0; i < 32; i++) begin: registers
-        if(i == 0)
+        if(i == 0) begin
             // creating the zero register (hardwired to zero)
             dff#(data_width) zero_register (.d('0), .clk, .rst, .en(reg_en[i]), .q(rf_out[i]));
-        else
+        end else begin
             // creating the other registers (wired to the databus)
             dff#(data_width) other_register (.d(write_data), .clk, .rst, .en(reg_en[i]), .q(rf_out[i]));
+        end
     end
 endgenerate
 
