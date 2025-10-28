@@ -1,5 +1,5 @@
 //TODO pipelining regs for data & cntr_sigs
-//TODO confirm busses are right,
+//TODO confirm buses are right,
 
 //prototype of basic pattern
 module riscv_cpu;
@@ -89,17 +89,13 @@ module riscv_cpu;
     );
 
     /* < ALU STARTS HERE > */
-    always_comb begin
-        unique case(1'b1)
 
-        alu_sel_add     :   RQ_DATA = RS1_DATA_PP + RS2_DATA_PP;
-        alu_sel_sub     :   RQ_DATA = RS1_DATA_PP - RS2_DATA_PP;
-        alu_sel_nop     :   RQ_DATA = '0;
-        alu_sel_pass1   :   RQ_DATA = RS1_DATA_PP;
-        alu_sel_pass2   :   RQ_DATA = RS2_DATA_PP;
+    /* Please note NOP's are a pseudoinstruction in RISC-V handled by the assembler as an ADDI of 0 with the zero register
+    back into the zero register. Also it may be worth considering using func3 and func7 instead of individual signals to 
+    reduce the number of signals being passed into the module. - Edgar */
 
-        endcase
-    end
+    alu#(32) ALU(.operand_a(RS1_DATA_PP), .operand_b(RS2_DATA_PP), .alu_sel_add, .alu_sel_sub, .alu_sel_nop, .alu_sel_pass1,
+    .alus_sel_pass2, .result(RQ_DATA));
 
 /* < EX/MEM > */ //====================================================================================================
 
