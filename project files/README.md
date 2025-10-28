@@ -1,3 +1,4 @@
+- this is a pipelined, 5 cycle instr, with lookuptable microprocessor, with no hazard control (no stalling, fowarding or branch prediction)
 - the mkurom.pl is used my typing "perl mkurom.pl" in the cmd line, perl needs to be installed here: https://www.perl.org/get.html get strawberry perl for windows
 - do not touch the microcode_legacy, or mkurom_legacy plz
 - feel free to edit and experiment with microcode.sh all you want, there isnt anything really important in there, but for now maybe dont remove the "UD_fault:" label.
