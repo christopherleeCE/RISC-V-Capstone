@@ -9,14 +9,14 @@
 - for use of these files in questia i recomond something along these lines
 
     * Documents
-        > Quartus
-            > Projects
-                > Project_1_Folder
-                    > work #this is used by questia
-                    > git_home_folder
-                        > Notes and Guides
-                        > project files #SV files in here
-                        > Verification
+        * Quartus
+            * Projects
+                * Project_1_Folder
+                    * work #this is used by questia
+                    * git_home_folder
+                        * Notes and Guides
+                        * project files #SV files in here
+                        * Verification
 
 - you have to in questia "add files to project", and you just navigate to the "project files" folder and select all of the verilog related files, (.sv, .inc, etc)
 - then you can compile all and check for errors, again no testbench has been created yet
