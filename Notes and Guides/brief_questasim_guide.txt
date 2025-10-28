@@ -9,7 +9,7 @@ INSTALLATION
 2. Obtain the license for QuestaSim from Intel's Self Service Licensing Center
     -You will have to make an account, but the license should be free
     -Instructions here:
-    https://www.intel.com/content/www/us/en/docs/programmable/683472/22-1/and-software-license.html
+    https://www.intel.com/content/www/us/en/docs/programmable/683472/24-3-1/and-software-license.html
 
 
 Here is how I ran a simulation in QuestaSim after creating the modules in VSCode:
