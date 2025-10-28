@@ -1,0 +1,296 @@
+#!/usr/bin/perl
+#
+#Written by Seth Abraham, March 2017
+#
+#small changes for 333 class, March 2018, by SA
+#
+
+#
+# for debugging....
+#
+sub dumphash
+{
+  my    $hr = shift;
+  local $_;
+
+  print map { "$_ => $hr->{$_} " } keys %{$hr} ;
+  print "\n";
+} #sub
+
+
+#
+# convert decimal to a bit string of specific width
+# (from perl cookbook)
+#
+sub d2bit
+{
+  local $_;
+  my    $wid = shift;
+  my    $num = shift;
+  my    $str;
+  $str = unpack( "B32",  pack("N", $num ) );
+  $str = substr( $str, -$wid);
+
+  return $str;
+} #d2bit
+
+
+open F,"./microcode.sh" or die "Cannot open microcode.sh";
+
+#
+# read microcode file, processing lines
+#
+#
+$upc = 0;
+while(<F>)
+{
+  s/#.*//;           # strip comments
+  next if /^\s*$/;   # skip blanks
+
+  #
+  # process a signal line
+  # save up the signals
+  # remember their width
+  # preserve their order
+  #
+  s/SIG\s/SIG1 /;
+  if (/SIG(\d)\s+(.*)/)
+  {
+    $wid  = $1;
+    @some = split(/\s+/, $2);
+    foreach (@some)
+    {
+      $width{$_} = $wid;
+      push @order, $_;
+    }
+    next;
+  }
+  #
+  # process a constant line
+  # define any constants
+  # put them in the constant hash
+  #
+  if (/CONST\s+(.*)/)
+  {
+    @some = split(/\s+/,$1);
+    $i    = 0;
+    foreach (@some)
+    {
+      $constant{$_} = $i++;
+    }
+    next;
+  }
+  #
+  # process a ucode label
+  # essentally, this is just a constant with value of current uip
+  #
+  $constant{$1} = $upc if /^\s*(\S+):/;
+  next if /:/;
+
+  #
+  # process a opcode line
+  # an opcode is partially a uip entry (i.e. like a ucode label)
+  # keep a list of our opcodes
+  #
+  $constant{$1} = $upc if /^\s*(\S+)\s+OPCODE/;
+  push @opcodes, $_ if /OPCODE/;
+  next if /OPCODE/;
+
+  #all that is left had better be ucode lines!
+  next unless /\S+/;
+
+  #
+  # save the ucode lines for later
+  #
+  push @lines, "$upc " . $_;
+  $upc++;
+
+} # file has a line of text
+
+
+#
+# go through all the signal names, and define ucode width
+#
+foreach (@order)
+{
+  $uwid += $width{$_};
+}
+
+
+#
+# a simple but ugly way to deduce the ucode address width
+# (a log2 sort of thing, essentially)
+#
+$wid = 3;
+$num = 8;
+while ($num < $upc)
+{
+  $num += $num;
+  $wid++;
+}
+
+
+#
+# go through each ucode line
+# replace all the symbolic names (constants) with their numerical values
+# check that signals on line were defined
+# process the multibit signals that have a name=value format
+#
+# finally create the ucode line, with 0s for the signals not explicitly listed
+# (which implies that a signal must be active high)
+# we will output all these ucode lines later when we write the ucode file
+#
+my %instruction_starts = map { $constant{$_} => $_ } map { (split)[0] } @opcodes;
+
+foreach (@lines)
+{
+  foreach $k (keys %constant ) { s/=$k/=$constant{$k}/; }
+
+  @some = split (/\s+/, $_);
+  $lnum = shift @some;
+
+  %seen = ();
+  foreach (@some)
+  {
+    $seen{$1}++                    if /([^=]+)/;
+    $width{$1} or die "Illegal signal $_ encountered at ucode address $lnum\n";
+    $seen{$1}=d2bit($width{$1},$2) if /(\S+)=(\S+)/;
+  }
+
+  $bitstr = "";
+  foreach (@order)
+  {
+    if ($seen{$_}) { $bitstr .= $seen{$_}; }
+    else { $bitstr .= "0"x$width{$_}; }
+  }
+
+  $cmts = $1 if /\d+(.*)/;
+
+  # add instruction header if this uaddress starts one
+  if (exists $instruction_starts{$lnum}) {
+    my $instr_name = $instruction_starts{$lnum};
+    $urom .= "// ==== INSTRUCTION: $instr_name ====\n";
+  }
+  elsif (defined $constant{"UD_fault"} && $lnum == $constant{"UD_fault"}) {
+    $urom .= "// ==== LABEL: UD_fault ====\n";
+  }
+
+
+  $urom .= sprintf("    %d'd%d: sig = %d'b%s; // %s\n",
+                   $wid, $lnum, $uwid, $bitstr, $cmts);
+}
+
+
+#
+# now we look at all the opcodes so we can create the instruction decoder
+#
+# note we saved the opcodes as ucode labels,
+# so we can use the constant table to find the uip
+# for the start of each opcode
+#
+# use 7-bit opcodes and print them in hex
+#
+foreach (@opcodes)
+{
+  /\s*(\S+)\s+OPC/;
+  $instr = $1;
+
+  foreach $k (keys %constant )
+  {
+    s/^\s*$k\s+/$constant{$k} /;
+  }
+
+  /(\S+)\s+OPCODE\s+(\S+)/;
+  (my $opcode_str = $2) =~ s/[_\s]//g;   # remove underscores and spaces
+  my $opcode_val = hex($opcode_str);
+
+
+  $casex .= sprintf("    7'h%02X :  uip = %d'd%d ;   // %s\n",
+                    $opcode_val, $wid, $1, $instr);
+}
+$casex .= sprintf("    default:      uip = %d'd%d ;   // #UD fault\n",
+                  $wid, $constant{UD_fault});
+
+
+
+#
+# create verilog declarations for the symbolic signal names
+#
+#
+foreach (@order)
+{
+  $declare .= "  logic ";
+
+  $w = $width{$_} - 1;
+  if ($w)
+  { $declare .= "[" .  $w  . ":0]$_;\n"; }
+  else
+  { $declare .= "     $_;\n" ; }
+
+
+}
+
+$highaddr   = $wid - 1;
+$highsignal = $uwid - 1;
+
+#
+# write signal declarations, as well as the assign that converts
+# raw ucode lines to symbolic names
+#
+open  F, ">./sig_declare.inc" or die "cannot open sig_declare for output\n";
+print F "//this file is generated by perl script mkurom.\n" .
+        "//Do not edit under pain of losing your edits!\n ";
+print F "parameter BIT_WIDTH=32,ADDR_WIDTH=32,UCODE_WIDTH=$highsignal+1,UIP_WIDTH=$highaddr+1; \n";
+
+foreach (keys %constant )
+{
+  next unless /^UC_/;
+  print F "  parameter $_ = ", $constant{$_}, ";\n";
+}
+
+
+print F $declare;
+#print F "  logic [UIP_WIDTH-1:0] uip;\n";
+print F "  logic [UCODE_WIDTH-1:0] sig;\n";
+print F "  assign {" . join(",", @order) . "} = sig;\n";
+
+
+#
+# write the ucode verilog file
+#
+
+open  F, ">./ustore.sv" or die "cannot open ustore.sv for output\n";
+print F "//this file is generated by perl script mkurom.\n" .
+        "//Do not edit under pain of losing your edits!\n ";
+print F " \n"
+      . "module US__ ( \n      input logic ["
+      . "$highaddr:0] uip,\n      output logic ["
+      . "$highsignal:0] sig \n\n"
+      . "          );\n"
+      . "always_comb begin\n  unique case ( uip ) \n"
+      . $urom
+      . "    default: sig = " . $uwid . "'d0;\n"
+      .  "  endcase\nend\n"
+      . "endmodule // US__ \n"
+      ;
+
+#
+# write the instruction decoder verilog file
+#
+
+open  F, ">./id.sv" or die "cannot open id.sv for output\n";
+print F "//this file is generated by perl script mkurom.\n" .
+        "//Do not edit under pain of losing your edits!\n ";
+print F "\n"
+      . "module ID__ \n"
+      . " #(UIP_WIDTH=$wid)\n"
+      ."( \n      input logic [6:0] opcode,\n"
+      . "      output logic ["
+      . "UIP_WIDTH-1:0] uip \n"
+      . "            ); \n"
+      . "always_comb begin\n  unique case (opcode) inside\n"
+      . $casex
+      . "  endcase\nend\n"
+      . "endmodule  // ID__ \n"
+      ;
+
