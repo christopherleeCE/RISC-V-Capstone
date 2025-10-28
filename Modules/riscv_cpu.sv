@@ -91,8 +91,8 @@ module riscv_cpu;
     /* < ALU STARTS HERE > */
 
     /* Please note NOP's are a pseudoinstruction in RISC-V handled by the assembler as an ADDI of 0 with the zero register
-    back into the zero register. Also it may be worth considering using func3 and func7 instead of individual signals to 
-    reduce the number of signals being passed into the module. - Edgar */
+    back into the zero register, and it likely doesn't need its own signal. Also it may be worth considering using func3 
+    and func7 instead of individual signals to reduce the number of signals being passed into the module. - Edgar */
 
     alu#(32) ALU(.operand_a(RS1_DATA_PP), .operand_b(RS2_DATA_PP), .alu_sel_add, .alu_sel_sub, .alu_sel_nop, .alu_sel_pass1,
     .alus_sel_pass2, .result(RQ_DATA));
