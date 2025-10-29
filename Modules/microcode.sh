@@ -56,6 +56,7 @@ SIG alu_sel_sub
 SIG alu_sel_nop
 SIG alu_sel_pass1
 SIG alu_sel_pass2
+SIG data_mem_wr_en
 
 NOP OPCODE 0x00
 branch_en

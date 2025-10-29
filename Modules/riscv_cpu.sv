@@ -2,6 +2,10 @@
 //TODO confirm buses are right,
 //TODO better comments for logic declarations
 
+//this makes it so that the compiler will throw an error if we try to use a signal/bus that has not been declared,
+//this will help avoid errors where an undeclared bus gets implicitly declared as a wire
+`default_nettype none
+
 //prototype of basic pattern
 module riscv_cpu;
 
@@ -31,7 +35,7 @@ module riscv_cpu;
     pc #(
         .WIDTH(32)
     ) pc_reg (
-        .d(from_wb),
+        .d(ALU_PP), //TODO i put ALU_PP here as a placeholder, THIS CAN CHANGE!!! -chris
         .clk(clk),
         .rst(rst),
         .inc(inc_pc),
