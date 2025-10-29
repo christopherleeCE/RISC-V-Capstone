@@ -1,3 +1,4 @@
+`timescale 1ns/1ns // timescale for simulator, 1 ns as time unit, 1ns precision
 module top_dff_async_reset
 #(parameter data_width = 8)(); //width 1 byte
 
@@ -7,7 +8,7 @@ logic clk, rst, wr_en; //control signals
 logic [data_width-1:0] h; //
 
 //Instantiate the dff
-dff_async_reset#(.WIDTH(data_width)) dut_dff(.*);
+dff_async_reset #(.WIDTH(data_width)) dut_dff(.*);
 
 // create clock signal for dff
 initial begin

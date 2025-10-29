@@ -46,11 +46,11 @@ module reg_file #(
 ) (
     input logic     [REG_ENCODE_WIDTH-1:0] rs1_addr,
     input logic     [REG_ENCODE_WIDTH-1:0] rs2_addr,
-    output logic    [REG_BIT_WIDTH:0] rs1_data,
-    output logic    [REG_BIT_WIDTH:0] rs2_data,
+    output logic    [REG_BIT_WIDTH-1:0] rs1_data,
+    output logic    [REG_BIT_WIDTH-1:0] rs2_data,
     input logic            rd_wr_en,
     input logic     [REG_ENCODE_WIDTH-1:0] rd_addr,
-    input logic     [REG_BIT_WIDTH:0] rd_data,
+    input logic     [REG_BIT_WIDTH-1:0] rd_data,
     input logic            clk, rst
 );
 
@@ -62,26 +62,21 @@ module reg_file #(
     //imagine the [REG_BIT_WIDTH-1:0] in the declaration pops out to the end of the declaration
     //so now its regs_out[0:NUM_OF_REGS-1][REG_BIT_WIDTH-1:0] 
 
-    assign rs1_data = (rs1_addr == 0) ? 32'b0 : regs_out[rs1_addr];
-    assign rs2_data = (rs2_addr == 0) ? 32'b0 : regs_out[rs2_addr];
+    assign rs1_data = regs_out[rs1_addr];
+    assign rs2_data = regs_out[rs2_addr];
 
-    //no reg_0, as this is hardcoded to be zero
     //this is a genvar loop, its a tool in sv to use a forloop to generate modules (in this case to generate 31 regs)
     
     genvar ii;
     generate
-        for(ii = 1; ii < NUM_OF_REGS; ii++) begin : gen_regs
-
-            dff_async_reset #(
-                .WIDTH(REG_BIT_WIDTH),
-                .RESET_VALUE(32'h0)
-            ) reg_ii (
-                .d(rd_data),
-                .clk(clk),
-                .rst(rst),
-                .wr_en(rd_wr_en && (rd_addr == ii)),
-                .q(regs_out[ii])
-            );
+        for(ii = 0; ii < NUM_OF_REGS; ii++) begin : gen_regs
+            if (ii == 0) begin // create the zero register
+                dff_async_reset #(.WIDTH(REG_BIT_WIDTH))
+                reg_ii (.d('0), .clk(clk), .rst(rst), .wr_en(rd_wr_en && (rd_addr == ii)), .q(regs_out[ii]));
+            end else begin // create the remaining registers
+                dff_async_reset #(.WIDTH(REG_BIT_WIDTH)) 
+                reg_ii (.d(rd_data), .clk(clk), .rst(rst), .wr_en(rd_wr_en && (rd_addr == ii)), .q(regs_out[ii]));
+            end
 
         end
     endgenerate
