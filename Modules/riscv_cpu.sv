@@ -1,19 +1,27 @@
 //TODO pipelining regs for data & cntr_sigs
 //TODO confirm buses are right,
+//TODO better comments for logic declarations
 
 //prototype of basic pattern
 module riscv_cpu;
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
     `include "sig_declare.inc";
-    logic [31:0] PC, INSTR, IR, ID;
+    logic [31:0] PC;
+    logic [31:0] INSTR;
+    logic [31:0] INSTR_PP;
+    logic [31:0] IR, ID;
     logic [31:0] RS1_DATA;  //read1 from regfile
-    logic [31:0] RS2_DATA;  //read2 from regfile
     logic [31:0] RS1_DATA_PP;  //read1 from regfile after pipeline reg
+    logic [31:0] RS2_DATA;  //read2 from regfile
     logic [31:0] RS2_DATA_PP;  //read2 from regfile after pipeline reg
-    logic [31:0] RQ_DATA;   //output of alu
+    logic [31:0] RS2_DATA_PP_PP;
     logic [31:0] RD_DATA;   //input write to regfile
+    logic [31:0] ALU;   //output of alu
+    logic [31:0] ALU_PP;
+    logic [31:0] ALU_PP_PP;
     logic [31:0] DATA_MEM_OUT;
+    logic [31:0] DATA_MEM_OUT_PP;
     logic clk, rst;
 
     pc #(
@@ -53,9 +61,13 @@ module riscv_cpu;
         .q(INSTR_PP)
     );
 
+    //TODO either the ID or the (ustore -> more hardware) needs to control datapath for instruciton types (R type, I type, etc), (i reccomend ustore -> more hardware) 
+    //TODO grouping together the ustore output signals to prepare them for the cnrt_sig pipeline
+    //-chris
+
     //given no seq engine, ID goes str8 into ustore
     ID__ my_id ( .ir (IR), .uip(ID) );
-    US__ my_ustore ( .uip(ID), .sig(sig) );    //TODO grouping together the ustore
+    US__ my_ustore ( .uip(ID), .sig(sig) );    
     //sig is all the control signals, see sig_declar.inc or "SIG" section in microcode for list
 
     //reg address & instr type needs to be interpreted here
@@ -96,7 +108,7 @@ module riscv_cpu;
 
     alu #(
         .WIDTH(32)
-    ) ALU (
+    ) alu_again_colon_closing_parenthesis (
         .operand_a(RS1_DATA_PP),
         .operand_b(RS2_DATA_PP),
         .alu_sel_add,
@@ -104,8 +116,8 @@ module riscv_cpu;
         .alu_sel_nop,
         .alu_sel_pass1,
         .alu_sel_pass2,
-        .result(RQ_DATA)
-    );
+        .result(ALU)
+        );
 
 /* < EX/MEM > */ //====================================================================================================
 
@@ -113,11 +125,11 @@ module riscv_cpu;
     dff_async_reset #(
         .WIDTH(32)
     ) ex_mem_reg (
-        .d('{RQ_DATA, RS2_DATA_PP}),
+        .d('{ALU, RS2_DATA_PP}),
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q('{RQ_DATA_PP, RS2_DATA_PP_PP})
+        .q('{ALU_PP, RS2_DATA_PP_PP})
     );
 
     //should be converted to proper ROM at some point
@@ -125,8 +137,8 @@ module riscv_cpu;
         .BIT_WIDTH(32),
         .ENTRY_COUNT(32)
     ) data_mem (
-        .readAddr(RQ_DATA_PP),
-        .writeAddr(RQ_DATA_PP),
+        .readAddr(ALU_PP),
+        .writeAddr(ALU_PP),
         .writeData(RS2_DATA_PP_PP),
         .writeEn(data_mem_wr_en),
         .readData(DATA_MEM_OUT),
@@ -138,18 +150,18 @@ module riscv_cpu;
     dff_async_reset #(
         .WIDTH(64)
     ) mem_we_reg (
-        .d('{RQ_DATA_PP, DATA_MEM_OUT}),
+        .d('{ALU_PP, DATA_MEM_OUT}),
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q('{RQ_DATA_PP_PP, DATA_MEM_OUT_PP})
+        .q('{ALU_PP_PP, DATA_MEM_OUT_PP})
     );
 
     //dbus mux
     always_comb begin
         unique case (1'b1)
 
-        dbus_sel_alu        : RD_DATA = RQ_DATA_PP_PP;
+        dbus_sel_alu        : RD_DATA = ALU_PP_PP;
         dbus_sel_data_mem   : RD_DATA = DATA_MEM_OUT_PP;
 
         endcase
