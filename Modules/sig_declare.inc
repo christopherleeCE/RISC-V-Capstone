@@ -6,7 +6,7 @@
   logic      inc_pc;
   logic      branch_en;
   logic      reg_file_wr_en;
-  logic      ir_wr_en;
+  logic      pipeline_advance;
   logic      dbus_sel_alu;
   logic      dbus_sel_data_mem;
   logic      alu_sel_add;
@@ -15,4 +15,4 @@
   logic      alu_sel_pass1;
   logic      alu_sel_pass2;
   logic [UCODE_WIDTH-1:0] sig;
-  assign {retire,halt,inc_pc,branch_en,reg_file_wr_en,ir_wr_en,dbus_sel_alu,dbus_sel_data_mem,alu_sel_add,alu_sel_sub,alu_sel_nop,alu_sel_pass1,alu_sel_pass2} = sig;
+  assign {retire,halt,inc_pc,branch_en,reg_file_wr_en,pipeline_advance,dbus_sel_alu,dbus_sel_data_mem,alu_sel_add,alu_sel_sub,alu_sel_nop,alu_sel_pass1,alu_sel_pass2} = sig;
