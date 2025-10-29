@@ -1,4 +1,4 @@
-module top_dff_async_rst
+module top_dff_async_reset
 #(parameter data_width = 8)(); //width 1 byte
 
 //create buses of proper width
@@ -7,7 +7,7 @@ logic clk, rst, wr_en; //control signals
 logic [data_width-1:0] h; //
 
 //Instantiate the dff
-dff_async_reset#(.WIDTH(data_width)) dut_dff(.*)
+dff_async_reset#(.WIDTH(data_width)) dut_dff(.*);
 
 // create clock signal for dff
 initial begin
@@ -31,9 +31,13 @@ end
 
 // reset test - enable reset then disable
 initial begin
-    rst = 1'b0; // reset enabled for several clock cycles
-    repeat(10)@(negedge clk); // repeat for a few more clock cycles
-    rst = 1'b1; // reset disabled
+    //Assume values in register at start are undefined, not zero
+    rst = 1'b1; // reset disabled at start
+    repeat(100)@(negedge clk);
+    rst = 1'b0; // reset test
+    repeat(10)@(negedge clk);
+    $stop(); //pause simulation, optional
+    //$finish() also works, but will prompt to exit Questa
 end
 
 // testing the enable - alternate between both states
@@ -65,6 +69,5 @@ always @(posedge clk) begin
         default: assert(q == '0) else $error("dff is not resetting");
     endcase
 end
-
 
 endmodule
