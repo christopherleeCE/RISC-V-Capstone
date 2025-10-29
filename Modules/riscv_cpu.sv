@@ -7,6 +7,9 @@ module riscv_cpu;
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
     `include "sig_declare.inc";
+
+    //a 'PP' mean post pipline (reg), so RS1_DATA goes into a pipeline reg, then on the out is 'RS1_DATA_PP'
+    //is the output of that reg and if 'RS1_DATA_PP' goes into a pipeline reg then the output is 'RS1_DATA_PP_PP'
     logic [31:0] PC;
     logic [31:0] INSTR;
     logic [31:0] INSTR_PP;
