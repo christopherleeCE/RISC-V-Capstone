@@ -35,6 +35,7 @@ module riscv_cpu;
     // TODO will place these control signals in microcode to be transferred to sig file later
     // or maybe just make them part of the sig file directly
     // letters on the end represent which stage of the pipeline they belong to
+    // f = fetch, d = decode, e = execute, m = memory, w = writeback
     logic [2:0] alu_control_d, alu_control_e;
     logic zero_flag_e;
 
