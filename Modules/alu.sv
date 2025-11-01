@@ -2,8 +2,7 @@ module alu
 #(
     parameter WIDTH = 32,
     parameter CONTROL = 3
-    )
-(
+)(
     input logic [WIDTH-1:0] operand_a, operand_b,
     //input logic alu_sel_add,
     //input logic alu_sel_sub,
