@@ -32,6 +32,12 @@ module riscv_cpu;
     logic [31:0] DATA_MEM_OUT_PP;
     logic clk, rst;
 
+    // TODO will place these control signals in microcode to be transferred to sig file later
+    // or maybe just make them part of the sig file directly
+    // letters on the end represent which stage of the pipeline they belong to
+    logic [2:0] alu_control_d, alu_control_e;
+    logic zero_flag_e;
+
     pc #(
         .WIDTH(32)
     ) pc_reg (
@@ -115,15 +121,18 @@ module riscv_cpu;
     and func7 instead of individual signals to reduce the number of signals being passed into the module. - Edgar */
 
     alu #(
-        .WIDTH(32)
+        .WIDTH(32),
+        .CONTROL(3)
     ) alu_again_colon_closing_parenthesis (
         .operand_a(RS1_DATA_PP),
         .operand_b(RS2_DATA_PP),
-        .alu_sel_add,
-        .alu_sel_sub,
-        .alu_sel_nop,
-        .alu_sel_pass1,
-        .alu_sel_pass2,
+        //.alu_sel_add,
+        //.alu_sel_sub,
+        //.alu_sel_nop,
+        //.alu_sel_pass1,
+        //.alu_sel_pass2,
+        .alu_control(alu_control_e),
+        .zero_flag(zero_flag_e),
         .result(ALU)
     );
 
