@@ -3,6 +3,12 @@
 # Produces: sig_declare.inc, ustore.sv, id.sv
 # Usage: python3 mkurom.py
 
+# Notes:
+# Single-bit signals set without =value become all-ones for their width. That matches reasonable intent.
+# Opcode parsing expects hex tokens (underscores allowed). It falls back to base-0 parse if needed.
+# Behavior and output formatting match the original Perl script closely.
+# Run from same directory as microcode.sh.
+
 import re
 import sys
 from collections import OrderedDict
