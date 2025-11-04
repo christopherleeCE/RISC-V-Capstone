@@ -119,7 +119,7 @@ module riscv_cpu;
 
     /* Please note NOP's are a pseudoinstruction in RISC-V handled by the assembler as an ADDI of 0 with the zero register
     back into the zero register, and it likely doesn't need its own signal. Also it may be worth considering using func3 
-    and func7 instead of individual signals to reduce the number of signals being passed into the module. - Edgar */
+    and func7 instead of individual signals to reduce the number of signals being passed into the module. */
 
     alu #(
         .WIDTH(32),
