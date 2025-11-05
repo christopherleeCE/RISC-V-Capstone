@@ -53,6 +53,13 @@ SIG pipeline_advance
 SIG dbus_sel_alu
 SIG dbus_sel_data_mem
 SIG data_mem_wr_en
+SIG alu_use_im
+SIG r_type
+SIG i_type
+SIG s_type
+SIG b_type
+SIG u_type
+SIG j_type
 
 NOP OPCODE 0x00
 dummy

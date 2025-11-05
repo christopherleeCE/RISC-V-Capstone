@@ -2,16 +2,16 @@
 //Do not edit under pain of losing your edits!
 
 module UID__ 
- # (UIP_WIDTH=4)
+ # (UIP_WIDTH=3)
 ( 
       input logic [6:0] opcode,
       output logic [UIP_WIDTH-1:0] uip 
             ); 
 always_comb begin
   unique case (opcode) inside
-    7'h00 :  uip = 4'd0 ;   // NOP
-    7'h01 :  uip = 4'd8 ;   // ADD
-    default:      uip = 4'd9 ;   // #UD fault
+    7'h00 :  uip = 3'd0 ;   // NOP
+    7'h01 :  uip = 3'd1 ;   // ADD
+    default:      uip = 3'd2 ;   // #UD fault
   endcase
 end
 endmodule  // UID__ 

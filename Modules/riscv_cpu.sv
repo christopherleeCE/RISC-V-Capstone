@@ -137,13 +137,14 @@ module riscv_cpu;
     back into the zero register, and it likely doesn't need its own signal. Also it may be worth considering using func3 
     and func7 instead of individual signals to reduce the number of signals being passed into the module. */
 
-    //TODO, implement mus for inputs of alu, inputs should either be from regfile and regfile, or regfile and immediate, imediate is "IM" from id_t
     alu #(
         .WIDTH(32),
         .CONTROL(3)
     ) alu_again_colon_closing_parenthesis (
         .operand_a(RS1_DATA_PP),
-        .operand_b(RS2_DATA_PP),
+        .operand_b(
+            alu_use_im ? IM : RS2_DATA_PP   //TODO, this should not be IM, but a post pipeline IM
+            ),
         //.alu_sel_add,
         //.alu_sel_sub,
         //.alu_sel_nop,

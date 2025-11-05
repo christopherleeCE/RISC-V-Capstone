@@ -2,26 +2,19 @@
 //Do not edit under pain of losing your edits!
 
 module US__ ( 
-      input logic [3:0] uip,
-      output logic [13:0] sig 
+      input logic [2:0] uip,
+      output logic [16:0] sig 
 
           );
 always_comb begin
   unique case ( uip ) 
 // ==== INSTRUCTION: NOP ====
-    4'd0: sig = 14'b00010000000000; // branch_en
-    4'd1: sig = 14'b00010000000000; // branch_en
-    4'd2: sig = 14'b00010000000000; // branch_en
-    4'd3: sig = 14'b00010000000000; // branch_en
-    4'd4: sig = 14'b00010000000000; // branch_en
-    4'd5: sig = 14'b00010000000000; // branch_en
-    4'd6: sig = 14'b00010000000000; // branch_en
-    4'd7: sig = 14'b00010000000000; // branch_en
+    3'd0: sig = 17'b10000000000000000; // dummy
 // ==== INSTRUCTION: ADD ====
-    4'd8: sig = 14'b10000000000000; // retire
+    3'd1: sig = 17'b10000000000000000; // dummy
 // ==== LABEL: UD_fault ====
-    4'd9: sig = 14'b11000000000000; // halt retire
-    default: sig = 14'd0;
+    3'd2: sig = 17'b10000000000000000; // dummy
+    default: sig = 17'd0;
   endcase
 end
 endmodule // US__ 
