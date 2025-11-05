@@ -43,6 +43,7 @@
 #You must add whatever microcode signals you use
 #
 
+SIG dummy
 SIG retire
 SIG halt
 SIG inc_pc
@@ -51,25 +52,14 @@ SIG reg_file_wr_en
 SIG pipeline_advance
 SIG dbus_sel_alu
 SIG dbus_sel_data_mem
-SIG alu_sel_add
-SIG alu_sel_sub
-SIG alu_sel_nop
-SIG alu_sel_pass1
-SIG alu_sel_pass2
 SIG data_mem_wr_en
 
 NOP OPCODE 0x00
-branch_en
-branch_en
-branch_en
-branch_en
-branch_en
-branch_en
-branch_en
-branch_en
+dummy
+
 
 ADD OPCODE 0x01
-retire
+dummy
 
 #
 # DO NOT delete this UD_fault microcode
@@ -77,7 +67,7 @@ retire
 # the mkrom program expects this to be defined
 #
 UD_fault:
-halt retire
+dummy
 
 
 

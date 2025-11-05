@@ -18,15 +18,19 @@ module riscv_cpu;
     logic [31:0] PC;
     logic [31:0] INSTR;
     logic [31:0] INSTR_PP;
-    logic [31:0] IR, ID;
-    logic [31:0] RS1_DATA;  //read1 from regfile
-    logic [31:0] RS1_DATA_PP;  //read1 from regfile after pipeline reg
-    logic [31:0] RS2_DATA;  //read2 from regfile
-    logic [31:0] RS2_DATA_PP;  //read2 from regfile after pipeline reg
-    logic [31:0] RS2_DATA_PP_PP;
-    logic [31:0] RD_DATA;   //input write to regfile
-    logic [31:0] ALU;   //output of alu
-    logic [31:0] ALU_PP;
+    logic [31:0] IR, UID;
+    logic [31:0] RS1;               //read addr of regfile 
+    logic [31:0] RS1_DATA;          //read1 from regfile
+    logic [31:0] RS1_DATA_PP;       //read1 from regfile after pipeline reg
+    logic [31:0] RS2;               //read addr of regfile
+    logic [31:0] RS2_DATA;          //read2 from regfile
+    logic [31:0] RS2_DATA_PP;       //read2 from regfile after pipeline reg
+    logic [31:0] RS2_DATA_PP_PP;    //read2 from regfile after 2pipeline reg
+    logic [31:0] RD;                //write addr of regfile
+    logic [31:0] RD_DATA;           //input write to regfile
+    logic [31:0] IM;
+    logic [31:0] ALU;               //output of alu
+    logic [31:0] ALU_PP;   
     logic [31:0] ALU_PP_PP;
     logic [31:0] DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_PP;
@@ -76,28 +80,40 @@ module riscv_cpu;
         .q(INSTR_PP)
     );
 
-    //TODO either the ID or the (ustore -> more hardware) needs to control datapath for instruciton types (R type, I type, etc), (i reccomend ustore -> more hardware) 
     //TODO grouping together the ustore output signals to prepare them for the cnrt_sig pipeline
     //-chris
 
     //given no seq engine, ID goes str8 into ustore
-    ID__ my_id ( .ir (IR), .uip(ID) );
-    US__ my_ustore ( .uip(ID), .sig(sig) );    
+    UID__ my_uid ( .ir (IR), .uip(UID) );
+    US__ my_ustore ( .uip(UID), .sig(sig) );
     //sig is all the control signals, see sig_declar.inc or "SIG" section in microcode for list
 
-    //reg address & instr type needs to be interpreted here
-
+    //muxing of reg addrs, and imediates
+    id_t my_id_t (
+            .instr(IR),
+            .r_type,
+            .i_type,
+            .s_type,
+            .b_type,
+            .u_type,
+            .j_type,
+            .rs1(RS1),
+            .rs2(RS2),
+            .rd(RD),
+            .im(IM)
+        );
+        
     //for rn hardcoded to R type instr
     reg_file #(
         .REG_BIT_WIDTH(32),
         .NUM_OF_REGS(32)
     ) my_reg_file (
-        .rs1_addr(IR[19:15]),
-        .rs2_addr(IR[24:20]),
+        .rs1_addr(RS1),
+        .rs2_addr(RS2),
         .rs1_data(RS1_DATA),
         .rs2_data(RS2_DATA),
         .rd_wr_en(reg_file_wr_en),
-        .rd_addr(IR[11:7]),
+        .rd_addr(RD), //TODO, THIS SHOULD NOT BE RD, BUT SOME POST PIPELINE REGISTER RD, AS PER "PPwithControl.png" IN GOOGLE DOC
         .rd_data(RD_DATA),
         .clk(clk),
         .rst(rst)
@@ -121,6 +137,7 @@ module riscv_cpu;
     back into the zero register, and it likely doesn't need its own signal. Also it may be worth considering using func3 
     and func7 instead of individual signals to reduce the number of signals being passed into the module. */
 
+    //TODO, implement mus for inputs of alu, inputs should either be from regfile and regfile, or regfile and immediate, imediate is "IM" from id_t
     alu #(
         .WIDTH(32),
         .CONTROL(3)
