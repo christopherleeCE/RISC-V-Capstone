@@ -1,0 +1,14 @@
+#-mkruom needs signals to be placed in "buckets", so for example alu_sel always needs to be declared in a way that it goes through 3 stages of the sig pipeline_advance
+-cntr_sig pipline
+-"new id" (proper istruction decoding for the ID stage to gett determine what goies into the alu and into the reg_file_wr_en)
+
+instr's to implement
+ADD
+ADDI
+OR
+AND
+SW
+LW
+JMP
+BEQ (not yet cus hazard control is hard :)
+NOP
