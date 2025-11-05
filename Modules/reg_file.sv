@@ -67,17 +67,15 @@ module reg_file #(
 
     //this is a genvar loop, its a tool in sv to use a forloop to generate modules (in this case to generate 31 regs)
     
+    // zero register -  a hardcoded zero
+    assign regs_out[0] = '0;
+
+    // generate the remaining registers
     genvar ii;
     generate
-        for(ii = 0; ii < NUM_OF_REGS; ii++) begin : gen_regs
-            if (ii == 0) begin // create the zero register
-                dff_async_reset #(.WIDTH(REG_BIT_WIDTH))
-                reg_ii (.d('0), .clk(clk), .rst(rst), .wr_en(rd_wr_en && (rd_addr == ii)), .q(regs_out[ii]));
-            end else begin // create the remaining registers
+        for(ii = 1; ii < NUM_OF_REGS; ii++) begin : gen_regs
                 dff_async_reset #(.WIDTH(REG_BIT_WIDTH)) 
                 reg_ii (.d(rd_data), .clk(clk), .rst(rst), .wr_en(rd_wr_en && (rd_addr == ii)), .q(regs_out[ii]));
-            end
-
         end
     endgenerate
 
