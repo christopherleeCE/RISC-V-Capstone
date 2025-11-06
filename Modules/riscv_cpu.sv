@@ -29,6 +29,7 @@ module riscv_cpu;
     logic [31:0] RD;                //write addr of regfile
     logic [31:0] RD_DATA;           //input write to regfile
     logic [31:0] IM;
+    logic [31:0] IM_PP;             //immediate after pipeline reg
     logic [31:0] ALU;               //output of alu
     logic [31:0] ALU_PP;   
     logic [31:0] ALU_PP_PP;
