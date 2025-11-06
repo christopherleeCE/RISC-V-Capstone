@@ -122,13 +122,13 @@ module riscv_cpu;
 /* < ID/EX > */ //====================================================================================================
 
     dff_async_reset #(
-        .WIDTH(64)
+        .WIDTH(96)
     ) id_ex_reg (
-        .d('{RS1_DATA, RS2_DATA}),
+        .d('{RS1_DATA, RS2_DATA, IM}),      // Include IM in pipeline
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q('{RS1_DATA_PP, RS2_DATA_PP})
+        .q('{RS1_DATA_PP, RS2_DATA_PP, IM_PP})
     );
 
     /* < ALU STARTS HERE > */
@@ -143,7 +143,7 @@ module riscv_cpu;
     ) alu_again_colon_closing_parenthesis (
         .operand_a(RS1_DATA_PP),
         .operand_b(
-            alu_use_im ? IM : RS2_DATA_PP   //TODO, this should not be IM, but a post pipeline IM
+            alu_use_im ? IM_PP : RS2_DATA_PP   // IM changed to IM_PP
             ),
         //.alu_sel_add,
         //.alu_sel_sub,
