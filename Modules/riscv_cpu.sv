@@ -56,16 +56,13 @@ module riscv_cpu;
 
     //should be converted to proper ROM at some point
     //as of rn idk if its async or not
-    memory #(
+    // response - This should now function as a ROM, and I believe it's async (no clk needed)
+    instruction_memory #(
         .BIT_WIDTH(32),
         .ENTRY_COUNT(32)
     ) instr_mem (
-        .readAddr(PC),
-        .writeAddr(32'h0),
-        .writeData(32'h0),
-        .writeEn(0),
-        .readData(INSTR),
-        .clk(clk)
+        .read_address(PC),
+        .read_data(INSTR),
     );
 
 /* < IF/ID > */ //====================================================================================================
@@ -168,8 +165,8 @@ module riscv_cpu;
         .q('{ALU_PP, RS2_DATA_PP_PP})
     );
 
-    //should be converted to proper ROM at some point
-    memory #(
+    //should be converted to proper RAM at some point
+    data_memory #(
         .BIT_WIDTH(32),
         .ENTRY_COUNT(32)
     ) data_mem (

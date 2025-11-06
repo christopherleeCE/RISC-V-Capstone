@@ -1,4 +1,8 @@
-module memory
+// This is the former memory module but renamed as the data memory
+// This should function as a RAM due to its option to write to it
+// A similar, read-only module has been created as the instruction memory
+
+module data_memory
   #( 
      parameter int BIT_WIDTH,
      parameter int ENTRY_COUNT,
@@ -20,6 +24,7 @@ module memory
    always @(posedge clk)
      if( writeEn )
        mem[writeAddr] <= writeData ; // probably should be non-blocking
+
    
 endmodule 
     
