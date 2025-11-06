@@ -29,6 +29,7 @@ module riscv_cpu;
     logic [31:0] RD;                //write addr of regfile
     logic [31:0] RD_DATA;           //input write to regfile
     logic [31:0] IM;
+    logic [31:0] IM_PP;             //immediate after pipeline reg
     logic [31:0] ALU;               //output of alu
     logic [31:0] ALU_PP;   
     logic [31:0] ALU_PP_PP;
@@ -119,13 +120,13 @@ module riscv_cpu;
 /* < ID/EX > */ //====================================================================================================
 
     dff_async_reset #(
-        .WIDTH(64)
+        .WIDTH(96)
     ) id_ex_reg (
-        .d('{RS1_DATA, RS2_DATA}),
+        .d('{RS1_DATA, RS2_DATA, IM}),      // Include IM in pipeline
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q('{RS1_DATA_PP, RS2_DATA_PP})
+        .q('{RS1_DATA_PP, RS2_DATA_PP, IM_PP})
     );
 
     /* < ALU STARTS HERE > */
@@ -140,7 +141,7 @@ module riscv_cpu;
     ) alu_again_colon_closing_parenthesis (
         .operand_a(RS1_DATA_PP),
         .operand_b(
-            alu_use_im ? IM : RS2_DATA_PP   //TODO, this should not be IM, but a post pipeline IM
+            alu_use_im ? IM_PP : RS2_DATA_PP   // IM changed to IM_PP
             ),
         //.alu_sel_add,
         //.alu_sel_sub,
