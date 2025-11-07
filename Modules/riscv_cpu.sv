@@ -63,7 +63,7 @@ module riscv_cpu;
         .ENTRY_COUNT(32)
     ) instr_mem (
         .read_address(PC),
-        .read_data(INSTR),
+        .read_data(INSTR)
     );
 
 /* < IF/ID > */ //====================================================================================================
@@ -159,8 +159,8 @@ module riscv_cpu;
     dff_async_reset #(
         .WIDTH(32)
     ) ex_mem_reg (
-        .d('{ALU, RS2_DATA_PP}),
-        .clk(clk),
+        .d('{ALU, RS2_DATA_PP}),      // TODO This assignment pattern compiles but fails in simulation. Using  
+        .clk(clk),                    // standard concatenation seems to resolve this
         .rst(rst),
         .wr_en(pipeline_advance),
         .q('{ALU_PP, RS2_DATA_PP_PP})
