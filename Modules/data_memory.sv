@@ -6,7 +6,7 @@ module data_memory
   #( 
      parameter int BIT_WIDTH,
      parameter int ENTRY_COUNT,
-     parameter int ADDR_WIDTH=$clog2(ENTRY_COUNT) 
+     parameter int ADDR_WIDTH=$clog2((BIT_WIDTH/8)*ENTRY_COUNT) //I think this is correct for byte-addressable mem. 
      )
    (
     input  logic [ADDR_WIDTH-1:0] readAddr,

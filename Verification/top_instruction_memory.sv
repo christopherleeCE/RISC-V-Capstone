@@ -35,7 +35,7 @@ end
 always @(negedge clk) begin
     //retrieve the output of the memory and display
     $display("output at address %d is %h", byte_addr, read_data);
-    if(byte_addr/4 == ENTRY_COUNT) begin
+    if(byte_addr/4 == ENTRY_COUNT-1) begin
         $stop(); //end the simulation after reaching end of memory
     end
 end

@@ -2,7 +2,7 @@ module instruction_memory
 #(
     parameter int BIT_WIDTH,
     parameter int ENTRY_COUNT,
-    parameter int ADDR_WIDTH=$clog2(ENTRY_COUNT*ENTRY_COUNT) 
+    parameter int ADDR_WIDTH=$clog2((BIT_WIDTH/8)*ENTRY_COUNT) // byte-addressable memory 
 ) 
 (
     input logic [ADDR_WIDTH-1:0] read_address,
