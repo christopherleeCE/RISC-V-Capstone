@@ -39,10 +39,6 @@ module riscv_cpu;
     logic clk, rst;
 
     // TODO will place these control signals in microcode to be transferred to sig file later
-    // or maybe just make them part of the sig file directly
-    // letters on the end represent which stage of the pipeline they belong to
-    // f = fetch, d = decode, e = execute, m = memory, w = writeback
-    logic [2:0] alu_control_d, alu_control_e;
     logic zero_flag_e;
 
     pc #(
@@ -117,7 +113,7 @@ module riscv_cpu;
         .rs2_data(RS2_DATA),
         .rd_wr_en(reg_file_wr_en),
         .rd_addr(RD), //TODO, THIS SHOULD NOT BE RD, BUT SOME POST PIPELINE REGISTER RD, AS PER "PPwithControl.png" IN GOOGLE DOC
-        .rd_data(RD_DATA),
+        .rd_data(RD_DATA), 
         .clk(clk),
         .rst(rst)
     );
@@ -142,18 +138,16 @@ module riscv_cpu;
 
     alu #(
         .WIDTH(32),
-        .CONTROL(3)
     ) alu_again_colon_closing_parenthesis (
         .operand_a(RS1_DATA_PP),
         .operand_b(
             alu_use_im ? IM_PP : RS2_DATA_PP   // IM changed to IM_PP
             ),
-        //.alu_sel_add,
-        //.alu_sel_sub,
-        //.alu_sel_nop,
-        //.alu_sel_pass1,
-        //.alu_sel_pass2,
-        .alu_control(alu_control_e),
+        .alu_sel_add,
+        .alu_sel_sub,
+        .alu_sel_and,
+        .alu_sel_or,
+        .alu_sel_slt,
         .zero_flag(zero_flag_e),
         .result(ALU)
     );

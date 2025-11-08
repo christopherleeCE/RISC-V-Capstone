@@ -60,6 +60,11 @@ SIG s_type
 SIG b_type
 SIG u_type
 SIG j_type
+SIG alu_sel_add
+SIG alu_sel_sub
+SIG alu_sel_and
+SIG alu_sel_or
+SIG alu_sel_slt
 
 NOP OPCODE 0x00
 dummy
