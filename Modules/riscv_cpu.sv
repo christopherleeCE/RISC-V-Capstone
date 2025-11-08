@@ -37,10 +37,10 @@ module riscv_cpu;
     logic [31:0] DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_PP;
 
-    logic [95:0] d2m_data;          //decode to memory data signals
-    logic [10:0] d2m_control;       //decode to memory control signals
-    logic [95:0] d2m_data_PP;       //decode to memory post pipeline
-    logic [10:0] d2m_control_PP;    //decode to memory control signals post pipeline
+    logic [95:0] d2e_data;          //decode to execute data signals
+    logic [10:0] d2e_control;       //decode to execute control signals
+    logic [95:0] d2e_data_PP;       //decode to execute post pipeline
+    logic [10:0] d2e_control_PP;    //decode to execute control signals post pipeline
 
     logic reg_file_wr_en_PP;
     logic alu_use_im_PP,
@@ -138,8 +138,8 @@ module riscv_cpu;
     );
 
     //preparing data and control signals for pipeline reg
-    assign d2m_data = {RS1_DATA, RS2_DATA, IM};
-    assign d2m_control = {
+    assign d2e_data = {RS1_DATA, RS2_DATA, IM};
+    assign d2e_control = {
         alu_use_im,
         alu_sel_add,
         alu_sel_sub,
@@ -158,25 +158,25 @@ module riscv_cpu;
     dff_async_reset #(
         .WIDTH(96)
     ) id_ex_reg (
-        .d(d2m_data),      // Include IM in pipeline
+        .d(d2e_data),      // Include IM in pipeline
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(d2m_data_PP)
+        .q(d2e_data_PP)
     );
 
     dff_async_reset #(
         .WIDTH(11)
     ) id_ex_control_reg (
-        .d(d2m_control),      // Include control signals in pipeline
+        .d(d2e_control),      // Include control signals in pipeline
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(d2m_control_PP)
+        .q(d2e_control_PP)
     );
 
     //unpacking data and control signals from pipeline reg
-    assign {RS1_DATA_PP, RS2_DATA_PP, IM_PP} = d2m_data_PP;
+    assign {RS1_DATA_PP, RS2_DATA_PP, IM_PP} = d2e_data_PP;
     assign {
         alu_use_im_PP,
         alu_sel_add_PP,
@@ -189,7 +189,7 @@ module riscv_cpu;
         dbus_sel_alu_PP,
         dbus_sel_data_mem_P,
         reg_file_wr_en_PP
-                            } = d2m_control_PP;
+    } = d2e_control_PP;
 
     /* < ALU STARTS HERE > */
 
