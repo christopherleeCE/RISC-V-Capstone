@@ -81,6 +81,10 @@ module riscv_cpu;
     //TODO grouping together the ustore output signals to prepare them for the cnrt_sig pipeline
     //-chris
 
+    assign IR = INSTR_PP[6:0]; //OPCODE is last 7 bits of instr
+    //TODO when we start to test R-TYPE inst, UID will also take in func3 and func7
+    //For now, this will work for LW, SW, and BEQ since they don't need the func fields to specify ALU operation
+
     //given no seq engine, ID goes str8 into ustore
     UID__ my_uid ( .ir (IR), .uip(UID) );
     US__ my_ustore ( .uip(UID), .sig(sig) );
@@ -88,7 +92,7 @@ module riscv_cpu;
 
     //muxing of reg addrs, and imediates
     id_t my_id_t (
-            .instr(IR),
+            .instr(INSTR_PP),
             .r_type,
             .i_type,
             .s_type,
