@@ -36,10 +36,29 @@ module riscv_cpu;
     logic [31:0] ALU_PP_PP;
     logic [31:0] DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_PP;
+
+    logic [95:0] d2m_data;          //decode to memory data signals
+    logic [10:0] d2m_control;       //decode to memory control signals
+    logic [95:0] d2m_data_PP;       //decode to memory post pipeline
+    logic [10:0] d2m_control_PP;    //decode to memory control signals post pipeline
+
+    logic reg_file_wr_en_PP;
+    logic alu_use_im_PP,
+    logic alu_sel_add_PP,
+    logic alu_sel_sub_PP,
+    logic alu_sel_and_PP,
+    logic alu_sel_or_PP,
+    logic alu_sel_slt_PP,
+    logic branch_en_PP,
+    logic data_mem_wr_en_PP,
+    logic dbus_sel_alu_PP,
+    logic dbus_sel_data_mem_PP;
+
+
     logic clk, rst;
 
     // TODO will place these control signals in microcode to be transferred to sig file later
-    logic zero_flag_e;
+    logic zero_flag;
 
     pc #(
         .WIDTH(32)
@@ -118,17 +137,59 @@ module riscv_cpu;
         .rst(rst)
     );
 
+    //preparing data and control signals for pipeline reg
+    assign d2m_data = {RS1_DATA, RS2_DATA, IM};
+    assign d2m_control = {
+        alu_use_im,
+        alu_sel_add,
+        alu_sel_sub,
+        alu_sel_and,
+        alu_sel_or,
+        alu_sel_slt,
+        branch_en,
+        data_mem_wr_en,
+        dbus_sel_alu,
+        dbus_sel_data_mem,
+        reg_file_wr_en
+    };
+
 /* < ID/EX > */ //====================================================================================================
 
     dff_async_reset #(
         .WIDTH(96)
     ) id_ex_reg (
-        .d('{RS1_DATA, RS2_DATA, IM}),      // Include IM in pipeline
+        .d(d2m_data),      // Include IM in pipeline
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q('{RS1_DATA_PP, RS2_DATA_PP, IM_PP})
+        .q(d2m_data_PP)
     );
+
+    dff_async_reset #(
+        .WIDTH(11)
+    ) id_ex_control_reg (
+        .d(d2m_control),      // Include control signals in pipeline
+        .clk(clk),
+        .rst(rst),
+        .wr_en(pipeline_advance),
+        .q(d2m_control_PP)
+    );
+
+    //unpacking data and control signals from pipeline reg
+    assign {RS1_DATA_PP, RS2_DATA_PP, IM_PP} = d2m_data_PP;
+    assign {
+        alu_use_im_PP,
+        alu_sel_add_PP,
+        alu_sel_sub_PP,
+        alu_sel_and_PP,
+        alu_sel_or_PP,
+        alu_sel_slt_PP,
+        branch_en_PP,
+        data_mem_wr_en_PP,
+        dbus_sel_alu_PP,
+        dbus_sel_data_mem_P,
+        reg_file_wr_en_PP
+                            } = d2m_control_PP;
 
     /* < ALU STARTS HERE > */
 
@@ -141,14 +202,14 @@ module riscv_cpu;
     ) alu_again_colon_closing_parenthesis (
         .operand_a(RS1_DATA_PP),
         .operand_b(
-            alu_use_im ? IM_PP : RS2_DATA_PP   // IM changed to IM_PP
+            alu_use_im_PP ? IM_PP : RS2_DATA_PP   // IM changed to IM_PP
             ),
-        .alu_sel_add,
-        .alu_sel_sub,
-        .alu_sel_and,
-        .alu_sel_or,
-        .alu_sel_slt,
-        .zero_flag(zero_flag_e),
+        .alu_sel_add(alu_sel_add_PP),
+        .alu_sel_sub(alu_sel_sub_PP),
+        .alu_sel_and(alu_sel_and_PP),
+        .alu_sel_or(alu_sel_or_PP),
+        .alu_sel_slt(alu_sel_slt_PP),
+        .zero_flag(zero_flag),
         .result(ALU)
     );
 
