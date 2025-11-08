@@ -18,7 +18,8 @@ module riscv_cpu;
     logic [31:0] PC;
     logic [31:0] INSTR;
     logic [31:0] INSTR_PP;
-    logic [31:0] IR, UID;
+    logic [6:0] OP;
+    logic [31:0] UID;
     logic [31:0] RS1;               //read addr of regfile 
     logic [31:0] RS1_DATA;          //read1 from regfile
     logic [31:0] RS1_DATA_PP;       //read1 from regfile after pipeline reg
@@ -81,12 +82,12 @@ module riscv_cpu;
     //TODO grouping together the ustore output signals to prepare them for the cnrt_sig pipeline
     //-chris
 
-    assign IR = INSTR_PP[6:0]; //OPCODE is last 7 bits of instr
+    assign OP = INSTR_PP[6:0]; //OPCODE is last 7 bits of instr
     //TODO when we start to test R-TYPE inst, UID will also take in func3 and func7
     //For now, this will work for LW, SW, and BEQ since they don't need the func fields to specify ALU operation
 
     //given no seq engine, ID goes str8 into ustore
-    UID__ my_uid ( .ir (IR), .uip(UID) );
+    UID__ my_uid ( .ir (OP), .uip(UID) );
     US__ my_ustore ( .uip(UID), .sig(sig) );
     //sig is all the control signals, see sig_declar.inc or "SIG" section in microcode for list
 
