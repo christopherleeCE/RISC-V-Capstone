@@ -42,6 +42,12 @@ module riscv_cpu;
     logic [95:0] d2e_data_PP;       //decode to execute post pipeline
     logic [10:0] d2e_control_PP;    //decode to execute control signals post pipeline
 
+    logic [63:0] e2m_data;          //execute to memory data signals
+    logic [3:0] e2m_control;       //execute to memory control signals
+    logic [63:0] e2m_data_PP;       //execute to memory post pipeline
+    logic [3:0] e2m_control_PP;    //execute to memory control signals post pipeline    
+
+    //control signals after 1 pipeline reg
     logic reg_file_wr_en_PP;
     logic alu_use_im_PP,
     logic alu_sel_add_PP,
@@ -54,6 +60,11 @@ module riscv_cpu;
     logic dbus_sel_alu_PP,
     logic dbus_sel_data_mem_PP;
 
+    //control signals after 2 pipeline regs
+    logic data_mem_wr_en_PP_PP;
+    logic dbus_sel_alu_PP_PP;
+    logic dbus_sel_data_mem_PP_PP;
+    logic reg_file_wr_en_PP_PP;
 
     logic clk, rst;
 
@@ -213,18 +224,46 @@ module riscv_cpu;
         .result(ALU)
     );
 
+    //preparing data and control signals for pipeline reg
+    assign e2m_data = {ALU, RS2_DATA_PP};
+    assign e2m_control = {
+        data_mem_wr_en_PP,
+        dbus_sel_alu_PP,
+        dbus_sel_data_mem_PP,
+        reg_file_wr_en_PP
+    };    
+
 /* < EX/MEM > */ //====================================================================================================
 
     //not sure but i think we may not need a pipeline reg here because of the nature of the data_mem
     dff_async_reset #(
-        .WIDTH(32)
+        .WIDTH(64)
     ) ex_mem_reg (
-        .d('{ALU, RS2_DATA_PP}),      // TODO This assignment pattern compiles but fails in simulation. Using  
-        .clk(clk),                    // standard concatenation seems to resolve this
+        .d(e2m_data),       
+        .clk(clk),                   
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q('{ALU_PP, RS2_DATA_PP_PP})
+        .q(e2m_data_PP)
     );
+
+    dff_async_reset #(
+        .WIDTH(4)
+    ) ex_mem_control_reg (
+        .d(e2m_control),      // Include control signals in pipeline
+        .clk(clk),
+        .rst(rst),
+        .wr_en(pipeline_advance),
+        .q(e2m_control_PP)
+    );
+
+    //unpacking data and control signals from pipeline reg
+    assign {ALU_PP, RS2_DATA_PP_PP} = e2m_data_PP;
+    assign {
+        data_mem_wr_en_PP_PP,
+        dbus_sel_alu_PP_PP,
+        dbus_sel_data_mem_PP_PP,
+        reg_file_wr_en_PP_PP
+    } = e2m_control_PP;     
 
     //should be converted to proper RAM at some point
     data_memory #(
@@ -234,7 +273,7 @@ module riscv_cpu;
         .readAddr(ALU_PP),
         .writeAddr(ALU_PP),
         .writeData(RS2_DATA_PP_PP),
-        .writeEn(data_mem_wr_en),
+        .writeEn(data_mem_wr_en_PP_PP),
         .readData(DATA_MEM_OUT),
         .clk(clk)
     );
