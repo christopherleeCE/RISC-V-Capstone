@@ -15,7 +15,7 @@ module pc #(parameter int WIDTH = 32)
 
     logic [WIDTH-1:0] ff_d, ff_q;
 
-    assign ff_d = wr_en ? d : (ff_q + 1);
+    assign ff_d = wr_en ? d : (ff_q + 4);
 
     dff_async_reset #(
         .WIDTH(WIDTH),
