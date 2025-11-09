@@ -23,7 +23,6 @@ module riscv_cpu;
     logic [31:0] PC_target;        //target PC for branches (calculated in execute stage)
     logic [31:0] INSTR;
     logic [31:0] INSTR_D;           //instruction after pipeline reg
-    logic [6:0] OP;
     logic [31:0] UID;
     logic [4:0] RS1;               //read addr of regfile 
     logic [31:0] RS1_DATA;          //read1 from regfile
@@ -89,7 +88,10 @@ module riscv_cpu;
     logic dbus_sel_data_mem_W;
     logic reg_file_wr_en_W;    
 
+    logic pipeline_advance; //when high, pipeline regs advance
     logic clk, rst;
+
+    assign pipeline_advance = 1'b1; //for rn, pipeline always advances
 
     //next pc logic
     //PC_target and zero_flag for branch instruction aren't known until EX stage
