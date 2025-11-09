@@ -14,79 +14,82 @@ module riscv_cpu;
     //TODO some bus declarations may be missing, and those dont show up in questa's console :( but that is a bridge we will burn l8r
     //a 'PP' mean post pipline (reg), so RS1_DATA goes into a pipeline reg, then on the out is 'RS1_DATA_PP'
     //is the output of that reg and if 'RS1_DATA_PP' goes into a pipeline reg then the output is 'RS1_DATA_PP_PP'
+
+    //new terminology:
+    // f=fetch, d=decode, e=execute, m=memory, w=writeback
     logic [31:0] PC;
     logic [31:0] INSTR;
-    logic [31:0] INSTR_PP;
+    logic [31:0] INSTR_D;           //instruction after pipeline reg
     logic [6:0] OP;
     logic [31:0] UID;
-    logic [31:0] RS1;               //read addr of regfile 
+    logic [4:0] RS1;               //read addr of regfile 
     logic [31:0] RS1_DATA;          //read1 from regfile
-    logic [31:0] RS1_DATA_PP;       //read1 from regfile after pipeline reg
-    logic [31:0] RS2;               //read addr of regfile
+    logic [31:0] RS1_DATA_E;       //read1 from regfile after pipeline reg
+    logic [4:0] RS2;               //read addr of regfile
     logic [31:0] RS2_DATA;          //read2 from regfile
-    logic [31:0] RS2_DATA_PP;       //read2 from regfile after pipeline reg
-    logic [31:0] RS2_DATA_PP_PP;    //read2 from regfile after 2pipeline reg
-    logic [31:0] RD;                //write addr of regfile
-    logic [31:0] RD_PP;             //write addr of regfile after pipeline reg
-    logic [31:0] RD_PP_PP;          //write addr of regfile after 2pipeline reg
-    logic [31:0] RD_PP_PP_PP;       //write addr of regfile after 3pipeline reg
+    logic [31:0] RS2_DATA_E;       //read2 from regfile after pipeline reg
+    logic [31:0] RS2_DATA_M;    //read2 from regfile after 2pipeline reg
+    logic [4:0] RD;                //write addr of regfile
+    logic [4:0] RD_E;             //write addr of regfile after pipeline reg
+    logic [4:0] RD_M;          //write addr of regfile after 2pipeline reg
+    logic [4:0] RD_W;       //write addr of regfile after 3pipeline reg
     logic [31:0] RD_DATA;           //input write to regfile
     logic [31:0] IM;
-    logic [31:0] IM_PP;             //immediate after pipeline reg
+    logic [31:0] IM_E;             //immediate after pipeline reg
     logic [31:0] ALU;               //output of alu
-    logic [31:0] ALU_PP;   
-    logic [31:0] ALU_PP_PP;
+    logic [31:0] ALU_M;   
+    logic [31:0] ALU_W;
     logic [31:0] DATA_MEM_OUT;
-    logic [31:0] DATA_MEM_OUT_PP;
+    logic [31:0] DATA_MEM_OUT_W;
 
-    logic [96:0] d2e_data;          //decode to execute data signals
-    logic [10:0] d2e_control;       //decode to execute control signals
-    logic [96:0] d2e_data_PP;       //decode to execute post pipeline
-    logic [10:0] d2e_control_PP;    //decode to execute control signals post pipeline
+    logic [100:0] d2e_data_D;          //decode to execute data signals
+    logic [10:0] d2e_control_D;       //decode to execute control signals
+    logic [100:0] d2e_data_E;       //decode to execute post pipeline
+    logic [10:0] d2e_control_E;    //decode to execute control signals post pipeline
 
-    logic [64:0] e2m_data;          //execute to memory data signals
-    logic [3:0] e2m_control;       //execute to memory control signals
-    logic [64:0] e2m_data_PP;       //execute to memory post pipeline
-    logic [3:0] e2m_control_PP;    //execute to memory control signals post pipeline  
+    logic [68:0] e2m_data_E;          //execute to memory data signals
+    logic [3:0] e2m_control_E;       //execute to memory control signals
+    logic [68:0] e2m_data_M;       //execute to memory post pipeline
+    logic [3:0] e2m_control_M;    //execute to memory control signals post pipeline  
 
-    logic [64:0] m2w_data;          //memory to writeback data signals
-    logic [2:0] m2w_control;       //memory to writeback control signals
-    logic [64:0] m2w_data_PP;       //memory to writeback post pipeline
-    logic [2:0] m2w_control_PP;    //memory to writeback control signals post pipeline    
+    logic [68:0] m2w_data_M;          //memory to writeback data signals
+    logic [2:0] m2w_control_M;       //memory to writeback control signals
+    logic [68:0] m2w_data_W;       //memory to writeback post pipeline
+    logic [2:0] m2w_control_W;    //memory to writeback control signals post pipeline    
 
     //control signals after 1 pipeline reg
-    logic reg_file_wr_en_PP;
-    logic alu_use_im_PP;
-    logic alu_sel_add_PP;
-    logic alu_sel_sub_PP;
-    logic alu_sel_and_PP;
-    logic alu_sel_or_PP;
-    logic alu_sel_slt_PP;
-    logic branch_en_PP;
-    logic data_mem_wr_en_PP;
-    logic dbus_sel_alu_PP;
-    logic dbus_sel_data_mem_PP;
+    logic reg_file_wr_en_E;
+    logic alu_use_im_E;
+    logic alu_sel_add_E;
+    logic alu_sel_sub_E;
+    logic alu_sel_and_E;
+    logic alu_sel_or_E;
+    logic alu_sel_slt_E;
+    logic branch_en_E;
+    logic data_mem_wr_en_E;
+    logic dbus_sel_alu_E;
+    logic dbus_sel_data_mem_E;
 
     //control signals after 2 pipeline regs
-    logic data_mem_wr_en_PP_PP;
-    logic dbus_sel_alu_PP_PP;
-    logic dbus_sel_data_mem_PP_PP;
-    logic reg_file_wr_en_PP_PP;
+    logic data_mem_wr_en_M;
+    logic dbus_sel_alu_M;
+    logic dbus_sel_data_mem_M;
+    logic reg_file_wr_en_M;
 
     //control signals after 3 pipeline regs
-    logic dbus_sel_alu_PP_PP_PP;
-    logic dbus_sel_data_mem_PP_PP_PP;
-    logic reg_file_wr_en_PP_PP_PP;    
+    logic dbus_sel_alu_W;
+    logic dbus_sel_data_mem_W;
+    logic reg_file_wr_en_W;    
 
     logic clk, rst;
 
-    // TODO will place these control signals in microcode to be transferred to sig file later
+    // TODO will place this control signal in microcode to be transferred to sig file later
     logic zero_flag;
 
     pc #(
         .WIDTH(32)
     ) pc_reg (
-        .d(ALU_PP), //TODO i put ALU_PP here as a placeholder, THIS CAN CHANGE!!! -chris
+        .d(ALU_M), //TODO i put ALU_M here as a placeholder, THIS CAN CHANGE!!! -chris
         .clk(clk),
         .rst(rst),
         .inc(inc_pc),
@@ -105,7 +108,7 @@ module riscv_cpu;
         .read_data(INSTR)
     );
 
-//represents pipeline registers
+//pipeline register
 /* < IF/ID > */ //====================================================================================================
 
     dff_async_reset #(
@@ -115,12 +118,12 @@ module riscv_cpu;
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(INSTR_PP)
+        .q(INSTR_D)
     );
 
 //====================================================================================================================    
 
-    assign OP = INSTR_PP[6:0]; //OPCODE is last 7 bits of instr
+    assign OP = INSTR_D[6:0]; //OPCODE is last 7 bits of instr
     //TODO when we start to test R-TYPE inst, UID will also take in func3 and func7
     //For now, this will work for LW, SW, and BEQ since they don't need the func fields to specify ALU operation
 
@@ -131,7 +134,7 @@ module riscv_cpu;
 
     //muxing of reg addrs, and imediates
     id_t my_id_t (
-            .instr(INSTR_PP),
+            .instr(INSTR_D),
             .r_type,
             .i_type,
             .s_type,
@@ -153,16 +156,16 @@ module riscv_cpu;
         .rs2_addr(RS2),
         .rs1_data(RS1_DATA),
         .rs2_data(RS2_DATA),
-        .rd_wr_en(reg_file_wr_en_PP_PP_PP), //this write en comes from the WB stage
-        .rd_addr(RD_PP_PP_PP), //TODO, THIS SHOULD NOT BE RD, BUT SOME POST PIPELINE REGISTER RD, AS PER "PPwithControl.png" IN GOOGLE DOC
+        .rd_wr_en(reg_file_wr_en_W),
+        .rd_addr(RD_W),
         .rd_data(RD_DATA), 
         .clk(clk),
         .rst(rst)
     );
 
     //preparing data and control signals for pipeline reg
-    assign d2e_data = {RS1_DATA, RS2_DATA, IM, RD};
-    assign d2e_control = {
+    assign d2e_data_D = {RS1_DATA, RS2_DATA, IM, RD};
+    assign d2e_control_D = {
         alu_use_im,
         alu_sel_add,
         alu_sel_sub,
@@ -179,42 +182,42 @@ module riscv_cpu;
 /* < ID/EX > */ //====================================================================================================
 
     dff_async_reset #(
-        .WIDTH(97)
+        .WIDTH(101)
     ) id_ex_reg (
-        .d(d2e_data),      // Include IM in pipeline
+        .d(d2e_data_D),      // Include IM in pipeline
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(d2e_data_PP)
+        .q(d2e_data_E)
     );
 
     dff_async_reset #(
         .WIDTH(11)
     ) id_ex_control_reg (
-        .d(d2e_control),      // Include control signals in pipeline
+        .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(d2e_control_PP)
+        .q(d2e_control_E)
     );
 
 //==================================================================================================================== 
 
     //unpacking data and control signals from pipeline reg
-    assign {RS1_DATA_PP, RS2_DATA_PP, IM_PP, RD_PP} = d2e_data_PP;
+    assign {RS1_DATA_E, RS2_DATA_E, IM_E, RD_E} = d2e_data_E;
     assign {
-        alu_use_im_PP,
-        alu_sel_add_PP,
-        alu_sel_sub_PP,
-        alu_sel_and_PP,
-        alu_sel_or_PP,
-        alu_sel_slt_PP,
-        branch_en_PP,
-        data_mem_wr_en_PP,
-        dbus_sel_alu_PP,
-        dbus_sel_data_mem_P,
-        reg_file_wr_en_PP
-    } = d2e_control_PP;
+        alu_use_im_E,
+        alu_sel_add_E,
+        alu_sel_sub_E,
+        alu_sel_and_E,
+        alu_sel_or_E,
+        alu_sel_slt_E,
+        branch_en_E,
+        data_mem_wr_en_E,
+        dbus_sel_alu_E,
+        dbus_sel_data_mem_E,
+        reg_file_wr_en_E
+    } = d2e_control_E;
 
     /* < ALU STARTS HERE > */
 
@@ -225,121 +228,121 @@ module riscv_cpu;
     alu #(
         .WIDTH(32),
     ) alu_again_colon_closing_parenthesis (
-        .operand_a(RS1_DATA_PP),
+        .operand_a(RS1_DATA_E),
         .operand_b(
-            alu_use_im_PP ? IM_PP : RS2_DATA_PP   // IM changed to IM_PP
+            alu_use_im_E ? IM_E : RS2_DATA_E   // IM changed to IM_E
             ),
-        .alu_sel_add(alu_sel_add_PP),
-        .alu_sel_sub(alu_sel_sub_PP),
-        .alu_sel_and(alu_sel_and_PP),
-        .alu_sel_or(alu_sel_or_PP),
-        .alu_sel_slt(alu_sel_slt_PP),
+        .alu_sel_add(alu_sel_add_E),
+        .alu_sel_sub(alu_sel_sub_E),
+        .alu_sel_and(alu_sel_and_E),
+        .alu_sel_or(alu_sel_or_E),
+        .alu_sel_slt(alu_sel_slt_E),
         .zero_flag(zero_flag),
         .result(ALU)
     );
 
     //preparing data and control signals for pipeline reg
-    assign e2m_data = {ALU, RS2_DATA_PP, RD_PP};
-    assign e2m_control = {
-        data_mem_wr_en_PP,
-        dbus_sel_alu_PP,
-        dbus_sel_data_mem_PP,
-        reg_file_wr_en_PP
+    assign e2m_data_E = {ALU, RS2_DATA_E, RD_E};
+    assign e2m_control_E = {
+        data_mem_wr_en_E,
+        dbus_sel_alu_E,
+        dbus_sel_data_mem_E,
+        reg_file_wr_en_E
     };    
 
 /* < EX/MEM > */ //====================================================================================================
 
     //not sure but i think we may not need a pipeline reg here because of the nature of the data_mem
     dff_async_reset #(
-        .WIDTH(65)
+        .WIDTH(69)
     ) ex_mem_reg (
-        .d(e2m_data),       
+        .d(e2m_data_E),       
         .clk(clk),                   
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(e2m_data_PP)
+        .q(e2m_data_M)
     );
 
     dff_async_reset #(
         .WIDTH(4)
     ) ex_mem_control_reg (
-        .d(e2m_control),      // Include control signals in pipeline
+        .d(e2m_control_E),      // Include control signals in pipeline
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(e2m_control_PP)
+        .q(e2m_control_M)
     );
 
 //==================================================================================================================== 
 
     //unpacking data and control signals from pipeline reg
-    assign {ALU_PP, RS2_DATA_PP_PP, RD_PP_PP} = e2m_data_PP;
+    assign {ALU_M, RS2_DATA_M, RD_M} = e2m_data_M;
     assign {
-        data_mem_wr_en_PP_PP,
-        dbus_sel_alu_PP_PP,
-        dbus_sel_data_mem_PP_PP,
-        reg_file_wr_en_PP_PP
-    } = e2m_control_PP;     
+        data_mem_wr_en_M,
+        dbus_sel_alu_M,
+        dbus_sel_data_mem_M,
+        reg_file_wr_en_M
+    } = e2m_control_M;     
 
     //should be converted to proper RAM at some point
     data_memory #(
         .BIT_WIDTH(32),
         .ENTRY_COUNT(32)
     ) data_mem (
-        .readAddr(ALU_PP),
-        .writeAddr(ALU_PP),
-        .writeData(RS2_DATA_PP_PP),
-        .writeEn(data_mem_wr_en_PP_PP),
+        .readAddr(ALU_M),
+        .writeAddr(ALU_M),
+        .writeData(RS2_DATA_M),
+        .writeEn(data_mem_wr_en_M),
         .readData(DATA_MEM_OUT),
         .clk(clk)
     );
 
     //preparing data and control signals for pipeline reg
-    assign m2w_data = {ALU_PP, DATA_MEM_OUT, RD_PP_PP};
-    assign m2w_control = {
-        dbus_sel_alu_PP_PP,
-        dbus_sel_data_mem_PP_PP,
-        reg_file_wr_en_PP_PP
+    assign m2w_data_M = {ALU_M, DATA_MEM_OUT, RD_M};
+    assign m2w_control_M = {
+        dbus_sel_alu_M,
+        dbus_sel_data_mem_M,
+        reg_file_wr_en_M
     };        
 
 /* < MEM/WB > */ //====================================================================================================
 
     dff_async_reset #(
-        .WIDTH(65)
+        .WIDTH(69)
     ) mem_wb_reg (
-        .d(m2w_data),
+        .d(m2w_data_M),
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(m2w_data_PP)
+        .q(m2w_data_W)
     );
 
     dff_async_reset #(
         .WIDTH(3)
     ) mem_wb_control_reg (
-        .d(m2w_control),      // Include control signals in pipeline
+        .d(m2w_control_M),      // Include control signals in pipeline
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(m2w_control_PP)
+        .q(m2w_control_W)
     );
 
 //====================================================================================================================     
 
     //unpacking data and control signals from pipeline reg
-    assign {ALU_PP_PP, DATA_MEM_OUT_PP, RD_PP_PP_PP} = m2w_data_PP;
+    assign {ALU_W, DATA_MEM_OUT_W, RD_W} = m2w_data_W;
     assign {
-        dbus_sel_alu_PP_PP_PP,
-        dbus_sel_data_mem_PP_PP_PP,
-        reg_file_wr_en_PP_PP_PP
-    } = m2w_control_PP;         
+        dbus_sel_alu_W,
+        dbus_sel_data_mem_W,
+        reg_file_wr_en_W
+    } = m2w_control_W;         
 
     //dbus mux
     always_comb begin
         unique case (1'b1)
 
-        dbus_sel_alu_PP_PP_PP        : RD_DATA = ALU_PP_PP;
-        dbus_sel_data_mem_PP_PP_PP   : RD_DATA = DATA_MEM_OUT_PP;
+        dbus_sel_alu_W        : RD_DATA = ALU_W;
+        dbus_sel_data_mem_W   : RD_DATA = DATA_MEM_OUT_W;
 
         endcase
     end
