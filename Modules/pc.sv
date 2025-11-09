@@ -9,21 +9,13 @@ module pc #(parameter int WIDTH = 32)
 
 (
     input logic [WIDTH-1:0] d,
-    input logic clk, rst, inc, wr_en, 
+    input logic clk, rst, wr_en,
     output logic [WIDTH-1:0] q
 );
 
     logic [WIDTH-1:0] ff_d, ff_q;
 
-    always_comb begin
-        unique case(1'b1)
-
-        inc:        ff_d = ff_q + 1;
-        wr_en:  ff_d = d;
-        default:    ff_d = ff_q;
-
-        endcase
-    end
+    assign ff_d = wr_en ? d : (ff_q + 1);
 
     dff_async_reset #(
         .WIDTH(WIDTH),
@@ -32,7 +24,7 @@ module pc #(parameter int WIDTH = 32)
         .d(ff_d),
         .clk(clk),
         .rst(rst),
-        .wr_en(inc || wr_en),
+        .wr_en(1'b1),
         .q(ff_q)
     );
 

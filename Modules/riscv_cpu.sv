@@ -18,6 +18,9 @@ module riscv_cpu;
     //new terminology:
     // f=fetch, d=decode, e=execute, m=memory, w=writeback
     logic [31:0] PC;
+    logic [31:0] PC_D;             //PC after pipeline reg
+    logic [31:0] PC_E;              //PC after pipeline reg
+    logic [31:0] PC_target;        //target PC for branches (calculated in execute stage)
     logic [31:0] INSTR;
     logic [31:0] INSTR_D;           //instruction after pipeline reg
     logic [6:0] OP;
@@ -42,9 +45,14 @@ module riscv_cpu;
     logic [31:0] DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_W;
 
-    logic [100:0] d2e_data_D;          //decode to execute data signals
+    logic zero_flag;
+
+    logic [63:0] f2d_data_F;          //fetch to decode data signals
+    logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
+
+    logic [132:0] d2e_data_D;          //decode to execute data signals
     logic [10:0] d2e_control_D;       //decode to execute control signals
-    logic [100:0] d2e_data_E;       //decode to execute post pipeline
+    logic [132:0] d2e_data_E;       //decode to execute post pipeline
     logic [10:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [68:0] e2m_data_E;          //execute to memory data signals
@@ -83,17 +91,16 @@ module riscv_cpu;
 
     logic clk, rst;
 
-    logic zero_flag;
-    logic inc_pc;
-
+    //next pc logic
+    //PC_target and zero_flag for branch instruction aren't known until EX stage
+    //TODO so don't forget to implement hazard handling for BEQ later
     pc #(
         .WIDTH(32)
     ) pc_reg (
-        .d(ALU_M), //TODO i put ALU_M here as a placeholder, THIS CAN CHANGE!!! -chris
+        .d(PC_target),
         .clk(clk),
         .rst(rst),
-        .inc(inc_pc),
-        .wr_en(branch_en),
+        .wr_en(branch_en && zero_flag),
         .q(PC)
     );
 
@@ -108,24 +115,30 @@ module riscv_cpu;
         .read_data(INSTR)
     );
 
+    //preparing data for pipeline reg
+    assign f2d_data_F = {INSTR, PC};
+
 //pipeline register
 /* < IF/ID > */ //====================================================================================================
 
     dff_async_reset #(
-        .WIDTH(32)
+        .WIDTH(64)
     ) instruction_reg (
-        .d(INSTR),
+        .d(f2d_data_F),
         .clk(clk),
         .rst(rst),
         .wr_en(pipeline_advance),
-        .q(INSTR_D)
+        .q(f2d_data_D)
     );
 
 //====================================================================================================================    
 
-    assign OP = INSTR_D[6:0]; //OPCODE is last 7 bits of instr
+    //unpacking IF/ID pipeline reg
+    assign {INSTR_D, PC_D} = f2d_data_D;
+
     //TODO when we start to test R-TYPE inst, UID will also take in func3 and func7
     //For now, this will work for LW, SW, and BEQ since they don't need the func fields to specify ALU operation
+    assign OP = INSTR_D[6:0]; //OPCODE is last 7 bits of instr
 
     //given no seq engine, ID goes str8 into ustore
     UID__ my_uid ( .ir (OP), .uip(UID) );
@@ -164,7 +177,7 @@ module riscv_cpu;
     );
 
     //preparing data and control signals for pipeline reg
-    assign d2e_data_D = {RS1_DATA, RS2_DATA, IM, RD};
+    assign d2e_data_D = {RS1_DATA, RS2_DATA, IM, RD, PC_D};
     assign d2e_control_D = {
         alu_use_im,
         alu_sel_add,
@@ -182,7 +195,7 @@ module riscv_cpu;
 /* < ID/EX > */ //====================================================================================================
 
     dff_async_reset #(
-        .WIDTH(101)
+        .WIDTH(133)
     ) id_ex_reg (
         .d(d2e_data_D),      // Include IM in pipeline
         .clk(clk),
@@ -204,7 +217,7 @@ module riscv_cpu;
 //==================================================================================================================== 
 
     //unpacking data and control signals from pipeline reg
-    assign {RS1_DATA_E, RS2_DATA_E, IM_E, RD_E} = d2e_data_E;
+    assign {RS1_DATA_E, RS2_DATA_E, IM_E, RD_E, PC_E} = d2e_data_E;
     assign {
         alu_use_im_E,
         alu_sel_add_E,
@@ -240,6 +253,9 @@ module riscv_cpu;
         .zero_flag(zero_flag),
         .result(ALU)
     );
+
+    //calculating target PC for branches
+    assign PC_target = PC_E + IM_E; //
 
     //preparing data and control signals for pipeline reg
     assign e2m_data_E = {ALU, RS2_DATA_E, RD_E};
