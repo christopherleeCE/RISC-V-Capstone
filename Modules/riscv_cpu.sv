@@ -239,7 +239,7 @@ module riscv_cpu;
     and func7 instead of individual signals to reduce the number of signals being passed into the module. */
 
     alu #(
-        .WIDTH(32),
+        .WIDTH(32)
     ) alu_again_colon_closing_parenthesis (
         .operand_a(RS1_DATA_E),
         .operand_b(
