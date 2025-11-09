@@ -32,7 +32,15 @@ opcodes_lines = []        # full lines that contain 'OPCODE'
 lines = []                # saved ucode lines as "upc <rest>"
 upc = 0
 
-for line in raw_lines:
+# === MODIFICATION START ===
+# We change from a 'for' loop to a 'while' loop to allow peeking ahead
+# and consuming multiple lines for a single OPCODE entry.
+
+i = 0
+while i < len(raw_lines):
+    line = raw_lines[i]
+    i += 1 # Consume the line immediately
+
     # strip comments
     line = re.sub(r'#.*', '', line)
     if re.match(r'^\s*$', line):
@@ -55,18 +63,19 @@ for line in raw_lines:
     m = re.match(r'^\s*CONST\s+(.*)', line)
     if m:
         names = re.split(r'\s+', m.group(1).strip())
-        for i, n in enumerate(names):
+        for i_const, n in enumerate(names): # Renamed 'i' to 'i_const'
             if n == '':
                 continue
-            constant[n] = i
+            constant[n] = i_const
         continue
 
     # label: "<name>:" becomes constant with current upc
+    # Must be checked before OPCODE
     m = re.match(r'^\s*(\S+):', line)
     if m:
         constant[m.group(1)] = upc
-        # if label-only line, skip (perl did next if /:/)
-        if ':' in line:
+        # The original script assumed a label-only line.
+        if ':' in line: # This check is from the original
             continue
 
     # OPCODE lines
@@ -76,12 +85,49 @@ for line in raw_lines:
             # perl set constant[label] = upc if /^\s*(\S+)\s+OPCODE/
             constant[m.group(1)] = upc
         opcodes_lines.append(line.rstrip('\n'))
-        continue
+        
+        # --- NEW LOGIC ---
+        # Consume subsequent lines as signals for this one ucode entry
+        ucode_signals = []
+        while i < len(raw_lines):
+            # Peek at the next line
+            peek_line = raw_lines[i]
+            peek_line_processed = re.sub(r'#.*', '', peek_line).strip()
 
-    # Everything else considered ucode line
+            if re.match(r'^\s*$', peek_line_processed):
+                # It's a blank line or comment-only, consume and continue
+                i += 1
+                continue
+
+            # Check if the line is a new directive (SIG, CONST, OPCODE, or label)
+            is_sig = re.search(r'\bSIG\d?\s', peek_line)
+            is_const = re.search(r'\bCONST\s', peek_line)
+            is_label = re.search(r':', peek_line) # Original logic
+            is_opcode = re.search(r'OPCODE', peek_line)
+
+            if is_sig or is_const or is_label or is_opcode:
+                # It's a new directive, stop consuming
+                break
+            
+            # It's a signal line, add its tokens and consume it
+            ucode_signals.extend(peek_line_processed.split())
+            i += 1 # IMPORTANT: Consume the line
+        
+        # After peeking, join all found signals into one entry
+        if ucode_signals:
+            full_ucode_line = " ".join(ucode_signals)
+            lines.append(f"{upc} {full_ucode_line}")
+            upc += 1
+        # --- END NEW LOGIC ---
+        
+        continue # Continue outer 'while' loop
+
+    # Everything else considered ucode line (e.g., lines after a label like UD_fault)
     if re.search(r'\S', line):
         lines.append(f"{upc} {line.rstrip()}")
         upc += 1
+        
+# === MODIFICATION END ===
 
 # compute ucode width (sum of individual widths)
 uwid = 0
