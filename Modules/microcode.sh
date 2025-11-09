@@ -46,7 +46,6 @@
 SIG dummy
 SIG retire
 SIG halt
-SIG inc_pc
 SIG branch_en
 SIG reg_file_wr_en
 SIG pipeline_advance

@@ -3,18 +3,18 @@
 
 module US__ ( 
       input logic [2:0] uip,
-      output logic [21:0] sig 
+      output logic [20:0] sig 
 
           );
 always_comb begin
   unique case ( uip ) 
 // ==== INSTRUCTION: NOP ====
-    3'd0: sig = 22'b1000000000000000000000; // dummy
+    3'd0: sig = 21'b100000000000000000000; // dummy
 // ==== INSTRUCTION: ADD ====
-    3'd1: sig = 22'b1000000000000000000000; // dummy
+    3'd1: sig = 21'b100000000000000000000; // dummy
 // ==== LABEL: UD_fault ====
-    3'd2: sig = 22'b1000000000000000000000; // dummy
-    default: sig = 22'd0;
+    3'd2: sig = 21'b100000000000000000000; // dummy
+    default: sig = 21'd0;
   endcase
 end
 endmodule // US__ 

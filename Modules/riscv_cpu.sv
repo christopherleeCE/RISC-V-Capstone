@@ -83,8 +83,8 @@ module riscv_cpu;
 
     logic clk, rst;
 
-    // TODO will place this control signal in microcode to be transferred to sig file later
     logic zero_flag;
+    logic inc_pc;
 
     pc #(
         .WIDTH(32)
