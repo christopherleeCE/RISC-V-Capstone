@@ -136,12 +136,8 @@ module riscv_cpu;
     //unpacking IF/ID pipeline reg
     assign {INSTR_D, PC_D} = f2d_data_D;
 
-    //TODO when we start to test R-TYPE inst, UID will also take in func3 and func7
-    //For now, this will work for LW, SW, and BEQ since they don't need the func fields to specify ALU operation
-    assign OP = INSTR_D[6:0]; //OPCODE is last 7 bits of instr
-
     //given no seq engine, ID goes str8 into ustore
-    UID__ my_uid ( .ir (OP), .uip(UID) );
+    UID__ my_uid ( .ir (INSTR_D), .uip(UID) );
     US__ my_ustore ( .uip(UID), .sig(sig) );
     //sig is all the control signals, see sig_declar.inc or "SIG" section in microcode for list
 
