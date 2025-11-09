@@ -170,21 +170,13 @@ for opl in opcodes_lines:
     instr = m.group(1)
     opcode_str = m.group(2)
     opcode_str = re.sub(r'[_\s]', '', opcode_str)  # remove underscores/spaces
-
-    # If opcode_str is hex (like 0x01), expand it; otherwise treat as 32-bit pattern
-    if re.fullmatch(r'0x[0-9A-Fa-f]+', opcode_str):
+    # interpret opcode_str as hex. Allow "0x" or plain hex
+    try:
         opcode_val = int(opcode_str, 16)
-        opcode_str = format(opcode_val, '032b')
-    elif re.fullmatch(r'[01?]{32}', opcode_str):
-        pass  # already a valid pattern
-    else:
-        print(f"Invalid opcode pattern '{opcode_str}' in instruction '{instr}'", file=sys.stderr)
-        sys.exit(1)
-
-    casex_lines.append(
-        f"    32'b{opcode_str} :  uip = {wid}'d{constant.get(instr, 0)} ;   // {instr}"
-    )
-
+    except ValueError:
+        # fallback: try int with base 0 (0b/0x) or decimal
+        opcode_val = int(opcode_str, 0)
+    casex_lines.append(f"    7'h{opcode_val:02X} :  uip = {wid}'d{constant.get(instr, 0)} ;   // {instr}")
 
 # default UD_fault
 ud_fault_val = constant.get("UD_fault", 0)
@@ -240,10 +232,10 @@ with open("./uid.sv", "w") as f:
     f.write("\n")
     f.write("module UID__ \n")
     f.write(f" # (UIP_WIDTH={wid})\n")
-    f.write("( \n      input logic [31:0] instr,\n")
+    f.write("( \n      input logic [6:0] opcode,\n")
     f.write("      output logic [UIP_WIDTH-1:0] uip \n")
     f.write("            ); \n")
-    f.write("always_comb begin\n  unique casez (instr)\n")
+    f.write("always_comb begin\n  unique case (opcode) inside\n")
     f.write(casex)
     f.write("  endcase\nend\n")
     f.write("endmodule  // UID__ \n")
