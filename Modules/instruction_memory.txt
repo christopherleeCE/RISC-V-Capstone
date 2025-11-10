@@ -1,8 +1,5 @@
-deadbeef
-face1234
-deadbeef
-face1234
-00000000
-00000000
-deadbeef
-face1234
+// memory data file (do not edit the following line - required for mem load use)
+// instance=/i_type_tb/instruction_memory
+// format=hex addressradix=h dataradix=h version=1.0 wordsperline=1 noaddress
+44444444
+11111111
