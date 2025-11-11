@@ -48,7 +48,6 @@ SIG retire
 SIG halt
 SIG branch_en
 SIG reg_file_wr_en
-SIG pipeline_advance
 SIG dbus_sel_alu
 SIG dbus_sel_data_mem
 SIG data_mem_wr_en
@@ -87,6 +86,13 @@ s_type
 alu_sel_add
 alu_use_im
 data_mem_wr_en
+
+ADDI OPCODE ???_????____?_????____?_????____000____?_????____001_0011
+i_type
+alu_sel_add 
+alu_use_im
+dbus_sel_alu
+reg_file_wr_en
 
 DUMMY OPCODE ???_????____?_????____?_????____010____?_????____000_0000
 dummy
