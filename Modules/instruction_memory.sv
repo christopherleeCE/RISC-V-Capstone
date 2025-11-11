@@ -2,7 +2,7 @@ module instruction_memory
 #(
     parameter int BIT_WIDTH,
     parameter int ENTRY_COUNT,
-    parameter int ADDR_WIDTH=$clog2((BIT_WIDTH/8)*ENTRY_COUNT) // byte-addressable memory 
+    parameter int ADDR_WIDTH=32 // byte-addressable memory 
 ) 
 (
     input logic [ADDR_WIDTH-1:0] read_address,
@@ -10,7 +10,7 @@ module instruction_memory
 );
 
 // Note: Entry count is in bytes currently
-reg [BIT_WIDTH-1:0] instr_mem [0:ENTRY_COUNT-1]; //instantiate the instruction memory
+logic [BIT_WIDTH-1:0] instr_mem [0:ENTRY_COUNT-1]; //instantiate the instruction memory
 
 initial begin
     $readmemh("instruction_memory.txt", instr_mem); //load the memory
