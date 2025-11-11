@@ -1,5 +1,6 @@
 // memory data file (do not edit the following line - required for mem load use)
-// instance=/i_type_tb/instruction_memory
+// instance=/i_type_tb/data_memory
 // format=hex addressradix=h dataradix=h version=1.0 wordsperline=1 noaddress
-00300093
-0000a103
+deadbeef
+000000ff
+deadbeef

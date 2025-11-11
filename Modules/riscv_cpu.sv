@@ -6,7 +6,10 @@
 `default_nettype none
 
 //prototype of basic pattern
-module riscv_cpu;
+module riscv_cpu
+(
+    input logic clk, rst //This works, right? For verification purposes?
+);
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
     `include "sig_declare.inc";
@@ -88,8 +91,9 @@ module riscv_cpu;
     logic dbus_sel_data_mem_W;
     logic reg_file_wr_en_W;    
 
+    // Apparently this is already declared in sig declare?
     logic pipeline_advance; //when high, pipeline regs advance
-    logic clk, rst;
+    // logic clk, rst; // moved to port list for verification
 
     assign pipeline_advance = 1'b1; //for rn, pipeline always advances
 
