@@ -15,7 +15,7 @@ instructions for now; to others doing verification, please feel free to test the
 module i_type_tb ();
 //constants
 parameter int CLOCK_PERIOD = 20;
-parameter int NUM_INSTRUCTIONS = 2; //Will go up to 14 for all I-type
+parameter int NUM_INSTRUCTIONS = 3; //Will go up to 14 for all I-type
 parameter int NUM_DATA_WORDS = 3;
 
 //declare the buses and signals
@@ -49,16 +49,17 @@ initial begin
     // list the instructions here:
     instruction_memory[NUM_INSTRUCTIONS-1:0] = 
     '{
-        32'h0000a103, //lw x2, 0(x1),
-        32'h00300093 //addi x1, x0, 3
+        32'h00000013, //addi x0, x0, 0    nop
+        32'h00402283, //lw x5, 4(x0)      lw t0, 4(zero)
+        32'h00000013  //addi x0, x0, 0    nop
     };
 
     //list the data memory here:
     data_memory[NUM_DATA_WORDS-1:0] =
     '{
-        32'hdeadbeef,
-        32'h000000ff,
-        32'hdeadbeef
+        32'hdeadbeef, //8
+        32'h000000ff, //4
+        32'hdeadbeef  //0
     };
     
     $writememh("instruction_memory.txt", instruction_memory); //transfer to instruction memory of CPU
