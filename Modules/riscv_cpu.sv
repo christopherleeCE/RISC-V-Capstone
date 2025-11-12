@@ -9,7 +9,7 @@
 module riscv_cpu
 (
     input wire clk, rst, //This has to be a wire for explicit net type declaration (according to Questa)
-    output logic ohalt //when this is asserted, a bad opcode was sent in. Please use in testbenching to stop CPU with an error
+    output logic ohalt //when this is asserted, CPU should stop execution. Please implement in testbench
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
@@ -91,14 +91,14 @@ module riscv_cpu
     logic reg_file_wr_en_W;
 
     // halt goes through pipeline
-    logic halt_F, halt_E, halt_M, halt_W;    
+    logic halt_D, halt_E, halt_M, halt_W;    
 
     logic pipeline_advance; //when high, pipeline regs advance
 
     // Before the first clock, halt is asserted by default... 
     // ...since no valid OPCODE has come from the fetch pipeline yet
     // Thus we have to wait for the first clock
-    assign halt_F = (halt && (PC != '0));
+    assign halt_D = (halt && (PC != '0));
 
     // once halt gets to end of pipeline, can stop CPU
     // (all instructions have fully gone through pipeline)
@@ -201,7 +201,7 @@ module riscv_cpu
         dbus_sel_alu,
         dbus_sel_data_mem,
         reg_file_wr_en,
-        halt_F
+        halt_D
     };
 
 /* < ID/EX > */ //====================================================================================================
