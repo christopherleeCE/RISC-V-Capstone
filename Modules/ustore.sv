@@ -3,26 +3,24 @@
 
 module US__ ( 
       input logic [2:0] uip,
-      output logic [19:0] sig 
+      output logic [17:0] sig 
 
           );
 always_comb begin
   unique case ( uip ) 
 // ==== INSTRUCTION: ADD ====
-    3'd0: sig = 20'b00001000010000010000; // r_type alu_sel_add reg_file_wr_en
+    3'd0: sig = 18'b001000010000010000; // r_type alu_sel_add reg_file_wr_en
 // ==== INSTRUCTION: SUB ====
-    3'd1: sig = 20'b00001000010000001000; // r_type alu_sel_sub reg_file_wr_en
+    3'd1: sig = 18'b001000010000001000; // r_type alu_sel_sub reg_file_wr_en
 // ==== INSTRUCTION: LW ====
-    3'd2: sig = 20'b00001010101000010000; // i_type alu_sel_add alu_use_im dbus_sel_data_mem reg_file_wr_en
+    3'd2: sig = 18'b001010101000010000; // i_type alu_sel_add alu_use_im dbus_sel_data_mem reg_file_wr_en
 // ==== INSTRUCTION: SW ====
-    3'd3: sig = 20'b00000001100100010000; // s_type alu_sel_add alu_use_im data_mem_wr_en
+    3'd3: sig = 18'b000001100100010000; // s_type alu_sel_add alu_use_im data_mem_wr_en
 // ==== INSTRUCTION: ADDI ====
-    3'd4: sig = 20'b00001100101000010000; // i_type alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
-// ==== INSTRUCTION: DUMMY ====
-    3'd5: sig = 20'b10000000000000000000; // dummy
+    3'd4: sig = 18'b001100101000010000; // i_type alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== LABEL: UD_fault ====
-    3'd6: sig = 20'b10000000000000000000; // dummy
-    default: sig = 20'd0;
+    3'd5: sig = 18'b100000000000000000; // halt
+    default: sig = 18'd0;
   endcase
 end
 endmodule // US__ 

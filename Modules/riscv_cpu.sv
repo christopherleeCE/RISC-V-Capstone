@@ -8,7 +8,8 @@
 //prototype of basic pattern
 module riscv_cpu
 (
-    input logic clk, rst //This works, right? For verification purposes?
+    input logic clk, rst, //This works, right? For verification purposes?
+    output logic ohalt //when this is asserted, a bad opcode was sent in. Please use in testbenching to stop CPU with an error
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
@@ -91,6 +92,7 @@ module riscv_cpu
 
     logic pipeline_advance; //when high, pipeline regs advance
 
+    assign ohalt = halt;
     assign pipeline_advance = 1'b1; //for rn, pipeline always advances
 
     //next pc logic

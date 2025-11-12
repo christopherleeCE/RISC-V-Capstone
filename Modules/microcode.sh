@@ -43,8 +43,15 @@
 #You must add whatever microcode signals you use
 #
 
-SIG dummy
-SIG retire
+#SIG dummy
+
+#SIG retire was initially used to show the status of the CPU
+#after all the microcycles of an instruction had been processed
+#we could probably find a way to use it in a pipeline sense
+#for now, i'll leave it commented
+
+#SIG retire
+
 SIG halt
 SIG branch_en
 SIG reg_file_wr_en
@@ -94,8 +101,8 @@ alu_use_im
 dbus_sel_alu
 reg_file_wr_en
 
-DUMMY OPCODE ???_????____?_????____?_????____010____?_????____000_0000
-dummy
+# DUMMY OPCODE ???_????____?_????____?_????____010____?_????____000_0000
+# dummy
 
 #
 # DO NOT delete this UD_fault microcode
@@ -103,7 +110,7 @@ dummy
 # the mkrom program expects this to be defined
 #
 UD_fault:
-dummy
+halt
 
 
 
