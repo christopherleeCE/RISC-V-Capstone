@@ -8,7 +8,7 @@
 //prototype of basic pattern
 module riscv_cpu
 (
-    input logic clk, rst, //This works, right? For verification purposes?
+    input wire clk, rst, //This has to be a wire for explicit net type declaration (according to Questa)
     output logic ohalt //when this is asserted, a bad opcode was sent in. Please use in testbenching to stop CPU with an error
 );
 
