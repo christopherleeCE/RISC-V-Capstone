@@ -24,6 +24,7 @@ always_comb begin
     alu_sel_and : result = operand_a & operand_b; // AND
     alu_sel_or : result = operand_a | operand_b; // OR
     alu_sel_slt : result = operand_a < operand_b; // SLT
+    default : result = '0;
     endcase
 end
 

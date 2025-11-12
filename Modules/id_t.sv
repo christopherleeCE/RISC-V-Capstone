@@ -62,6 +62,8 @@ module id_t(
                 im = {{11{instr[31]}}, instr[31], instr[19:12], instr[20], instr[30:21], 1'b0}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
+            default : {rs2,rs1,rd,im} = '0;
+
         endcase
     end
 

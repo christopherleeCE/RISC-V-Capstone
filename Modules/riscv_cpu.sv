@@ -25,7 +25,7 @@ module riscv_cpu
     logic [31:0] PC_target;        //target PC for branches (calculated in execute stage)
     logic [31:0] INSTR;
     logic [31:0] INSTR_D;           //instruction after pipeline reg
-    logic [31:0] UID;
+    logic [UIP_WIDTH-1:0] UIP;
     logic [4:0] RS1;               //read addr of regfile 
     logic [31:0] RS1_DATA;          //read1 from regfile
     logic [31:0] RS1_DATA_E;       //read1 from regfile after pipeline reg
@@ -141,8 +141,8 @@ module riscv_cpu
     assign {INSTR_D, PC_D} = f2d_data_D;
 
     //given no seq engine, ID goes str8 into ustore
-    UID__ my_uid ( .ir (INSTR_D), .uip(UID) );
-    US__ my_ustore ( .uip(UID), .sig(sig) );
+    UID__ my_uid ( .instr (INSTR_D), .uip(UIP) );
+    US__ my_ustore ( .uip(UIP), .sig(sig) );
     //sig is all the control signals, see sig_declar.inc or "SIG" section in microcode for list
 
     //muxing of reg addrs, and imediates
@@ -360,6 +360,7 @@ module riscv_cpu
         dbus_sel_alu_W        : RD_DATA = ALU_W;
         dbus_sel_data_mem_W   : RD_DATA = DATA_MEM_OUT_W;
 
+        default : RD_DATA = '0;
         endcase
     end
 
