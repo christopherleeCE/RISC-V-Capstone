@@ -21,12 +21,13 @@ parameter int NUM_INSTRUCTIONS = 3; //Will go up
 parameter int NUM_DATA_WORDS = 3;
 
 //declare the buses and signals
-logic clk, rst;
+logic clk, rst, ohalt;
 reg [31:0] instruction_memory [NUM_INSTRUCTIONS-1:0];
 reg [31:0] data_memory [NUM_DATA_WORDS-1:0];
 
 //golden model
 int instruction_track; //NOT the program counter, only for verification
+logic [31:0] data_mem_addr; //size of address for data memory - default 32 bit addressing
 logic [63:0] inst_and_result; //instruction being performed and ensuing computational result
 logic [63:0] if_id, id_ex, ex_mem, mem_wb; //transferring instruction and result
 
@@ -38,7 +39,7 @@ logic [6:0] opcode;
 
 
 //instantiate the CPU
-// riscv_cpu cpu_dut(.clk(clk), .rst(rst));
+riscv_cpu cpu_dut(.clk(clk), .rst(rst), .ohalt(ohalt));
 
 
 
@@ -51,6 +52,7 @@ initial begin
     clk = 1'b0;
 
     // list the instructions here:
+    //NOTE execution from bottom to top
     instruction_memory[NUM_INSTRUCTIONS-1:0] = 
     '{
         32'h00000013, //addi x0, x0, 0    nop
@@ -59,10 +61,11 @@ initial begin
     };
 
     //list the data memory here:
+    //NOTE address from bottom to top
     data_memory[NUM_DATA_WORDS-1:0] =
     '{
         32'hdeadbeef, //8
-        32'h000000ff, //4
+        32'haabbccdd, //4
         32'hdeadbeef  //0
     };
     
@@ -98,7 +101,14 @@ always@(posedge clk or negedge rst) begin
         //solve the instruction and feed result into the other half of the pipeline bus
         if (opcode == 7'b0000011) begin
            if(func3 == 3'b010) begin
-            inst_and_result[31:0] <= 32'haaaaaaaa; //placeholder
+
+            //LW-----------------------------------------------------------------------------------
+            data_mem_addr = cpu_dut.my_reg_file.regs_out[rs1] + {20'b0, imm}; //calculate address
+            // $display("memory address for LW: %h", data_mem_addr);
+            inst_and_result[31:0] <= data_memory[data_mem_addr[31:2]]; //load in word
+            // $display("loading in: %h", data_memory[data_mem_addr[31:2]]);
+
+
            end
         end else begin
             inst_and_result[31:0] <= 32'hdeadbeef; //irrelevant result
@@ -122,25 +132,33 @@ always @(negedge clk) begin
     $display("IF: %h, ID: %h, EX: %h, MEM: %h, WB: %h", inst_and_result[63:32], if_id[63:32], id_ex[63:32],
     ex_mem[63:32], mem_wb[63:32]);
 
-    if(mem_wb[63:32] == 32'hdeadbeef) begin
+    if (ohalt == 1'b1) begin
+        $display("Halt signal asserted, CPU has stopped");
+        $stop();
+
+    end else if(mem_wb[63:32] == 32'hdeadbeef) begin
+        //NOTE: This was created before the halt, this section could be removed
         $display("Verification complete.");
         $stop(); //program ends after all instructions are completed
 
     end else if (instruction_track > 4) begin
         //verification begins once first instruction has fully executed
         $display("Currently verifying: %h", mem_wb[63:32]);
-        $display("Expected result: %h", mem_wb[31:0]);
 
-        //breaking instruction into components
-        //we can reuse these wires because they operate on different clock edges
-        {imm, rs1, func3, rd, opcode} = mem_wb[63:32]; //I-TYPE
+        //I-type
+        {imm, rs1, func3, rd, opcode} = mem_wb[63:32];
+        $display("imm: %d, rs1: %d, func3: %d, rd: %d, opcode:%d",
+        imm, rs1, func3, rd, opcode);
         
         //identify the instruction and begin verification
         if (opcode == 7'b0000011) begin
-           if(func3 == 3'b010) begin
+            if(func3 == 3'b010) begin
                 //LW ------------------------------------
                 $display("Identified as LW");
-                assert()
+                $display("Contents of x%d:\n   CPU: %h\n   Model: %h",
+                rd, cpu_dut.my_reg_file.regs_out[rd], mem_wb[31:0]);
+                assert(cpu_dut.my_reg_file.regs_out[rd] == mem_wb[31:0])
+                else $error("LW failed.");
            end
         end else begin
                 //UNKNOWN ------------------------------

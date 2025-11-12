@@ -2,5 +2,5 @@
 // instance=/i_type_tb/data_memory
 // format=hex addressradix=h dataradix=h version=1.0 wordsperline=1 noaddress
 deadbeef
-000000ff
+aabbccdd
 deadbeef

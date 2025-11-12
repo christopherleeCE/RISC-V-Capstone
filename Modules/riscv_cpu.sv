@@ -3,12 +3,12 @@
 
 //this makes it so that the compiler will throw an error if we try to use a signal/bus that has not been declared,
 //this will help avoid errors where an undeclared bus gets implicitly declared as a wire
-`default_nettype none
+// `default_nettype none
 
 //prototype of basic pattern
 module riscv_cpu
 (
-    input wire clk, rst, //This has to be a wire for explicit net type declaration (according to Questa)
+    input logic clk, rst, //This has to be a wire for explicit net type declaration (according to Questa)
     output logic ohalt //when this is asserted, CPU should stop execution. Please implement in testbench
 );
 
