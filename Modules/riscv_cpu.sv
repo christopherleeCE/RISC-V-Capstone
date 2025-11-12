@@ -52,19 +52,19 @@ module riscv_cpu
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
 
     logic [132:0] d2e_data_D;          //decode to execute data signals
-    logic [10:0] d2e_control_D;       //decode to execute control signals
+    logic [11:0] d2e_control_D;       //decode to execute control signals
     logic [132:0] d2e_data_E;       //decode to execute post pipeline
-    logic [10:0] d2e_control_E;    //decode to execute control signals post pipeline
+    logic [11:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [68:0] e2m_data_E;          //execute to memory data signals
-    logic [3:0] e2m_control_E;       //execute to memory control signals
+    logic [4:0] e2m_control_E;       //execute to memory control signals
     logic [68:0] e2m_data_M;       //execute to memory post pipeline
-    logic [3:0] e2m_control_M;    //execute to memory control signals post pipeline  
+    logic [4:0] e2m_control_M;    //execute to memory control signals post pipeline  
 
     logic [68:0] m2w_data_M;          //memory to writeback data signals
-    logic [2:0] m2w_control_M;       //memory to writeback control signals
+    logic [3:0] m2w_control_M;       //memory to writeback control signals
     logic [68:0] m2w_data_W;       //memory to writeback post pipeline
-    logic [2:0] m2w_control_W;    //memory to writeback control signals post pipeline    
+    logic [3:0] m2w_control_W;    //memory to writeback control signals post pipeline    
 
     //control signals after 1 pipeline reg
     logic reg_file_wr_en_E;
@@ -88,11 +88,22 @@ module riscv_cpu
     //control signals after 3 pipeline regs
     logic dbus_sel_alu_W;
     logic dbus_sel_data_mem_W;
-    logic reg_file_wr_en_W;    
+    logic reg_file_wr_en_W;
+
+    // halt goes through pipeline
+    logic halt_F, halt_E, halt_M, halt_W;    
 
     logic pipeline_advance; //when high, pipeline regs advance
 
-    assign ohalt = halt;
+    // Before the first clock, halt is asserted by default... 
+    // ...since no valid OPCODE has come from the fetch pipeline yet
+    // Thus we have to wait for the first clock
+    assign halt_F = (halt && (PC != '0));
+
+    // once halt gets to end of pipeline, can stop CPU
+    // (all instructions have fully gone through pipeline)
+    assign ohalt = halt_W;
+
     assign pipeline_advance = 1'b1; //for rn, pipeline always advances
 
     //next pc logic
@@ -189,7 +200,8 @@ module riscv_cpu
         data_mem_wr_en,
         dbus_sel_alu,
         dbus_sel_data_mem,
-        reg_file_wr_en
+        reg_file_wr_en,
+        halt_F
     };
 
 /* < ID/EX > */ //====================================================================================================
@@ -205,7 +217,7 @@ module riscv_cpu
     );
 
     dff_async_reset #(
-        .WIDTH(11)
+        .WIDTH(12)
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
@@ -229,7 +241,8 @@ module riscv_cpu
         data_mem_wr_en_E,
         dbus_sel_alu_E,
         dbus_sel_data_mem_E,
-        reg_file_wr_en_E
+        reg_file_wr_en_E,
+        halt_E
     } = d2e_control_E;
 
     /* < ALU STARTS HERE > */
@@ -263,7 +276,8 @@ module riscv_cpu
         data_mem_wr_en_E,
         dbus_sel_alu_E,
         dbus_sel_data_mem_E,
-        reg_file_wr_en_E
+        reg_file_wr_en_E,
+        halt_E
     };    
 
 /* < EX/MEM > */ //====================================================================================================
@@ -280,7 +294,7 @@ module riscv_cpu
     );
 
     dff_async_reset #(
-        .WIDTH(4)
+        .WIDTH(5)
     ) ex_mem_control_reg (
         .d(e2m_control_E),      // Include control signals in pipeline
         .clk(clk),
@@ -297,7 +311,8 @@ module riscv_cpu
         data_mem_wr_en_M,
         dbus_sel_alu_M,
         dbus_sel_data_mem_M,
-        reg_file_wr_en_M
+        reg_file_wr_en_M,
+        halt_M
     } = e2m_control_M;     
 
     //should be converted to proper RAM at some point
@@ -318,7 +333,8 @@ module riscv_cpu
     assign m2w_control_M = {
         dbus_sel_alu_M,
         dbus_sel_data_mem_M,
-        reg_file_wr_en_M
+        reg_file_wr_en_M,
+        halt_M
     };        
 
 /* < MEM/WB > */ //====================================================================================================
@@ -334,7 +350,7 @@ module riscv_cpu
     );
 
     dff_async_reset #(
-        .WIDTH(3)
+        .WIDTH(4)
     ) mem_wb_control_reg (
         .d(m2w_control_M),      // Include control signals in pipeline
         .clk(clk),
@@ -350,7 +366,8 @@ module riscv_cpu
     assign {
         dbus_sel_alu_W,
         dbus_sel_data_mem_W,
-        reg_file_wr_en_W
+        reg_file_wr_en_W,
+        halt_W
     } = m2w_control_W;         
 
     //dbus mux
