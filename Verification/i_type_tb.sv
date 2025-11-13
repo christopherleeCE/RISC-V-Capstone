@@ -19,7 +19,7 @@ instructions for now; to others doing verification, please feel free to test the
 module i_type_tb ();
 //constants
 parameter int CLOCK_PERIOD = 20;
-parameter int NUM_INSTRUCTIONS = 7;
+parameter int NUM_INSTRUCTIONS = 14;
 parameter int NUM_DATA_WORDS = 3;
 
 //declare the buses and signals
@@ -172,7 +172,7 @@ always @(negedge clk) begin
         if(func3 == 3'b010) begin //----LW------------------------------------
             $display("Identified as LW.");
             assert(cpu_dut.my_reg_file.regs_out[rd] == post_wb[31:0]) $display("LW successful.");
-            else $error("LW failed.");
+            else $error("LW failed.");//compare contents
             $display("Contents of x%d:\n   CPU: %h\n   Model: %h",
             rd, cpu_dut.my_reg_file.regs_out[rd], post_wb[31:0]);
         end
@@ -181,7 +181,7 @@ always @(negedge clk) begin
         if(func3 == 3'b000) begin //-------ADDI-------------------------------
             $display("Identified as ADDI.");
             assert(cpu_dut.my_reg_file.regs_out[rd] == post_wb[31:0]) $display("ADDI successful.");
-            else $error("ADDI failed.");
+            else $error("ADDI failed.");//compare contents
             $display("Contents of x%d:\n   CPU: %h\n   Model: %h",
             rd, cpu_dut.my_reg_file.regs_out[rd], post_wb[31:0]);
         end
