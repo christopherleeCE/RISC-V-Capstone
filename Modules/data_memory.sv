@@ -17,13 +17,20 @@ module data_memory
     input  logic          clk
     );
 
-   logic [BIT_WIDTH-1:0] 	  mem[ENTRY_COUNT-1:0];
+   logic [BIT_WIDTH-1:0] data_mem [ENTRY_COUNT-1:0];
 
-   assign readData = mem[readAddr];
+   //Need this to initialize the memory
+   initial begin
+    $readmemh("data_memory.txt", data_mem); //load the memory
+   end
 
-   always @(posedge clk)
-     if( writeEn )
-       mem[writeAddr] <= writeData ; // probably should be non-blocking
+   assign readData = data_mem[readAddr[ADDR_WIDTH-1:2]];
+
+   always @(posedge clk) begin
+      if( writeEn == 1'b1) begin
+          data_mem[writeAddr[ADDR_WIDTH-1:2]] <= writeData ; // probably should be non-blocking
+      end
+   end
 
    
 endmodule 
