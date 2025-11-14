@@ -3,8 +3,8 @@ TESTING: TBD
 SUCCESSFUL TESTS: ADDI, LW, SW
 
 - This testbench has been a lot of trial and error, but I'm very happy with it so far. It should hopefully
-not be too hard to expand to other instruction type. Not the best, but looks like it gets the job done!
-Feel free to run it and let me know if you have any questions.
+not be too hard to expand to other instruction types. Feel free to run it and let me know if you have any
+questions.
 
 - Load up a program in the instruction memory along with any contents in the data memory. Please note that you
 have to adjust the constants for the testbench to fully cover all instructions and data, or you may get a
@@ -26,21 +26,22 @@ parameter int NUM_DATA_WORDS = 32;
 logic clk, rst, ohalt;
 
 //golden model
-int instruction_track; //NOT the program counter, only for verification
+int instruction_track;
 int instruction_failure;
-logic [31:0] data_mem_addr; //size of address for data memory - default 32 bit addressing
 logic [31:0] instruction_memory [NUM_INSTRUCTIONS-1:0];
 logic [31:0] data_memory [NUM_DATA_WORDS-1:0];
-logic [31:0] instruction, result; //instruction being performed, result of computation
-logic [31:0] if_id, id_ex, ex_mem, mem_wb, post_wb; //transferring instruction and result
+logic [31:0] if_id, id_ex, ex_mem, mem_wb, post_wb;
 
-//instruction components
-logic [11:0] imm_i, imm_s, imm_b; //immediate size vary by instruction type
-logic [19:0] imm_u, imm_j;
-logic [4:0] rs1, rs2, rd;
-logic [2:0] func3;
-logic [6:0] func7;
-logic [6:0] opcode;
+//components for computing instruction and verification
+logic [31:0] instruction, instruction_v;
+logic [11:0] imm_i, imm_i_v, imm_s, imm_s_v, imm_b, imm_b_v;
+logic [19:0] imm_u, imm_u_v, imm_j, imm_j_v;
+logic [4:0] rs1, rs1_v, rs2, rs2_v, rd, rd_v;
+logic [2:0] func3, func3_v;
+logic [6:0] func7, func7_v;
+logic [6:0] opcode, opcode_v;
+logic [31:0] data_mem_addr, data_mem_addr_v;
+logic [31:0] result, result_v;
 
 
 //instantiate the CPU
@@ -57,13 +58,10 @@ end
 
 //RESET/MEMORY SETUP ------------------------------------------------------------------------------------------------------
 initial begin
-    //WARNING - reset could potentially mask bugs, your choice.
+    //WARNING - reset could potentially mask bugs, your choice to comment or uncomment.
     rst = 1'b0; //reset the CPU and golden model during startup
     instruction_track = 0;
     instruction_failure = 0;
-
-    // NOTE: Instead of writing the program to memory, I might write the program in memory and read it into the testbench
-    //       Both work, but the format might be a little more user friendly.
 
     // instruction memory for testbench
     $readmemh("instruction_memory.txt", instruction_memory);
@@ -87,10 +85,18 @@ initial begin
     rst = 1'b1; //disable the reset
 end
 
+ /* How does this work? -------------------------------------------------------------------------------------------------------
+    The reference computes the instruction before the write back is complete. This helps the reference avoid/identify a data 
+    hazard by allowing all previous instructions to write back to the registers/data memory first. The fields and result of
+    each instruction is passed to a "post write back" stage, where the actual verification occurs by comparing the model's
+    output with the CPU's after writing is complete. The testbench obtains all necessary values by probing the components of
+    the CPU.
+*/
 
 //GOLDEN MODEL ----------------------------------------------------------------------------------------------------------------
 //pipeline to follow the CPU's pipeline (asynchronous reset too)
 always@(posedge clk or negedge rst) begin
+
     if(!rst) begin //resets the pipeline and tracker
         {if_id, id_ex, ex_mem, mem_wb} <= '0;
         instruction_track = 0;
@@ -100,38 +106,79 @@ always@(posedge clk or negedge rst) begin
         if (instruction_track <= NUM_INSTRUCTIONS-1) begin
             instruction = instruction_memory[instruction_track]; //current instruction
         end else begin
-            instruction = 32'hdeadbeef; //no more instructions
+            instruction = 32'hdeadbeef; //no more instructions (failsafe)
         end
 
-        //continues advancing instructions and associated results
+        //continues advancing instructions through pipeline
         if_id <= instruction;
         id_ex <= if_id;
         ex_mem <= id_ex;
         mem_wb <= ex_mem;
+
+        //advancing components and results to final verification stage
         post_wb <= mem_wb;
+        instruction_v <= instruction;
+        {imm_i_v, imm_s_v, imm_b_v, imm_u_v, imm_j_v} <= {imm_i, imm_s, imm_b, imm_u, imm_j};
+        {rs1_v, rs2_v, rd_v} <= {rs1, rs2, rd};
+        {func3_v, func7_v} <= {func3, func7};
+        opcode_v <= opcode;
+        result_v <= result;
+        data_mem_addr_v <= data_mem_addr;
         instruction_track += 1;
+
+    end
+end
+
+//computation of instruction
+always_comb begin
+    opcode = mem_wb[6:0]; //identify the instruction during write back
+
+    if (opcode == 7'b0010011) begin //----- I-TYPE ---------------------------------------
+
+        {imm_i, rs1, func3, rd} = mem_wb[31:7]; //breaking the instruction into components
+        if(func3 == 3'b000) begin //-------ADDI-------------------------------
+            result = cpu_dut.my_reg_file.regs_out[rs1] + {{20{imm_i[11]}}, imm_i};
+        end
+
+    end else if (opcode == 7'b0000011) begin //----I-TYPE----------------------------------
+
+        {imm_i, rs1, func3, rd} = mem_wb[31:7]; //breaking the instruction into components
+        if(func3 == 3'b010) begin //----LW------------------------------------
+            data_mem_addr = cpu_dut.my_reg_file.regs_out[rs1] + {20'b0, imm_i}; //calculate address
+            result = data_memory[data_mem_addr[31:2]]; //load in word
+        end
+
+    end else if (opcode == 7'b0100011) begin //------S-TYPE----------------------------------
+
+        {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = mem_wb[31:7]; //breaking the instruction into components
+        if(func3 == 3'b010) begin //----SW-------------------------------------
+            data_mem_addr = cpu_dut.my_reg_file.regs_out[rs1] + {20'b0, imm_s}; //calculate address
+            result = cpu_dut.my_reg_file.regs_out[rs2]; // pull value out of source register
+            data_memory[data_mem_addr[31:2]] <= result; // write to data memory of testbench
+
+        end
 
     end
 end
 
 
 //VERIFICATION -----------------------------------------------------------------------------------------------------------------
-//start simulation of the CPU
 always @(negedge clk) begin
 
     if (ohalt == 1'b1) begin //HALT SIGNAL --------------------------------------------------------------
         $display("\nWARNING: Recieved halt signal. Pausing verification.");
+        $display("Program counter: %d", cpu_dut.PC);
         $stop(); //pauses verification if CPU outputs halt signal
 
-    end else if(instruction_failure == 1) begin
-        $display("\nWARNING: Instruction not executed properly. Pausing verification.");
+    end else if(instruction_failure == 1) begin //INSTRUCTION FAILURE----------------------------------
+        $display("\nWARNING: Mismatch between model and CPU. Pausing verification.");
         $stop(); //pauses verification if CPU outputs halt signal
 
-    end else if(post_wb == 32'hdeadbeef) begin //NO MORE INSTRUCTIONS ----------------------------
+    end else if(post_wb == 32'hdeadbeef) begin //NO MORE INSTRUCTIONS ----------------------------------
 
-        //NOTE: This was created before the halt, this section could be removed. Will stop verification
-        //      automatically after exceeding specified number of instructions
-        $display("\nWARNING: No instructions left in testbench. Pausing verification.");
+        //Older code that is a bit redundant, but it stops the testbench automatically even if the halt signal
+        //from the CPU is disabled.
+        $display("\nWARNING: No further instructions. Pausing verification.");
         $stop(); //program ends after all instructions are completed
 
     end
@@ -140,63 +187,59 @@ always @(negedge clk) begin
     //Golden model pipeline - parallel to CPU
     $display("\nInstructions in pipeline:"); //seeing where the instructions are located
     $display("IF/ID: 0x%h, ID/EX: 0x%h, EX/MEM: 0x%h, MEM/WB: 0x%h", if_id, id_ex, ex_mem, mem_wb);
-    $display("Currently verifying: 0x%h", post_wb);
+    $display("Currently verifying: 0x%h", post_wb); //instruction in verification stage
 
-    //identify the instruction and begin verification
-    opcode = post_wb[6:0];
-    
-    if (opcode == 7'b0010011) begin //----- I-TYPE ---------------------------------------
+    //NOTE: the variables used here contain "_v"; they are the results from the final stage
 
-        {imm_i, rs1, func3, rd} = post_wb[31:7]; //breaking the instruction into components
-        $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode);
+    if (opcode_v == 7'b0010011) begin //----- I-TYPE ---------------------------------------
 
-        if(func3 == 3'b000) begin //-------ADDI-------------------------------
-            $display("\tIdentified as ADDI.");
+        $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i_v, rs1_v,
+        func3_v, rd_v, opcode_v); //instruction info
 
-            result = cpu_dut.my_reg_file.regs_out[rs1] + {{20{imm_i[11]}}, imm_i};
+        if(func3_v == 3'b000) begin //-------ADDI-------------------------------
+            if(imm_i_v == 20'd0 & rs1_v == 5'd0 & rd_v == 5'd0) begin
+                $display("\tIdentified as NOP.");
+            end else begin
+                $display("\tIdentified as ADDI.");
+            end
 
-            assert(cpu_dut.my_reg_file.regs_out[rd] == result) $display("ADDI successful.");
+            assert(cpu_dut.my_reg_file.regs_out[rd_v] == result_v) $display("ADDI/NOP successful.");
             else instruction_failure = 1;//compare contents of model register with CPU register
 
-            $display("Contents of x%d:\n   CPU: 0x%h\n   Model: 0x%h", rd, cpu_dut.my_reg_file.regs_out[rd], result);
+            $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd_v, cpu_dut.my_reg_file.regs_out[rd_v],
+            result_v); //model vs cpu
         end
 
-    end else if (opcode == 7'b0000011) begin //----I-TYPE----------------------------------
+    end else if (opcode_v == 7'b0000011) begin //----I-TYPE----------------------------------
 
-        {imm_i, rs1, func3, rd} = post_wb[31:7]; //breaking the instruction into components
-        $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode);
+        $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i_v, rs1_v,
+        func3_v, rd_v, opcode_v); //instruction info
 
-        if(func3 == 3'b010) begin //----LW------------------------------------
+        if(func3_v == 3'b010) begin //----LW------------------------------------
             $display("\tIdentified as LW.");
+            $display("Reading from data memory at address 0x%h.", data_mem_addr_v); //display addr
 
-            data_mem_addr = cpu_dut.my_reg_file.regs_out[rs1] + {20'b0, imm_i}; //calculate address
-            $display("Reading from data memory at address 0x%h.", data_mem_addr); //display addr
-            result = data_memory[data_mem_addr[31:2]]; //load in word
-
-            assert(cpu_dut.my_reg_file.regs_out[rd] == result) $display("LW successful.");
+            assert(cpu_dut.my_reg_file.regs_out[rd_v] == result_v) $display("LW successful.");
             else instruction_failure = 1;//compare contents of model register with CPU register
 
-            $display("Contents of x%d:\n   CPU: 0x%h\n   Model: 0x%h", rd, cpu_dut.my_reg_file.regs_out[rd], result);
+            $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd_v, cpu_dut.my_reg_file.regs_out[rd_v],
+            result_v); //model vs cpu
         end
 
-    end else if (opcode == 7'b0100011) begin //------S-TYPE----------------------------------
+    end else if (opcode_v == 7'b0100011) begin //------S-TYPE----------------------------------
 
-        {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = post_wb[31:7]; //breaking the instruction into components
-        $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, rs2: 0b%b, opcode: 0b%b", imm_s, rs2, rs1, func3, opcode);
+        $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, rs2: 0b%b, opcode: 0b%b", imm_s_v, rs2_v, rs1_v,
+        func3_v, opcode_v); //instruction info
 
-        if(func3 == 3'b010) begin //----SW-------------------------------------
+        if(func3_v == 3'b010) begin //----SW-------------------------------------
             $display("\tIdentified as SW.");
+            $display("Writing to data memory at address 0x%h.", data_mem_addr_v); //display addr
 
-            data_mem_addr = cpu_dut.my_reg_file.regs_out[rs1] + {20'b0, imm_s}; //calculate address
-            $display("Writing to data memory at address 0x%h.", data_mem_addr); //display addr
-            result = cpu_dut.my_reg_file.regs_out[rs2]; // pull value out of source register
-            data_memory[data_mem_addr[31:2]] <= result; // store in testbench memory, might remove this if not needed
-
-            assert(cpu_dut.data_mem.data_mem[data_mem_addr[31:2]] == result) $display("SW successful.");
+            assert(cpu_dut.data_mem.data_mem[data_mem_addr_v[31:2]] == result_v) $display("SW successful.");
             else instruction_failure = 1;//ensure source register was written to CPU memory
 
-            $display("Contents of data memory at 0x%h:\n   CPU: 0x%h\n   Model: 0x%h",
-            data_mem_addr, cpu_dut.data_mem.data_mem[data_mem_addr[31:2]], result); //compare memory contents
+            $display("Contents of data memory at 0x%h:\n\tCPU: 0x%h\n\tModel: 0x%h",
+            data_mem_addr_v, cpu_dut.data_mem.data_mem[data_mem_addr_v[31:2]], result_v); //compare memory contents
         end
 
     end else begin
@@ -210,7 +253,7 @@ always @(negedge clk) begin
         $display("\t\tx%d: 0x%h", k, cpu_dut.my_reg_file.regs_out[k]);
     end
 
-    // CPU DATA MEMORY DUMP
+    //CPU DATA MEMORY DUMP
     // WARNING: Can be very long, uncomment at your convenience.
     $display("CPU DATA MEMORY DUMP: ");
     for (int k = 0; k < NUM_DATA_WORDS; k++) begin
@@ -218,5 +261,4 @@ always @(negedge clk) begin
     end
 
 end
-
 endmodule
