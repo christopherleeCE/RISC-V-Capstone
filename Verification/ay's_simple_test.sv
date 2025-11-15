@@ -92,9 +92,9 @@ module top_riscv_cpu ();
       
       $display(" Data Memory " );
       for (i=0; i < 2048; i++ ) begin
-        if ( CPU.data_mem.mem[ i ] >= 0 )
+        if ( CPU.data_mem.data_mem[ i ] >= 0 )
         begin
-          $display(" addr:%h val:%h ",   i,CPU.data_mem.mem[i] );
+          $display(" addr:%h val:%h ",   i,CPU.data_mem.data_mem[i] );
         end
       end      
       
