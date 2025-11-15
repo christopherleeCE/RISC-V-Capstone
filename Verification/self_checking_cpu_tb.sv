@@ -123,8 +123,13 @@ always@(posedge clk or negedge rst) begin
         opcode_v <= opcode;
         result_v <= result;
         data_mem_addr_v <= data_mem_addr;
-        instruction_track += 1;
+        instruction_track += 1; 
 
+        if (opcode == 7'b0100011) begin //------RUN
+            if(func3 == 3'b010) begin //----SW-------------------------------------
+                data_memory[data_mem_addr[31:2]] <= result; // write to data memory of testbench
+            end
+        end
     end
 end
 
@@ -166,14 +171,11 @@ always_comb begin
         if(func3 == 3'b010) begin //----SW-------------------------------------
             data_mem_addr = cpu_dut.my_reg_file.regs_out[rs1] + {20'b0, imm_s}; //calculate address
             result = cpu_dut.my_reg_file.regs_out[rs2]; // pull value out of source register
-            data_memory[data_mem_addr[31:2]] <= result; // write to data memory of testbench
-
         end
 
     end else begin
 
         result = 32'hdeadbeef; //placeholder value, instruction ignored anyways in verification
-
     end
 end
 
@@ -300,6 +302,12 @@ always @(negedge clk) begin
     for (int k = 0; k < NUM_DATA_WORDS; k++) begin
         $display("\t\t0x%h: 0x%h", k*4, cpu_dut.data_mem.data_mem[k]);
     end
+
+    // //TB DATA MEMORY DUMP - for comparison
+    //  $display("TB DATA MEMORY DUMP: ");
+    // for (int k = 0; k < NUM_DATA_WORDS; k++) begin
+    //     $display("\t\t0x%h: 0x%h", k*4, data_memory[k]);
+    // end
 
 end
 endmodule
