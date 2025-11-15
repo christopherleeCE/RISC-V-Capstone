@@ -9,9 +9,9 @@ module US__ (
 always_comb begin
   unique case ( uip ) 
 // ==== INSTRUCTION: ADD ====
-    3'd0: sig = 18'b001000010000010000; // r_type alu_sel_add reg_file_wr_en
+    3'd0: sig = 18'b001100010000010000; // r_type alu_sel_add dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: SUB ====
-    3'd1: sig = 18'b001000010000001000; // r_type alu_sel_sub reg_file_wr_en
+    3'd1: sig = 18'b001100010000001000; // r_type alu_sel_sub dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: LW ====
     3'd2: sig = 18'b001010101000010000; // i_type alu_sel_add alu_use_im dbus_sel_data_mem reg_file_wr_en
 // ==== INSTRUCTION: SW ====
