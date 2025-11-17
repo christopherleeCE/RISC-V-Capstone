@@ -312,7 +312,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = post_wb[31:7];
         $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_s, rs2, rs1,
         func3, opcode); //instruction info
-        verification_address = {20{imm_s[11]}, imm_s} + rs1_data;
+        verification_address = {{20{imm_s[11]}}, imm_s} + rs1_data;
 
         if(func3 == 3'b010) begin //----SW-------------------------------------
             $display("\tIdentified as SW.");
@@ -322,7 +322,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         end
 
         //compare model vs CPU memory contents
-        $display("Contents of data memory position%h:\n\tCPU: 0x%h\n\tModel: 0x%h", verification_address, mem_data, rs2_data);
+        $display("Contents of data memory at 0x%h:\n\tCPU: 0x%h\n\tModel: 0x%h", verification_address, mem_data, rs2_data);
 
     end else begin
 
