@@ -24,6 +24,7 @@ module riscv_cpu
     logic [31:0] PC_E;              //PC after pipeline reg
     logic [31:0] PC_target;        //target PC for branches (calculated in execute stage)
     logic [31:0] INSTR;
+    logic [31:0] INSTR_REAL;      //real instruction after deciding whether to flush or not
     logic [31:0] INSTR_D;           //instruction after pipeline reg
     logic [UIP_WIDTH-1:0] UIP;
     logic [4:0] RS1;               //read addr of regfile 
@@ -46,7 +47,8 @@ module riscv_cpu
     logic [31:0] DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_W;
 
-    logic zero_flag;
+    logic zero_flag;               //from alu, is the result zero?
+    logic branch_taken;          //is a branch taken?
 
     logic [63:0] f2d_data_F;          //fetch to decode data signals
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
@@ -91,12 +93,30 @@ module riscv_cpu
     logic reg_file_wr_en_W;
 
     // halt goes through pipeline
-    logic halt_D, halt_E, halt_M, halt_W;    
+    logic halt_D, halt_E, halt_M, halt_W;
 
+    // flush signals for control hazard handling
+    logic flush_FD, flush_DE;  
+
+    // pipeline advance for data signals
     logic pipeline_advance; //when high, pipeline regs advance
 
-    // Before the first clock, halt is asserted by default... 
-    // ...since no valid OPCODE has come from the fetch pipeline yet
+    // separate advance signals for control pipeline regs
+    logic pipeline_advance_FD;
+    logic pipeline_advance_DE; 
+    logic pipeline_advance_EM;
+    logic pipeline_advance_MW;
+
+    //for rn, data pipeline always advances
+    assign pipeline_advance = 1'b1;
+
+    //can change control pipelining depending on if stalling is implemented
+    assign pipeline_advance_FD = pipeline_advance;
+    assign pipeline_advance_DE = pipeline_advance;
+    assign pipeline_advance_EM = pipeline_advance;
+    assign pipeline_advance_MW = pipeline_advance;
+
+    // Before the first clock, halt is asserted by default since no valid OPCODE has come from the fetch pipeline yet
     // Thus we have to wait for the first clock
     assign halt_D = (halt && (PC != '0));
 
@@ -104,18 +124,24 @@ module riscv_cpu
     // (all instructions have fully gone through pipeline)
     assign ohalt = halt_W;
 
-    assign pipeline_advance = 1'b1; //for rn, pipeline always advances
+    //branch logic
+    assign branch_taken = branch_en_E && zero_flag; //is the branch taken?
+
+    //Control Hazard Handling
+    assign flush_FD = branch_taken; //flush IF/ID pipeline reg if branch taken by inserting NOP
+    assign flush_DE = branch_taken; //flush ID/EX pipeline reg if branch taken by resetting control signals
+
+    //==================================================================================================================== 
+    // < IF STARTS HERE >
 
     //next pc logic
-    //PC_target and zero_flag for branch instruction aren't known until EX stage
-    //TODO so don't forget to implement hazard handling for BEQ later
     pc #(
         .WIDTH(32)
     ) pc_reg (
         .d(PC_target),
         .clk(clk),
         .rst(rst),
-        .wr_en(branch_en && zero_flag),
+        .wr_en(branch_taken), //normally, PC increments by 4 each cycle, but if branch taken, load PC_target
         .q(PC)
     );
 
@@ -130,8 +156,11 @@ module riscv_cpu
         .read_data(INSTR)
     );
 
+    //deciding whether to flush instruction or not
+    assign INSTR_REAL = flush_FD ? 32'h00000013 : INSTR; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
+
     //preparing data for pipeline reg
-    assign f2d_data_F = {INSTR, PC};
+    assign f2d_data_F = {INSTR_REAL, PC};
 
 //pipeline register
 /* < IF/ID > */ //====================================================================================================
@@ -142,7 +171,7 @@ module riscv_cpu
         .d(f2d_data_F),
         .clk(clk),
         .rst(rst),
-        .wr_en(pipeline_advance),
+        .wr_en(pipeline_advance_FD),
         .q(f2d_data_D)
     );
 
@@ -212,7 +241,7 @@ module riscv_cpu
         .d(d2e_data_D),      // Include IM in pipeline
         .clk(clk),
         .rst(rst),
-        .wr_en(pipeline_advance),
+        .wr_en(pipeline_advance_DE),
         .q(d2e_data_E)
     );
 
@@ -221,8 +250,8 @@ module riscv_cpu
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
-        .rst(rst),
-        .wr_en(pipeline_advance),
+        .rst(rst && !flush_DE), //flush on branch taken (DeMorgan's law for active low reset)
+        .wr_en(pipeline_advance_DE),
         .q(d2e_control_E)
     );
 
@@ -289,7 +318,7 @@ module riscv_cpu
         .d(e2m_data_E),       
         .clk(clk),                   
         .rst(rst),
-        .wr_en(pipeline_advance),
+        .wr_en(pipeline_advance_EM),
         .q(e2m_data_M)
     );
 
@@ -299,7 +328,7 @@ module riscv_cpu
         .d(e2m_control_E),      // Include control signals in pipeline
         .clk(clk),
         .rst(rst),
-        .wr_en(pipeline_advance),
+        .wr_en(pipeline_advance_EM),
         .q(e2m_control_M)
     );
 
@@ -345,7 +374,7 @@ module riscv_cpu
         .d(m2w_data_M),
         .clk(clk),
         .rst(rst),
-        .wr_en(pipeline_advance),
+        .wr_en(pipeline_advance_MW),
         .q(m2w_data_W)
     );
 
@@ -355,7 +384,7 @@ module riscv_cpu
         .d(m2w_control_M),      // Include control signals in pipeline
         .clk(clk),
         .rst(rst),
-        .wr_en(pipeline_advance),
+        .wr_en(pipeline_advance_MW),
         .q(m2w_control_W)
     );
 
