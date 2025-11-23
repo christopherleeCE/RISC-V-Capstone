@@ -54,9 +54,9 @@ module riscv_cpu
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
 
     logic [132:0] d2e_data_D;          //decode to execute data signals
-    logic [11:0] d2e_control_D;       //decode to execute control signals
+    logic [15:0] d2e_control_D;       //decode to execute control signals
     logic [132:0] d2e_data_E;       //decode to execute post pipeline
-    logic [11:0] d2e_control_E;    //decode to execute control signals post pipeline
+    logic [15:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [68:0] e2m_data_E;          //execute to memory data signals
     logic [4:0] e2m_control_E;       //execute to memory control signals
@@ -73,6 +73,10 @@ module riscv_cpu
     logic alu_use_im_E;
     logic alu_sel_add_E;
     logic alu_sel_sub_E;
+    logic alu_sel_mul_E;
+    logic alu_sel_mulh_E;
+    logic alu_sel_mulhsu_E;
+    logic alu_sel_mulhu_E;
     logic alu_sel_and_E;
     logic alu_sel_or_E;
     logic alu_sel_slt_E;
@@ -222,6 +226,10 @@ module riscv_cpu
         alu_use_im,
         alu_sel_add,
         alu_sel_sub,
+        alu_sel_mul,
+        alu_sel_mulh,
+        alu_sel_mulhsu,
+        alu_sel_mulhu,
         alu_sel_and,
         alu_sel_or,
         alu_sel_slt,
@@ -246,7 +254,7 @@ module riscv_cpu
     );
 
     dff_async_reset #(
-        .WIDTH(12)
+        .WIDTH(16)
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
@@ -263,6 +271,10 @@ module riscv_cpu
         alu_use_im_E,
         alu_sel_add_E,
         alu_sel_sub_E,
+        alu_sel_mul_E,
+        alu_sel_mulh_E,
+        alu_sel_mulhsu_E,
+        alu_sel_mulhu_E,
         alu_sel_and_E,
         alu_sel_or_E,
         alu_sel_slt_E,
@@ -289,6 +301,10 @@ module riscv_cpu
             ),
         .alu_sel_add(alu_sel_add_E),
         .alu_sel_sub(alu_sel_sub_E),
+        .alu_sel_mul(alu_sel_mul_E),
+        .alu_sel_mulh(alu_sel_mulh_E),
+        .alu_sel_mulhsu(alu_sel_mulhsu_E),
+        .alu_sel_mulhu(alu_sel_mulh_E),
         .alu_sel_and(alu_sel_and_E),
         .alu_sel_or(alu_sel_or_E),
         .alu_sel_slt(alu_sel_slt_E),

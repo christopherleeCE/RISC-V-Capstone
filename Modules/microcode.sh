@@ -67,6 +67,10 @@ SIG u_type
 SIG j_type
 SIG alu_sel_add
 SIG alu_sel_sub
+SIG alu_sel_mul
+SIG alu_sel_mulh
+SIG alu_sel_mulhsu
+SIG alu_sel_mulhu
 SIG alu_sel_and
 SIG alu_sel_or
 SIG alu_sel_slt
@@ -80,6 +84,30 @@ reg_file_wr_en
 SUB OPCODE 010_0000____?_????____?_????____000____?_????____011_0011
 r_type
 alu_sel_sub
+dbus_sel_alu
+reg_file_wr_en
+
+MUL OPCODE 000_0001____?_????____?_????____000____?_????____011_0011
+r_type
+alu_sel_mul
+dbus_sel_alu
+reg_file_wr_en
+
+MULH OPCODE 000_0001____?_????____?_????____001____?_????____011_0011
+r_type
+alu_sel_mulh
+dbus_sel_alu
+reg_file_wr_en
+
+MULHSU OPCODE 000_0001____?_????____?_????____010____?_????____011_0011
+r_type
+alu_sel_mulhsu
+dbus_sel_alu
+reg_file_wr_en
+
+MULHU OPCODE 000_0001____?_????____?_????____011____?_????____011_0011
+r_type
+alu_sel_mulhu
 dbus_sel_alu
 reg_file_wr_en
 
@@ -102,6 +130,7 @@ alu_sel_add
 alu_use_im
 dbus_sel_alu
 reg_file_wr_en
+
 
 # DUMMY OPCODE ???_????____?_????____?_????____010____?_????____000_0000
 # dummy

@@ -2,25 +2,33 @@
 //Do not edit under pain of losing your edits!
 
 module US__ ( 
-      input logic [2:0] uip,
-      output logic [17:0] sig 
+      input logic [3:0] uip,
+      output logic [21:0] sig 
 
           );
 always_comb begin
   unique case ( uip ) 
 // ==== INSTRUCTION: ADD ====
-    3'd0: sig = 18'b001100010000010000; // r_type alu_sel_add dbus_sel_alu reg_file_wr_en
+    4'd0: sig = 22'b0011000100000100000000; // r_type alu_sel_add dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: SUB ====
-    3'd1: sig = 18'b001100010000001000; // r_type alu_sel_sub dbus_sel_alu reg_file_wr_en
+    4'd1: sig = 22'b0011000100000010000000; // r_type alu_sel_sub dbus_sel_alu reg_file_wr_en
+// ==== INSTRUCTION: MUL ====
+    4'd2: sig = 22'b0011000100000001000000; // r_type alu_sel_mul dbus_sel_alu reg_file_wr_en
+// ==== INSTRUCTION: MULH ====
+    4'd3: sig = 22'b0011000100000000100000; // r_type alu_sel_mulh dbus_sel_alu reg_file_wr_en
+// ==== INSTRUCTION: MULHSU ====
+    4'd4: sig = 22'b0011000100000000010000; // r_type alu_sel_mulhsu dbus_sel_alu reg_file_wr_en
+// ==== INSTRUCTION: MULHU ====
+    4'd5: sig = 22'b0011000100000000001000; // r_type alu_sel_mulhu dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: LW ====
-    3'd2: sig = 18'b001010101000010000; // i_type alu_sel_add alu_use_im dbus_sel_data_mem reg_file_wr_en
+    4'd6: sig = 22'b0010101010000100000000; // i_type alu_sel_add alu_use_im dbus_sel_data_mem reg_file_wr_en
 // ==== INSTRUCTION: SW ====
-    3'd3: sig = 18'b000001100100010000; // s_type alu_sel_add alu_use_im data_mem_wr_en
+    4'd7: sig = 22'b0000011001000100000000; // s_type alu_sel_add alu_use_im data_mem_wr_en
 // ==== INSTRUCTION: ADDI ====
-    3'd4: sig = 18'b001100101000010000; // i_type alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
+    4'd8: sig = 22'b0011001010000100000000; // i_type alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== LABEL: UD_fault ====
-    3'd5: sig = 18'b100000000000000000; // halt
-    default: sig = 18'd0;
+    4'd9: sig = 22'b1000000000000000000000; // halt
+    default: sig = 22'd0;
   endcase
 end
 endmodule // US__ 
