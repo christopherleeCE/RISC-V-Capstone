@@ -248,7 +248,7 @@ module riscv_cpu
     ) id_ex_reg (
         .d(d2e_data_D),      // Include IM in pipeline
         .clk(clk),
-        .rst(rst),
+        .rst(rst && !flush_DE), //flush on branch taken (DeMorgan's law for active low reset)
         .wr_en(pipeline_advance_DE),
         .q(d2e_data_E)
     );
