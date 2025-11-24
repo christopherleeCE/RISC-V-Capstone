@@ -111,10 +111,10 @@ module riscv_cpu
     logic pipeline_advance_EM;
     logic pipeline_advance_MW;
 
-    //for rn, data pipeline always advances
+    //for rn, pipeline always advances
     assign pipeline_advance = 1'b1;
 
-    //can change control pipelining depending on if stalling is implemented
+    //can change specific stage register depending on if stalling is implemented
     assign pipeline_advance_FD = pipeline_advance;
     assign pipeline_advance_DE = pipeline_advance;
     assign pipeline_advance_EM = pipeline_advance;
