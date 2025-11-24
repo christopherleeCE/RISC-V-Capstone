@@ -334,7 +334,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         end 
 
         //compare the model's expected PC value vs the CPU's program counter
-        $display("Expected address of next instruction:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
+        $display("Value of program counter:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
 
     
     end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
@@ -349,7 +349,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         else(instruction_failure) = 1; //ensure the PC and rd have changed to appropiate values
 
         //output the PC and the rd for the CPU and the model
-        $display("Expected address of next instruction:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
+        $display("Value of program counter:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
         $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, (pc_data + 32'd4)); //model vs cpu registers
 
     //----U-TYPE---------------------------------
