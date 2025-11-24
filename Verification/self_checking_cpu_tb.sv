@@ -1,5 +1,5 @@
 /*
-TESTING: TBD
+TESTING: BEQ, JAL, MUL, MULH, MULHSU, MULHU
 SUCCESSFUL TESTS: ADDI/NOP, LW, SW, ADD, SUB
 
 - Load up a program in the instruction memory along with any contents in the data memory. Please note that you
@@ -56,8 +56,10 @@ logic [31:0] memory_address, verification_address;
 
 //instruction components for verification
 int instruction_failure;
-logic [11:0] imm_i, imm_s, imm_b;
-logic [19:0] imm_u, imm_j;
+logic [11:0] imm_i, imm_s;
+logic [12:0] imm_b; // not necessary helps keep consistency with ISA
+logic [19:0] imm_u;
+logic [20:0] imm_j; //same consistency reasons
 logic [4:0]  rs1, rs2, rd;
 logic [2:0]  func3;
 logic [6:0]  func7;
@@ -130,10 +132,10 @@ end
 //combinational logic used to retrieve data from various stages in CPU for verification
 always_comb begin
     //ID -------------------------------------------------------------------------------
-        data_s = {6{32'hdeadbeef}}; //to replace with if-statement for jumps
+        data_s = {6{32'hdeadbeef}}; //placeholder values, not significant
 
     //EX --------------------------------------------------------------------------------
-    if(id_ex[6:0] == 7'b1100011) begin //---B-TYPE---
+    if(id_ex[6:0] == 7'b1100011 || id_ex[6:0] == 7'b1101111 || id_ex[6:0] == 7'b1100111) begin //---B-TYPE/J-TYPE---
         data_u = {
             data_t[5], //mem
             data_t[4], //next_pc
@@ -156,7 +158,7 @@ always_comb begin
             cpu_dut.my_reg_file.regs_out[ex_mem[19:15]], //rs1
             data_t[0] //rd
         };
-    end else if(ex_mem[6:0] == 7'b1100011) begin //---B-TYPE---
+    end else if(ex_mem[6:0] == 7'b1100011 || id_ex[6:0] == 7'b1101111 || id_ex[6:0] == 7'b1100111) begin //---B-TYPE/J-TYPE--
         data_w = {
             data_v[5], //mem
             cpu_dut.PC, //next_pc
@@ -170,21 +172,12 @@ always_comb begin
     end
 
     //WB-------------------------------------------------------------------------------
-    if(mem_wb[6:0] == 7'b0110011) begin //--R-TYPE----
+    if(mem_wb[6:0] == 7'b0110011 || mem_wb[6:0] == 7'b0010011) begin //--R-TYPE/I-TYPE (ARITHMETIC) ---
         data_y = {
             data_x[5], //mem
             data_x[4], //next_pc
             data_x[3], //pc
             cpu_dut.my_reg_file.regs_out[mem_wb[24:20]], //rs2
-            cpu_dut.my_reg_file.regs_out[mem_wb[19:15]], //rs1
-            data_x[0] //rd
-        };
-    end else if(mem_wb[6:0] == 7'b0010011) begin //--I-TYPE-(immediates)--
-        data_y = {
-            data_x[5], //mem
-            data_x[4], //next_pc
-            data_x[3], //pc
-            data_x[2], //rs2
             cpu_dut.my_reg_file.regs_out[mem_wb[19:15]], //rs1
             data_x[0] //rd
         };
@@ -213,12 +206,8 @@ always_comb begin
     end
 
     //VF ---------------------------------------------------------------------------------
-    if(post_wb[6:0] == 7'b0110011 || post_wb[6:0] == 7'b0010011 || post_wb[6:0] == 7'b0000011) begin //R, I, and S type
-        rd_data = cpu_dut.my_reg_file.regs_out[post_wb[11:7]]; //rd
-    end else begin
-        rd_data = data_z[0]; //rd
-    end
-    {mem_data, next_pc_data, pc_data, rs2_data, rs1_data} = data_z[5:1]; //everything else
+    rd_data = cpu_dut.my_reg_file.regs_out[post_wb[11:7]]; //---ALL-TYPES----------------
+    {mem_data, next_pc_data, pc_data, rs2_data, rs1_data} = data_z[5:1]; //unpacking else
 end
 
 
@@ -274,7 +263,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, expected_result);
 
 
-    end else if (opcode == 7'b0010011) begin //-----I-TYPE ---------------------------------------
+    end else if (opcode == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
         {imm_i, rs1, func3, rd} = post_wb[31:7];
         $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1,
         func3, rd, opcode); //instruction info
@@ -294,7 +283,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         //model vs cpu register
         $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, expected_result);
 
-    end else if (opcode == 7'b0000011) begin //----I-TYPE----------------------------------
+    end else if (opcode == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
         {imm_i, rs1, func3, rd} = post_wb[31:7];
         $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1,
         func3, rd, opcode); //instruction info
@@ -308,11 +297,12 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
 
         $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, mem_data); //model vs cpu registers
 
+
     end else if (opcode == 7'b0100011) begin //------S-TYPE----------------------------------
         {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = post_wb[31:7];
         $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_s, rs2, rs1,
         func3, opcode); //instruction info
-        verification_address = {{20{imm_s[11]}}, imm_s} + rs1_data;
+        verification_address = {{20{imm_s[11]}}, imm_s} + rs1_data; //expected address in memory
 
         if(func3 == 3'b010) begin //----SW-------------------------------------
             $display("\tIdentified as SW.");
@@ -324,6 +314,48 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         //compare model vs CPU memory contents
         $display("Contents of data memory at 0x%h:\n\tCPU: 0x%h\n\tModel: 0x%h", verification_address, mem_data, rs2_data);
 
+
+    end else if (opcode == 7'b1100011) begin //------B-TYPE----------------------------
+        {imm_b[12], imm_b[10:5], rs2, rs1, func3, imm_b[4:1], imm_b[11]} = post_wb[31:7];
+        imm_b[0] = 1'b0; //LSB is always zero for B-type
+        $display("\tB-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_b[12:1], rs2, rs1,
+        func3, opcode); //instruction info
+
+        if(func3 == 3'b000) begin //----BEQ------------------------------------------------
+            $display("\tIdentified as BEQ.");
+            if(rs1 == rs2) begin //if equal
+                expected_result = pc_data + {{19{imm_b[11]}}, imm_b}; //determine new PC address
+            end else begin
+                expected_result = pc_data + 32'd4; //increment PC normally (I think this is right...)
+            end
+            assert(next_pc_data == expected_result) $display("BEQ successful.");
+            else instruction_failure = 1; //ensure the PC has changed to the correct address
+
+        end 
+
+        //compare the model's expected PC value vs the CPU's program counter
+        $display("Expected address of next instruction:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
+
+    
+    end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
+        {imm_j[20], imm_j[10:1], imm_j[11] imm_j[19:12], rd} = post_wb[31:7];
+        imm_j[0] = 1'b0;
+        $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_j[20:1], rd, opcode); //instruction info
+
+        //----JAL------------
+        expected_result == pc_data + {{11{imm_j[20]}}, imm_j};
+
+        assert(rd_data == pc_data + 32'd4 && next_pc_data == expected_result) $display("JAL successful.");
+        else(instruction_failure) = 1; //ensure the PC and rd have changed to appropiate values
+
+        //output the PC and the rd for the CPU and the model
+        $display("Expected address of next instruction:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
+        $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, (pc_data + 32'd4)); //model vs cpu registers
+
+    //----U-TYPE---------------------------------
+
+    //----M-TYPE--------------------------------
+    
     end else begin
 
             //UNKNOWN ------------------------------
