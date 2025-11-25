@@ -194,8 +194,9 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
 
     end else if(instruction_failure == 1) begin //INSTRUCTION FAILURE----------------------------------
         $display("\nWARNING: Mismatch between model and CPU. Pausing verification.");
-        $display("\tPlease check for data hazards and issues in instruction datapath/control.");
+        $display("\tPlease check for data hazards and issues in this instruction's datapath/control.");
         $stop(); //pauses verification if an instruction has failed OR a data hazard has occured.
+        instruction_failure = 0; //resets to zero after pause to check other instructions (OPTIONAL).
 
     end
 
