@@ -2,9 +2,7 @@
 TESTING: BEQ, JAL, MUL, MULH, MULHSU, MULHU
 SUCCESSFUL TESTS: ADDI/NOP, LW, SW, ADD, SUB
 
-- Load up a program in the instruction memory along with any contents in the data memory. Please note that you
-have to adjust the constants for the testbench to fully cover all instructions and data, or you may get a
-false error.
+- Load up a program in the instruction memory along with any contents in the data memory.
 
 - Edgar G.
 
@@ -22,15 +20,10 @@ parameter int NUM_DATA_WORDS = 32;
 //declare the buses and signals
 logic clk, rst, ohalt;
 
-//TB memory
-logic [31:0] instruction_memory [NUM_INSTRUCTIONS-1:0];
-logic [31:0] data_memory [NUM_DATA_WORDS-1:0];
-
 /*
 Instruction Pipeline: This syncs up verification with the instructions in the CPU, and drives the data pipeline as
 it sweeps through the CPU.
 */
-int instruction_track;
 logic [31:0] instruction;
 logic [31:0] if_id, id_ex, ex_mem, mem_wb, post_wb;
 
@@ -57,7 +50,7 @@ logic [31:0] memory_address, verification_address;
 //instruction components for verification
 int instruction_failure;
 logic [11:0] imm_i, imm_s;
-logic [12:0] imm_b; // not necessary helps keep consistency with ISA
+logic [12:0] imm_b; // not necessary, but helps keep consistency with ISA
 logic [19:0] imm_u;
 logic [20:0] imm_j; //same consistency reasons
 logic [4:0]  rs1, rs2, rd;
@@ -66,7 +59,7 @@ logic [6:0]  func7;
 logic [6:0]  opcode;
 logic [31:0] data_mem_addr;
 logic [31:0] expected_result;
-
+logic signed [63:0] product;
 
 //DUT---------------------------------------------------------------------------------------------------------------------
 //instantiate the CPU
@@ -85,21 +78,7 @@ end
 initial begin
     //WARNING - reset could potentially mask bugs, your choice to comment or uncomment.
     rst = 1'b0; //reset the CPU and golden model during startup
-    instruction_track = 0;
     instruction_failure = 0;
-
-    // instruction memory for testbench
-    $readmemh("instruction_memory.txt", instruction_memory);
-
-
-    // //display the contents of the memory. WARNING: Can be long, uncomment at your convenience.
-    // $display("\nInstructions Passed to Testbench: ");
-    // for (int i = 0; i < NUM_INSTRUCTIONS; i++) begin
-    //     $display("\t\t0x%h", instruction_memory[i]);
-    // end
-
-    $display("NOTE: Adjust TB constants to match amount of instructions/data in memory.");
-    $display("      This includes for future write operations.");
     repeat(1)@(posedge clk);
     rst = 1'b1; //disable the reset
 end
@@ -112,20 +91,14 @@ always@(posedge clk or negedge rst) begin //async reset
     if(!rst) begin //resets the pipeline and tracker
         {if_id, id_ex, ex_mem, mem_wb, post_wb} <= '0;
         {data_t, data_v, data_x, data_z} <= '0;
-        instruction_track = 0;
     end else begin
 
         //feed instruction into the pipeline bus
-        if (instruction_track <= NUM_INSTRUCTIONS-1) begin
-            instruction = instruction_memory[instruction_track]; //current instruction
-        end else begin
-            instruction = 32'hdeadbeef; //no more instructions (failsafe)
-        end
+        instruction = cpu_dut.INSTR_REAL; // with control hazard safety.
 
         //continues advancing instructions and data through pipelines
         {if_id, id_ex, ex_mem, mem_wb, post_wb} <= {instruction, if_id, id_ex, ex_mem, mem_wb};  //instructions
         {data_t, data_v, data_x, data_z} <= {data_s, data_u, data_w, data_y}; //data
-        instruction_track +=1; //increase instruction counter
     end
 end
 
@@ -172,7 +145,7 @@ always_comb begin
     end
 
     //WB-------------------------------------------------------------------------------
-    if(mem_wb[6:0] == 7'b0110011 || mem_wb[6:0] == 7'b0010011) begin //--R-TYPE/I-TYPE (ARITHMETIC) ---
+    if(mem_wb[6:0] == 7'b0110011 || mem_wb[6:0] == 7'b0010011) begin //--R-TYPE/I-TYPE (ARITHMETIC)/M-TYPE ---
         data_y = {
             data_x[5], //mem
             data_x[4], //next_pc
@@ -224,13 +197,6 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         $display("\tPlease check for data hazards and issues in instruction datapath/control.");
         $stop(); //pauses verification if an instruction has failed OR a data hazard has occured.
 
-    end else if(post_wb == 32'hdeadbeef) begin //NO MORE INSTRUCTIONS ----------------------------------
-
-        //Older code that is a bit redundant, but it stops the testbench automatically even if the halt signal
-        //from the CPU is disabled.
-        $display("\nWARNING: No further instructions. Pausing verification.");
-        $stop(); //program ends after all instructions are completed
-
     end
 
     //START VERIFICATION -------------------------------------------------------------------------------
@@ -240,22 +206,60 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
 
     opcode = post_wb[6:0]; //identify the instructions
 
-    if (opcode == 7'b0110011) begin //--------R-TYPE----------------------------------------------
+    if (opcode == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
         {func7, rs2, rs1, func3, rd} = post_wb[31:7];
-        $display("\tR-Type: func7: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b",
+        $display("\tR/M-Type: func7: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b",
         func7, rs2, rs1, func3, rd, opcode); //instruction info
 
-        if(func3 == 3'b000 && func7 == 7'b0000000) begin //----ADD------------------------------
-            $display("\tIdentified as ADD.");
-            expected_result = rs1_data + rs2_data;
-            assert(rd_data == expected_result) $display("ADD successful.");
-            else instruction_failure = 1;//compare contents of model register with CPU register
+        //-R-TYPE---------------
+        if (func7 == 7'b0000000) begin
+            if (func3 == 3'b000) begin //----ADD------------------------------
+                $display("\tIdentified as ADD.");
+                expected_result = rs1_data + rs2_data;
+                assert(rd_data == expected_result) $display("ADD successful.");
+                else instruction_failure = 1;//compare contents of model register with CPU register
+            end
 
-        end else if (func3 == 3'b000 && func7 == 7'b0100000) begin //----SUB---------------------------
-            $display("\tIdentified as SUB.");
-            expected_result = rs1_data - rs2_data;
-            assert(rd_data == expected_result) $display("SUB successful.");
-            else instruction_failure = 1;//compare contents of model register with CPU register
+        end else if (func7 == 7'b0100000) begin     
+            if (func3 == 3'b000) begin //----SUB---------------------------
+                $display("\tIdentified as SUB.");
+                expected_result = rs1_data - rs2_data;
+                assert(rd_data == expected_result) $display("SUB successful.");
+                else instruction_failure = 1;//compare contents of model register with CPU register
+            end
+
+
+        //-M-TYPE---------------
+        end else if (func7 == 7'b0000001) begin
+            if (func3 == 3'b000) begin //----MUL------------------------------
+                $display("\tIdentified as MUL.");
+                product = {{32{rs1_data[31]}}, rs1_data} * {{32{rs2_data[31]}}, rs2_data};
+                expected_result = product[31:0];
+                assert(rd_data == expected_result) $display("MUL successful.");
+                else instruction_failure = 1;//compare contents of model register with CPU register
+
+            end else if (func3 == 3'b001) begin //----MULH------------------------------
+                $display("\tIdentified as MULH.");
+                product = {{32{rs1_data[31]}}, rs1_data} * {{32{rs2_data[31]}}, rs2_data};
+                expected_result = product[63:32];
+                assert(rd_data == expected_result) $display("MULH successful.");
+                else instruction_failure = 1;//compare contents of model register with CPU register
+
+            end else if (func3 == 3'b010) begin //----MULHSU------------------------------
+                $display("\tIdentified as MULHSU.");
+                product = {{32{rs1_data[31]}}, rs1_data} * {{32{1'b0}}, rs2_data};
+                expected_result = product[63:32];
+                assert(rd_data == expected_result) $display("MULHSU successful.");
+                else instruction_failure = 1;//compare contents of model register with CPU register
+
+            end else if (func3 == 3'b011) begin //----MULHU------------------------------
+                $display("\tIdentified as MULHU.");
+                product = {{32{1'b0}}, rs1_data} * {{32{1'b0}}, rs2_data};
+                expected_result = product[63:32];
+                assert(rd_data == expected_result) $display("MULHU successful.");
+                else instruction_failure = 1;//compare contents of model register with CPU register
+
+            end
 
         end
 
@@ -338,27 +342,35 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
 
     
     end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
-        {imm_j[20], imm_j[10:1], imm_j[11] imm_j[19:12], rd} = post_wb[31:7];
+        {imm_j[20], imm_j[10:1], imm_j[11], imm_j[19:12], rd} = post_wb[31:7];
         imm_j[0] = 1'b0;
         $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_j[20:1], rd, opcode); //instruction info
 
         //----JAL------------
-        expected_result == pc_data + {{11{imm_j[20]}}, imm_j};
-
-        assert(rd_data == pc_data + 32'd4 && next_pc_data == expected_result) $display("JAL successful.");
-        else(instruction_failure) = 1; //ensure the PC and rd have changed to appropiate values
+        $display("\tIdentified as JAL.");
+        expected_result = pc_data + {{11{imm_j[20]}}, imm_j};
+        assert(rd_data == (pc_data + 32'd4) && next_pc_data == expected_result) $display("JAL successful.");
+        else instruction_failure = 1; //ensure the PC and rd have changed to appropiate values
 
         //output the PC and the rd for the CPU and the model
         $display("Value of program counter:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
         $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, (pc_data + 32'd4)); //model vs cpu registers
 
-    //----U-TYPE---------------------------------
 
-    //----M-TYPE--------------------------------
-    
+    end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
+        {imm_u, rd} = post_wb[31:7];
+        $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_u, rd, opcode); //instruction info
+
+        //----LUI---------------
+        $display("\tIdentified as LUI.");
+        expected_result = imm_u <<< 12;
+        assert(rd_data == expected_result) $display("LUI successful.");
+        else instruction_failure = 1;//compare contents of model register with CPU register
+
+        $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, expected_result); //model vs cpu registers
+
     end else begin
-
-            //UNKNOWN ------------------------------
+        //UNKNOWN ------------------------------
         $display("WARNING: Instruction type not currently recognized by TB.");
 
     end

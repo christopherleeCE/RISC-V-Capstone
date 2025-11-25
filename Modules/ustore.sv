@@ -26,8 +26,10 @@ always_comb begin
     4'd7: sig = 22'b0000011001000100000000; // s_type alu_sel_add alu_use_im data_mem_wr_en
 // ==== INSTRUCTION: ADDI ====
     4'd8: sig = 22'b0011001010000100000000; // i_type alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
+// ==== INSTRUCTION: LUI ====
+    4'd9: sig = 22'b0011001000010100000000; // u_type alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== LABEL: UD_fault ====
-    4'd9: sig = 22'b1000000000000000000000; // halt
+    4'd10: sig = 22'b1000000000000000000000; // halt
     default: sig = 22'd0;
   endcase
 end
