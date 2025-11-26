@@ -37,10 +37,10 @@ always_comb begin
     unique case(1'b1)
     alu_sel_add : result = add_result; // ADD
     alu_sel_sub : result = sub_result; // SUB
-    alu_sel_mul : result = ( operand_a * operand_b );                // MUL
+    alu_sel_mul : result = ( operand_a_s * operand_b_s );                // MUL
     alu_sel_mulh : result = ( operand_a_s * operand_b_s ) >>> WIDTH; // MULH
-    alu_sel_mulhsu : result = ( operand_a_s * operand_b ) >>> WIDTH; // MULHSU
-    alu_sel_mulhu : result = ( operand_a * operand_b ) >> WIDTH;     // MULHU
+    alu_sel_mulhsu : result = ( operand_a_s * $unsigned($signed(operand_b)) ) >>> WIDTH; // MULHSU
+    alu_sel_mulhu : result = ( $unsigned(operand_a) * $unsigned(operand_b) ) >> WIDTH;     // MULHU
     alu_sel_and : result = operand_a & operand_b; // AND
     alu_sel_or : result = operand_a | operand_b; // OR
     alu_sel_slt : result = operand_a < operand_b; // SLT
