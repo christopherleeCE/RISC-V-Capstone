@@ -26,10 +26,17 @@ logic signed [WIDTH-1:0] operand_a_s, operand_b_s;
 assign operand_a_s = operand_a;
 assign operand_b_s = operand_b;
 
+// Pre-compute common arithmetic results
+logic [WIDTH-1:0] add_result, sub_result;
+assign add_result = operand_a + operand_b;
+assign sub_result = operand_a - operand_b;
+logic eq_flag;
+assign eq_flag = (operand_a == operand_b);
+
 always_comb begin
     unique case(1'b1)
-    alu_sel_add : result = operand_a + operand_b; // ADD
-    alu_sel_sub : result = operand_a - operand_b; // SUB
+    alu_sel_add : result = add_result; // ADD
+    alu_sel_sub : result = sub_result; // SUB
     alu_sel_mul : result = ( operand_a * operand_b );                // MUL
     alu_sel_mulh : result = ( operand_a_s * operand_b_s ) >>> WIDTH; // MULH
     alu_sel_mulhsu : result = ( operand_a_s * operand_b ) >>> WIDTH; // MULHSU
@@ -42,6 +49,6 @@ always_comb begin
 end
 
 // Zero flag logic
-assign zero_flag = ( result == '0 );
+assign zero_flag = alu_sel_sub ? eq_flag : ( result == '0 );
 
 endmodule

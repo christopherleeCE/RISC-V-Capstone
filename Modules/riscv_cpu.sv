@@ -23,6 +23,9 @@ module riscv_cpu
     logic [31:0] PC_D;             //PC after pipeline reg
     logic [31:0] PC_E;              //PC after pipeline reg
     logic [31:0] PC_target;        //target PC for branches (calculated in execute stage)
+    logic [31:0] PC_plus_4_E;      //PC + 4 (needed for JAL)
+    logic [31:0] PC_plus_4_M;
+    logic [31:0] PC_plus_4_W;
     logic [31:0] INSTR;
     logic [31:0] INSTR_REAL;      //real instruction after deciding whether to flush or not
     logic [31:0] INSTR_D;           //instruction after pipeline reg
@@ -49,6 +52,8 @@ module riscv_cpu
 
     logic zero_flag;               //from alu, is the result zero?
     logic branch_taken;          //is a branch taken?
+    logic jump_taken;            //is a jump taken?
+    logic redirect_pc;           //should the PC be redirected?
 
     logic [63:0] f2d_data_F;          //fetch to decode data signals
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
@@ -70,6 +75,7 @@ module riscv_cpu
 
     //control signals after 1 pipeline reg
     logic reg_file_wr_en_E;
+    logic jump_en_E;
     logic alu_use_im_E;
     logic alu_sel_add_E;
     logic alu_sel_sub_E;
@@ -84,16 +90,19 @@ module riscv_cpu
     logic data_mem_wr_en_E;
     logic dbus_sel_alu_E;
     logic dbus_sel_data_mem_E;
+    logic dbus_sel_pc_plus_4_E;
 
     //control signals after 2 pipeline regs
     logic data_mem_wr_en_M;
     logic dbus_sel_alu_M;
     logic dbus_sel_data_mem_M;
+    logic dbus_sel_pc_plus_4_M;
     logic reg_file_wr_en_M;
 
     //control signals after 3 pipeline regs
     logic dbus_sel_alu_W;
     logic dbus_sel_data_mem_W;
+    logic dbus_sel_pc_plus_4_W;
     logic reg_file_wr_en_W;
 
     // halt goes through pipeline
@@ -130,6 +139,8 @@ module riscv_cpu
 
     //branch logic
     assign branch_taken = branch_en_E && zero_flag; //is the branch taken?
+    assign jump_taken = jump_en_E;                  //are we taking an unconditional jump?
+    assign redirect_pc = branch_taken || jump_taken; //should the PC be redirected?
 
     //Control Hazard Handling
     assign flush_FD = branch_taken; //flush IF/ID pipeline reg if branch taken by inserting NOP
@@ -145,7 +156,7 @@ module riscv_cpu
         .d(PC_target),
         .clk(clk),
         .rst(rst),
-        .wr_en(branch_taken), //normally, PC increments by 4 each cycle, but if branch taken, load PC_target
+        .wr_en(redirect_pc), //normally, PC increments by 4 each cycle, but if branch/jump taken, load PC_target
         .q(PC)
     );
 
@@ -234,9 +245,11 @@ module riscv_cpu
         alu_sel_or,
         alu_sel_slt,
         branch_en,
+        jump_en,
         data_mem_wr_en,
         dbus_sel_alu,
         dbus_sel_data_mem,
+        dbus_sel_pc_plus_4,
         reg_file_wr_en,
         halt_D
     };
@@ -267,6 +280,7 @@ module riscv_cpu
 
     //unpacking data and control signals from pipeline reg
     assign {RS1_DATA_E, RS2_DATA_E, IM_E, RD_E, PC_E} = d2e_data_E;
+    assign PC_plus_4_E = PC_E + 32'd4;
     assign {
         alu_use_im_E,
         alu_sel_add_E,
@@ -279,9 +293,11 @@ module riscv_cpu
         alu_sel_or_E,
         alu_sel_slt_E,
         branch_en_E,
+        jump_en_E,
         data_mem_wr_en_E,
         dbus_sel_alu_E,
         dbus_sel_data_mem_E,
+        dbus_sel_pc_plus_4_E,
         reg_file_wr_en_E,
         halt_E
     } = d2e_control_E;
@@ -421,6 +437,7 @@ module riscv_cpu
 
         dbus_sel_alu_W        : RD_DATA = ALU_W;
         dbus_sel_data_mem_W   : RD_DATA = DATA_MEM_OUT_W;
+        dbus_sel_pc_plus_4_W  : RD_DATA = PC_plus_4_W;
 
         default : RD_DATA = '0;
         endcase
