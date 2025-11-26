@@ -32,8 +32,10 @@ always_comb begin
     4'd10: sig = 24'b000110001000010100000000; // u_type alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: JAL ====
     4'd11: sig = 24'b001100100000001000000000; // j_type jump_en dbus_sel_pc_plus_4 reg_file_wr_en
+// ==== INSTRUCTION: JALR ====
+    4'd12: sig = 24'b001100100000001100000000; // j_type jump_en alu_sel_add dbus_sel_pc_plus_4 reg_file_wr_en
 // ==== LABEL: UD_fault ====
-    4'd12: sig = 24'b100000000000000000000000; // halt
+    4'd13: sig = 24'b100000000000000000000000; // halt
     default: sig = 24'd0;
   endcase
 end

@@ -329,7 +329,7 @@ module riscv_cpu
     );
 
     //calculating target PC for branches
-    assign PC_target = PC_E + IM_E; //
+    assign PC_target = (alu_sel_add_E)? RS1_DATA + IM_E : PC_E + IM_E; //left is for JALR, right for JAL
 
     //preparing data and control signals for pipeline reg
     assign e2m_data_E = {ALU, RS2_DATA_E, RD_E};
