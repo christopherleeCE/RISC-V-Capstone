@@ -21,10 +21,14 @@ module alu
 
 //initialize the ALU
 
-// Define signed operands
-logic signed [WIDTH-1:0] operand_a_s, operand_b_s;
-assign operand_a_s = operand_a;
-assign operand_b_s = operand_b;
+// Define signed products
+logic signed [2*WIDTH-1:0] product_ss;   // signed * signed
+logic signed [2*WIDTH-1:0] product_su;   // signed * unsigned
+logic signed [2*WIDTH-1:0] product_uu;   // unsigned * unsigned
+
+assign product_ss = {{32{operand_a[31]}}, operand_a} * {{32{operand_b[31]}}, operand_b};
+assign product_su = {{32{operand_a[31]}}, operand_a} * {{32{1'b0}}, operand_b};
+assign product_uu = {{32{1'b0}}, operand_a} * {{32{1'b0}}, operand_b};
 
 // Pre-compute common arithmetic results
 logic [WIDTH-1:0] add_result, sub_result;
@@ -37,10 +41,10 @@ always_comb begin
     unique case(1'b1)
     alu_sel_add : result = add_result; // ADD
     alu_sel_sub : result = sub_result; // SUB
-    alu_sel_mul : result = ( operand_a_s * operand_b_s );                // MUL
-    alu_sel_mulh : result = ( operand_a_s * operand_b_s ) >>> WIDTH; // MULH
-    alu_sel_mulhsu : result = ( operand_a_s * $unsigned($signed(operand_b)) ) >>> WIDTH; // MULHSU
-    alu_sel_mulhu : result = ( $unsigned(operand_a) * $unsigned(operand_b) ) >> WIDTH;     // MULHU
+    alu_sel_mul : result = product_ss[WIDTH-1:0];         // MUL
+    alu_sel_mulh : result = product_ss[2*WIDTH-1:WIDTH];  // MULH
+    alu_sel_mulhsu : result = product_su[2*WIDTH-1:WIDTH]; // MULHSU
+    alu_sel_mulhu : result = product_uu[2*WIDTH-1:WIDTH];  // MULHU
     alu_sel_and : result = operand_a & operand_b; // AND
     alu_sel_or : result = operand_a | operand_b; // OR
     alu_sel_slt : result = operand_a < operand_b; // SLT
