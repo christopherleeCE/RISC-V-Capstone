@@ -58,7 +58,7 @@ logic [2:0]  func3;
 logic [6:0]  func7;
 logic [6:0]  opcode;
 logic [31:0] data_mem_addr;
-logic [31:0] expected_result;
+logic [31:0] expected_result, additional_result;
 logic signed [63:0] product;
 
 //DUT---------------------------------------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ always_comb begin
         data_u = {
             data_t[5], //mem
             data_t[4], //next_pc
-            cpu_dut.PC, //pc
+            cpu_dut.PC_E, //pc
             cpu_dut.my_reg_file.regs_out[id_ex[24:20]], //rs2
             cpu_dut.my_reg_file.regs_out[id_ex[19:15]], //rs1
             data_t[0] //rd
@@ -131,7 +131,7 @@ always_comb begin
             cpu_dut.my_reg_file.regs_out[ex_mem[19:15]], //rs1
             data_t[0] //rd
         };
-    end else if(ex_mem[6:0] == 7'b1100011 || id_ex[6:0] == 7'b1101111 || id_ex[6:0] == 7'b1100111) begin //---B-TYPE/J-TYPE--
+    end else if(ex_mem[6:0] == 7'b1100011 || ex_mem[6:0] == 7'b1101111 || ex_mem[6:0] == 7'b1100111) begin //---B-TYPE/J-TYPE--
         data_w = {
             data_v[5], //mem
             cpu_dut.PC, //next_pc
@@ -328,8 +328,8 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
 
         if(func3 == 3'b000) begin //----BEQ------------------------------------------------
             $display("\tIdentified as BEQ.");
-            if(rs1 == rs2) begin //if equal
-                expected_result = pc_data + {{19{imm_b[11]}}, imm_b}; //determine new PC address
+            if(rs1_data == rs2_data) begin //if equal
+                expected_result = pc_data + {{19{imm_b[12]}}, imm_b}; //determine new PC address
             end else begin
                 expected_result = pc_data + 32'd4; //increment PC normally (I think this is right...)
             end
@@ -350,12 +350,17 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         //----JAL------------
         $display("\tIdentified as JAL.");
         expected_result = pc_data + {{11{imm_j[20]}}, imm_j};
-        assert(rd_data == (pc_data + 32'd4) && next_pc_data == expected_result) $display("JAL successful.");
+        if(rd == 5'd0)begin
+            additional_result = 32'd0; //jump (no link register)
+        end else begin
+            additional_result = pc_data + 32'd4; //jump and link register
+        end 
+        assert(next_pc_data == expected_result && rd_data == additional_result) $display("JAL successful.");
         else instruction_failure = 1; //ensure the PC and rd have changed to appropiate values
 
         //output the PC and the rd for the CPU and the model
         $display("Value of program counter:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
-        $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, (pc_data + 32'd4)); //model vs cpu registers
+        $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, additional_result); //model vs cpu registers
 
 
     end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
