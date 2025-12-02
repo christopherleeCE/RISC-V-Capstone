@@ -144,8 +144,8 @@ module riscv_cpu
     assign redirect_pc = branch_taken || jump_taken; //should the PC be redirected?
 
     //Control Hazard Handling
-    assign flush_FD = branch_taken; //flush IF/ID pipeline reg if branch taken by inserting NOP
-    assign flush_DE = branch_taken; //flush ID/EX pipeline reg if branch taken by resetting control signals
+    assign flush_FD = redirect_pc; //flush IF/ID pipeline reg if branch taken by inserting NOP
+    assign flush_DE = redirect_pc; //flush ID/EX pipeline reg if branch taken by resetting control signals
 
     //==================================================================================================================== 
     // < IF STARTS HERE >
@@ -332,8 +332,8 @@ module riscv_cpu
         .result(ALU)
     );
 
-    //calculating target PC for branches
-    assign PC_target = (alu_sel_add_E)? RS1_DATA + IM_E : PC_E + IM_E; //left is for JALR, right for JAL
+    //calculating target PC for branches and jumps
+    assign PC_target = (alu_sel_add_E)? RS1_DATA_E + IM_E : PC_E + IM_E; //left is for JALR, right for JAL
 
     //preparing data and control signals for pipeline reg
     assign e2m_data_E = {ALU, RS2_DATA_E, RD_E, PC_plus_4_E};

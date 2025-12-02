@@ -92,12 +92,8 @@ always@(posedge clk or negedge rst) begin //async reset
         {if_id, id_ex, ex_mem, mem_wb, post_wb} <= '0;
         {data_t, data_v, data_x, data_z} <= '0;
     end else begin
-
-        //feed instruction into the pipeline bus
-        instruction = cpu_dut.INSTR_REAL; // with control hazard safety.
-
         //continues advancing instructions and data through pipelines
-        {if_id, id_ex, ex_mem, mem_wb, post_wb} <= {instruction, if_id, id_ex, ex_mem, mem_wb};  //instructions
+        {if_id, id_ex, ex_mem, mem_wb, post_wb} <= {cpu_dut.INSTR_F_FLUSH, cpu_dut.INSTR_D_FLUSH,id_ex, ex_mem, mem_wb};//instr
         {data_t, data_v, data_x, data_z} <= {data_s, data_u, data_w, data_y}; //data
     end
 end
@@ -185,16 +181,35 @@ end
 
 
 //VERIFICATION -----------------------------------------------------------------------------------------------------------------
+task reg_mem_dump;
+    begin
+        //CPU REGISTER DUMP - comment/uncomment as needed
+        $display("CPU REGISTER DUMP, POST WB:");
+        for(int k = 0; k < 32; k++) begin
+            $display("\t\tx%d: 0x%h", k, cpu_dut.my_reg_file.regs_out[k]);
+        end
+
+        //CPU DATA MEMORY DUMP
+        // WARNING: Can be very long, uncomment at your convenience.
+        $display("CPU DATA MEMORY DUMP: ");
+        for (int k = 0; k < NUM_DATA_WORDS; k++) begin
+            $display("\t\t0x%h: 0x%h", k*4, cpu_dut.data_mem.data_mem[k]);
+        end
+    end
+endtask
+
 always @(negedge clk) begin //read on negative edge to give everything time to settle
 
     if (ohalt == 1'b1) begin //HALT SIGNAL --------------------------------------------------------------
         $display("\nWARNING: Recieved halt signal. Pausing verification.");
         $display("Program counter: %d", cpu_dut.PC);
+        reg_mem_dump();
         $stop(); //pauses verification if CPU outputs halt signal
 
     end else if(instruction_failure == 1) begin //INSTRUCTION FAILURE----------------------------------
         $display("\nWARNING: Mismatch between model and CPU. Pausing verification.");
         $display("\tPlease check for data hazards and issues in this instruction's datapath/control.");
+        reg_mem_dump();
         $stop(); //pauses verification if an instruction has failed OR a data hazard has occured.
         instruction_failure = 0; //resets to zero after pause to check other instructions (OPTIONAL).
 
@@ -380,19 +395,6 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         $display("WARNING: Instruction type not currently recognized by TB.");
 
     end
-
-    // //CPU REGISTER DUMP - comment/uncomment as needed
-    // $display("CPU REGISTER DUMP, POST WB:");
-    // for(int k = 0; k < 32; k++) begin
-    //     $display("\t\tx%d: 0x%h", k, cpu_dut.my_reg_file.regs_out[k]);
-    // end
-
-    // //CPU DATA MEMORY DUMP
-    // // WARNING: Can be very long, uncomment at your convenience.
-    // $display("CPU DATA MEMORY DUMP: ");
-    // for (int k = 0; k < NUM_DATA_WORDS; k++) begin
-    //     $display("\t\t0x%h: 0x%h", k*4, cpu_dut.data_mem.data_mem[k]);
-    // end
 
 end
 endmodule
