@@ -26,9 +26,10 @@ module riscv_cpu
     logic [31:0] PC_plus_4_E;      //PC + 4 (needed for JAL)
     logic [31:0] PC_plus_4_M;
     logic [31:0] PC_plus_4_W;
-    logic [31:0] INSTR;
-    logic [31:0] INSTR_REAL;      //real instruction after deciding whether to flush or not
-    logic [31:0] INSTR_D;           //instruction after pipeline reg
+    logic [31:0] INSTR_F;           //IF instruction from instruction memory, before flush
+    logic [31:0] INSTR_F_FLUSH;    //IF instruction after deciding whether to flush or not
+    logic [31:0] INSTR_D;           //ID instruction after pipeline reg, before flush
+    logic [31:0] INSTR_D_FLUSH;     //ID instruction after pipeline reg, after flush
     logic [UIP_WIDTH-1:0] UIP;
     logic [4:0] RS1;               //read addr of regfile 
     logic [31:0] RS1_DATA;          //read1 from regfile
@@ -168,14 +169,14 @@ module riscv_cpu
         .ENTRY_COUNT(32)
     ) instr_mem (
         .read_address(PC),
-        .read_data(INSTR)
+        .read_data(INSTR_F)
     );
 
     //deciding whether to flush instruction or not
-    assign INSTR_REAL = flush_FD ? 32'h00000013 : INSTR; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
+    assign INSTR_F_FLUSH = flush_FD ? 32'h00000013 : INSTR_F; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
 
     //preparing data for pipeline reg
-    assign f2d_data_F = {INSTR_REAL, PC};
+    assign f2d_data_F = {INSTR_F_FLUSH, PC};
 
 //pipeline register
 /* < IF/ID > */ //====================================================================================================
@@ -195,14 +196,17 @@ module riscv_cpu
     //unpacking IF/ID pipeline reg
     assign {INSTR_D, PC_D} = f2d_data_D;
 
+    //deciding whether to flush instruction or not
+    assign INSTR_D_FLUSH = flush_DE ? 32'h00000013 : INSTR_D; //if flushing, replace instruction with NOP 
+
     //given no seq engine, ID goes str8 into ustore
-    UID__ my_uid ( .instr (INSTR_D), .uip(UIP) );
+    UID__ my_uid ( .instr (INSTR_D_FLUSH), .uip(UIP) );
     US__ my_ustore ( .uip(UIP), .sig(sig) );
     //sig is all the control signals, see sig_declar.inc or "SIG" section in microcode for list
 
     //muxing of reg addrs, and imediates
     id_t my_id_t (
-            .instr(INSTR_D),
+            .instr(INSTR_D_FLUSH),
             .r_type,
             .i_type,
             .s_type,
@@ -261,7 +265,7 @@ module riscv_cpu
     ) id_ex_reg (
         .d(d2e_data_D),      // Include IM in pipeline
         .clk(clk),
-        .rst(rst && !flush_DE), //flush on branch taken (DeMorgan's law for active low reset)
+        .rst(rst),
         .wr_en(pipeline_advance_DE),
         .q(d2e_data_E)
     );
@@ -271,7 +275,7 @@ module riscv_cpu
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
-        .rst(rst && !flush_DE), //flush on branch taken (DeMorgan's law for active low reset)
+        .rst(rst),
         .wr_en(pipeline_advance_DE),
         .q(d2e_control_E)
     );
