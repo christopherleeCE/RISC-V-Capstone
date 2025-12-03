@@ -34,8 +34,6 @@ assign product_uu = {{32{1'b0}}, operand_a} * {{32{1'b0}}, operand_b};
 logic [WIDTH-1:0] add_result, sub_result;
 assign add_result = operand_a + operand_b;
 assign sub_result = operand_a - operand_b;
-logic eq_flag;
-assign eq_flag = (operand_a == operand_b);
 
 always_comb begin
     unique case(1'b1)
@@ -53,6 +51,6 @@ always_comb begin
 end
 
 // Zero flag logic
-assign zero_flag = alu_sel_sub ? eq_flag : ( result == '0 );
+assign zero_flag = ( result == '0 );
 
 endmodule

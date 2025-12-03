@@ -145,7 +145,7 @@ module riscv_cpu
 
     //Control Hazard Handling
     assign flush_FD = redirect_pc; //flush IF/ID pipeline reg if branch taken by inserting NOP
-    assign flush_DE = redirect_pc; //flush ID/EX pipeline reg if branch taken by resetting control signals
+    assign flush_DE = redirect_pc; //flush ID/EX pipeline reg if branch taken by inserting NOP
 
     //==================================================================================================================== 
     // < IF STARTS HERE >
