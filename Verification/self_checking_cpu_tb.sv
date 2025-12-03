@@ -1,6 +1,6 @@
 /*
-TESTING: BEQ, JAL, MUL, MULH, MULHSU, MULHU
-SUCCESSFUL TESTS: ADDI/NOP, LW, SW, ADD, SUB
+UNVERIFIED/UNSUCCESSFUL: MUL, MULH, MULHSU, MULHU
+SUCCESSFUL TESTS: ADDI/NOP, LW, SW, ADD, SUB, BEQ, JAL, JALR, LUI
 
 - Load up a program in the instruction memory along with any contents in the data memory.
 
@@ -45,6 +45,7 @@ Data pipeline structure
 logic [5:0] [31:0] data_s, data_t, data_u, data_v, data_w, data_x, data_y, data_z;
 logic [31:0] rd_data, rs1_data, rs2_data, pc_data, next_pc_data, mem_data;
 logic [31:0] memory_address, verification_address;
+logic branched_jumped;
 
 
 //instruction components for verification
@@ -96,6 +97,8 @@ always@(posedge clk or negedge rst) begin //async reset
         {if_id, id_ex, ex_mem, mem_wb, post_wb} <= {cpu_dut.INSTR_F_FLUSH, cpu_dut.INSTR_D_FLUSH,id_ex, ex_mem, mem_wb};//instr
         {data_t, data_v, data_x, data_z} <= {data_s, data_u, data_w, data_y}; //data
     end
+
+    branched_jumped <= cpu_dut.redirect_pc; //indicates branch/jump in last cycle
 end
 
 //combinational logic used to retrieve data from various stages in CPU for verification
@@ -104,7 +107,7 @@ always_comb begin
         data_s = {6{32'hdeadbeef}}; //placeholder values, not significant
 
     //EX --------------------------------------------------------------------------------
-    if(id_ex[6:0] == 7'b1100011 || id_ex[6:0] == 7'b1101111 || id_ex[6:0] == 7'b1100111) begin //---B-TYPE/J-TYPE---
+    if(id_ex[6:0] == 7'b1100011 || id_ex[6:0] == 7'b1101111 || id_ex[6:0] == 7'b1100111) begin //---B-TYPE/JAL/JALR
         data_u = {
             data_t[5], //mem
             data_t[4], //next_pc
@@ -125,16 +128,16 @@ always_comb begin
             data_v[3], //pc
             cpu_dut.my_reg_file.regs_out[ex_mem[24:20]], //rs2
             cpu_dut.my_reg_file.regs_out[ex_mem[19:15]], //rs1
-            data_t[0] //rd
+            data_v[0] //rd
         };
-    end else if(ex_mem[6:0] == 7'b1100011 || ex_mem[6:0] == 7'b1101111 || ex_mem[6:0] == 7'b1100111) begin //---B-TYPE/J-TYPE--
+    end else if(ex_mem[6:0] == 7'b1100011 || ex_mem[6:0] == 7'b1101111 || ex_mem[6:0] == 7'b1100111) begin //--B-TYPE/JAL/JALR
         data_w = {
             data_v[5], //mem
-            cpu_dut.PC, //next_pc
+            (branched_jumped)? cpu_dut.PC: cpu_dut.PC_E,  //.PC after flush, PC_E in normal condition
             data_v[3], //pc
             data_v[2], //rs2
             data_v[1], //rs1
-            data_t[0] //rd
+            data_v[0] //rd
         };
     end else begin
         data_w = data_v;
@@ -244,7 +247,6 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
                 else instruction_failure = 1;//compare contents of model register with CPU register
             end
 
-
         //-M-TYPE---------------
         end else if (func7 == 7'b0000001) begin
             if (func3 == 3'b000) begin //----MUL------------------------------
@@ -283,6 +285,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, expected_result);
 
 
+
     end else if (opcode == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
         {imm_i, rs1, func3, rd} = post_wb[31:7];
         $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1,
@@ -317,6 +320,29 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
 
         $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, mem_data); //model vs cpu registers
 
+    end else if (opcode == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
+        {imm_i, rs1, func3, rd} = post_wb[31:7];
+        $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1,
+        func3, rd, opcode); //instruction info
+
+        if(func3 == 3'b000) begin //-------JALR-------------------------------
+            $display("\tIdentified as JALR.");
+            expected_result = rs1_data + {{20{imm_i[11]}}, imm_i};
+            if(rd == 5'd0)begin
+                additional_result = 32'd0; //jump (no link register)
+            end else begin
+                additional_result = pc_data + 32'd4; //jump and link register
+            end 
+            assert(next_pc_data == expected_result && rd_data == additional_result) $display("JALR successful.");
+            else instruction_failure = 1; //ensure the PC and rd have changed to appropiate values
+
+        end
+
+        //output the PC and the rd for the CPU and the model
+        $display("Value of program counter:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
+        $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, additional_result); //model vs cpu registers
+
+
 
     end else if (opcode == 7'b0100011) begin //------S-TYPE----------------------------------
         {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = post_wb[31:7];
@@ -333,6 +359,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
 
         //compare model vs CPU memory contents
         $display("Contents of data memory at 0x%h:\n\tCPU: 0x%h\n\tModel: 0x%h", verification_address, mem_data, rs2_data);
+
 
 
     end else if (opcode == 7'b1100011) begin //------B-TYPE----------------------------
@@ -356,6 +383,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         //compare the model's expected PC value vs the CPU's program counter
         $display("Value of program counter:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
 
+
     
     end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
         {imm_j[20], imm_j[10:1], imm_j[11], imm_j[19:12], rd} = post_wb[31:7];
@@ -376,6 +404,7 @@ always @(negedge clk) begin //read on negative edge to give everything time to s
         //output the PC and the rd for the CPU and the model
         $display("Value of program counter:\n\tCPU: 0x%h\n\tModel: 0x%h", next_pc_data, expected_result);
         $display("Contents of register x%d:\n\tCPU: 0x%h\n\tModel: 0x%h", rd, rd_data, additional_result); //model vs cpu registers
+
 
 
     end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
