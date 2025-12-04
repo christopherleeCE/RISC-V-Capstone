@@ -32,11 +32,17 @@ module riscv_cpu
     logic [31:0] INSTR_D_FLUSH;     //ID instruction after pipeline reg, after flush
     logic [UIP_WIDTH-1:0] UIP;
     logic [4:0] RS1;               //read addr of regfile 
+    logic [4:0] RS1_E;            //read addr of regfile after pipeline reg
     logic [31:0] RS1_DATA;          //read1 from regfile
+    logic [31:0] RS1_DATA_FWD;      //read1 from regfile after data hazard forwarding
     logic [31:0] RS1_DATA_E;       //read1 from regfile after pipeline reg
+    logic [31:0] RS1_DATA_E_FWD;   //read1 from regfile after data hazard forwarding]
     logic [4:0] RS2;               //read addr of regfile
+    logic [4:0] RS2_E;            //read addr of regfile after pipeline reg
     logic [31:0] RS2_DATA;          //read2 from regfile
+    logic [31:0] RS2_DATA_FWD;      //read2 from regfile after data hazard forwarding
     logic [31:0] RS2_DATA_E;       //read2 from regfile after pipeline reg
+    logic [31:0] RS2_DATA_E_FWD;   //read2 from regfile after data hazard forwarding
     logic [31:0] RS2_DATA_M;    //read2 from regfile after 2pipeline reg
     logic [4:0] RD;                //write addr of regfile
     logic [4:0] RD_E;             //write addr of regfile after pipeline reg
@@ -59,9 +65,9 @@ module riscv_cpu
     logic [63:0] f2d_data_F;          //fetch to decode data signals
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
 
-    logic [132:0] d2e_data_D;          //decode to execute data signals
+    logic [142:0] d2e_data_D;          //decode to execute data signals
     logic [17:0] d2e_control_D;       //decode to execute control signals
-    logic [132:0] d2e_data_E;       //decode to execute post pipeline
+    logic [142:0] d2e_data_E;       //decode to execute post pipeline
     logic [17:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [100:0] e2m_data_E;          //execute to memory data signals
@@ -112,6 +118,14 @@ module riscv_cpu
     // flush signals for control hazard handling
     logic flush_FD, flush_DE;  
 
+    // data hazard case signals
+    logic R1_case_dm2alu;
+    logic R1_case_rf2alu;
+    logic R1_case_rf2rf;
+    logic R2_case_dm2alu;
+    logic R2_case_rf2alu;
+    logic R2_case_rf2rf;
+
     // pipeline advance for data signals
     logic pipeline_advance; //when high, pipeline regs advance
 
@@ -146,6 +160,29 @@ module riscv_cpu
     //Control Hazard Handling
     assign flush_FD = redirect_pc; //flush IF/ID pipeline reg if branch taken by inserting NOP
     assign flush_DE = redirect_pc; //flush ID/EX pipeline reg if branch taken by inserting NOP
+
+    //Data Hazard Handling (might put in another module)
+    //detecting data hazards for RS1
+    assign R1_case_dm2alu = (reg_file_wr_en_M && 
+                            (RD_M != 5'd0) && 
+                            (RD_M == RS1_E)    );    //DM to ALU
+    assign R1_case_rf2alu = (reg_file_wr_en_W && 
+                            (RD_W != 5'd0) && 
+                            (RD_W == RS1_E)    );    //RF to ALU
+    assign R1_case_rf2rf = (reg_file_wr_en_W && 
+                            (RD_W != 5'd0) && 
+                            (RD_W == RS1)    );      //RF to RF
+
+    //detecting data hazards for RS2
+    assign R2_case_dm2alu = (reg_file_wr_en_M && 
+                            (RD_M != 5'd0) && 
+                            (RD_M == RS2_E)    );
+    assign R2_case_rf2alu = (reg_file_wr_en_W && 
+                            (RD_W != 5'd0) && 
+                            (RD_W == RS2_E)    );
+    assign R2_case_rf2rf = (reg_file_wr_en_W && 
+                            (RD_W != 5'd0) && 
+                            (RD_W == RS2)    );
 
     //==================================================================================================================== 
     // < IF STARTS HERE >
@@ -235,8 +272,12 @@ module riscv_cpu
         .rst(rst)
     );
 
+    //Data Hazard Forwarding for Register File Read
+    assign RS1_DATA_FWD = (R1_case_rf2rf) ? ALU_W : RS1_DATA;     //Before WB clock, take from ALU_W if RF to RF case
+    assign RS2_DATA_FWD = (R2_case_rf2rf) ? ALU_W : RS2_DATA;     //Before WB clock, take from ALU_W if RF to RF case
+
     //preparing data and control signals for pipeline reg
-    assign d2e_data_D = {RS1_DATA, RS2_DATA, IM, RD, PC_D};
+    assign d2e_data_D = {RS1_DATA_FWD, RS2_DATA_FWD, IM, RD, PC_D, RS1, RS2};
     assign d2e_control_D = {
         alu_use_im,
         alu_sel_add,
@@ -261,7 +302,7 @@ module riscv_cpu
 /* < ID/EX > */ //====================================================================================================
 
     dff_async_reset #(
-        .WIDTH(133)
+        .WIDTH(143)
     ) id_ex_reg (
         .d(d2e_data_D),      // Include IM in pipeline
         .clk(clk),
@@ -283,7 +324,7 @@ module riscv_cpu
 //==================================================================================================================== 
 
     //unpacking data and control signals from pipeline reg
-    assign {RS1_DATA_E, RS2_DATA_E, IM_E, RD_E, PC_E} = d2e_data_E;
+    assign {RS1_DATA_E, RS2_DATA_E, IM_E, RD_E, PC_E, RS1_E, RS2_E} = d2e_data_E;
     assign PC_plus_4_E = PC_E + 32'd4;
     assign {
         alu_use_im_E,
@@ -306,18 +347,37 @@ module riscv_cpu
         halt_E
     } = d2e_control_E;
 
+    //Data Hazard Forwarding MUXes for RS1
+    always_comb begin
+        unique case (1'b1)
+
+        (R1_case_dm2alu && !data_mem_wr_en_M) : RS1_DATA_E_FWD = ALU_M;         //Take from ALU_M if DM to ALU case and not LW operation
+        R1_case_rf2alu : RS1_DATA_E_FWD = ALU_W;                                //Take from ALU_W if RF to ALU case
+        (R1_case_dm2alu && data_mem_wr_en_M)  : RS1_DATA_E_FWD = DATA_MEM_OUT;  //Take from DATA_MEM_OUT if DM to ALU case and LW operation
+
+        default : RS1_DATA_E_FWD = RS1_DATA_E;
+        endcase
+    end
+
+    //Data Hazard Forwarding MUXes for RS2
+    always_comb begin
+        unique case (1'b1)
+
+        (R2_case_dm2alu && !data_mem_wr_en_M) : RS2_DATA_E_FWD = ALU_M;
+        R2_case_rf2alu : RS2_DATA_E_FWD = ALU_W;
+        (R2_case_rf2rf && data_mem_wr_en_M)  : RS2_DATA_E_FWD = DATA_MEM_OUT;
+
+        default : RS2_DATA_E_FWD = RS2_DATA_E;
+        endcase
+    end
+
     /* < ALU STARTS HERE > */
-
-    /* Please note NOP's are a pseudoinstruction in RISC-V handled by the assembler as an ADDI of 0 with the zero register
-    back into the zero register, and it likely doesn't need its own signal. Also it may be worth considering using func3 
-    and func7 instead of individual signals to reduce the number of signals being passed into the module. */
-
     alu #(
         .WIDTH(32)
     ) alu_again_colon_closing_parenthesis (
-        .operand_a(RS1_DATA_E),
+        .operand_a(RS1_DATA_E_FWD),
         .operand_b(
-            alu_use_im_E ? IM_E : RS2_DATA_E   // IM changed to IM_E
+            alu_use_im_E ? IM_E : RS2_DATA_E_FWD   // IM changed to IM_E
             ),
         .alu_sel_add(alu_sel_add_E),
         .alu_sel_sub(alu_sel_sub_E),
@@ -336,7 +396,7 @@ module riscv_cpu
     assign PC_target = (alu_sel_add_E && jump_en_E)?  ALU : PC_E + IM_E; //left is for JALR, right for branches and JAL
 
     //preparing data and control signals for pipeline reg
-    assign e2m_data_E = {ALU, RS2_DATA_E, RD_E, PC_plus_4_E};
+    assign e2m_data_E = {ALU, RS2_DATA_E_FWD, RD_E, PC_plus_4_E};
     assign e2m_control_E = {
         data_mem_wr_en_E,
         dbus_sel_alu_E,
