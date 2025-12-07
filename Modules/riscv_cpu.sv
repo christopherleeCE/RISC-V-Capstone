@@ -349,11 +349,11 @@ module riscv_cpu
 
     //Data Hazard Forwarding MUXes for RS1
     always_comb begin
-        unique case (1'b1)
+        priority case (1'b1)
 
         (R1_case_dm2alu && !data_mem_wr_en_M) : RS1_DATA_E_FWD = ALU_M;         //Take from ALU_M if DM to ALU case and not LW operation
-        R1_case_rf2alu : RS1_DATA_E_FWD = ALU_W;                                //Take from ALU_W if RF to ALU case
         (R1_case_dm2alu && data_mem_wr_en_M)  : RS1_DATA_E_FWD = DATA_MEM_OUT;  //Take from DATA_MEM_OUT if DM to ALU case and LW operation
+        R1_case_rf2alu : RS1_DATA_E_FWD = ALU_W;                                //Take from ALU_W if RF to ALU case
 
         default : RS1_DATA_E_FWD = RS1_DATA_E;
         endcase
@@ -361,11 +361,11 @@ module riscv_cpu
 
     //Data Hazard Forwarding MUXes for RS2
     always_comb begin
-        unique case (1'b1)
+        priority case (1'b1)
 
         (R2_case_dm2alu && !data_mem_wr_en_M) : RS2_DATA_E_FWD = ALU_M;
+        (R2_case_dm2alu && data_mem_wr_en_M)  : RS2_DATA_E_FWD = DATA_MEM_OUT;        
         R2_case_rf2alu : RS2_DATA_E_FWD = ALU_W;
-        (R2_case_rf2rf && data_mem_wr_en_M)  : RS2_DATA_E_FWD = DATA_MEM_OUT;
 
         default : RS2_DATA_E_FWD = RS2_DATA_E;
         endcase
