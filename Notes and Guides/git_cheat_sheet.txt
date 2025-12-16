@@ -55,3 +55,9 @@ if local is out of date
     this instructions under "before SAVING changes to the main branch on github", if
     you run into an issue dm me (chris) or possible holden for help.
     -DO NOT USE -force, before pushing make sure that your commit doesnt break anything
+
+reset local to align with main (lose all local changes)
+=======================================================
+git fetch --all
+git reset --hard origin/main
+git clean -fd
