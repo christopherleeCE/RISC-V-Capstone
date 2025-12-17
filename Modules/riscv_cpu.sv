@@ -442,7 +442,8 @@ module riscv_cpu
         halt_M
     } = e2m_control_M;     
 
-    //should be converted to proper RAM at some point
+    //TODO i think EC = 32 might mean we only have words of datamem, mabye increase at some point
+    //-chris
     data_memory #(
         .BIT_WIDTH(32),
         .ENTRY_COUNT(32)
