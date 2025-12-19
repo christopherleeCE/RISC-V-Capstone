@@ -11,6 +11,9 @@ SUCCESSFUL TESTS: ADDI/NOP, LW, SW, ADD, SUB, BEQ, JAL, JALR, LUI
 `timescale 1ns/1ns
 
 module self_checking_cpu_tb ();
+
+    /* OLD CODE */
+
 //PARAMETERS/BUSES----------------------------------------------------------------------------------------------------------
 //constants
 parameter int CLOCK_PERIOD = 20;
@@ -20,47 +23,8 @@ parameter int NUM_DATA_WORDS = 32;
 //declare the buses and signals
 logic clk, rst, ohalt;
 
-/*
-Instruction Pipeline: This syncs up verification with the instructions in the CPU, and drives the data pipeline as
-it sweeps through the CPU.
-*/
-logic [31:0] instruction;
-logic [31:0] if_id, id_ex, ex_mem, mem_wb, post_wb;
-
-/*
-Data Pipeline: This collects the parameters and output for each instruction as the instruction travels through the CPU.
-Each instruction type will collect the appropiate data; for example, for LW, the pipeline retrieves the memory value in
-the MEM stage and the register value in the WB stage, and transport them to verification where we can simply compare and
-confirm they're equal, which means the CPU loaded the correct value to the register from memory.
-
-Data pipeline structure
-5 - memory
-4 - next_pc
-3 - pc
-2 - rs2
-1 - rs1
-0 - rd
-
-*/
-logic [5:0] [31:0] data_s, data_t, data_u, data_v, data_w, data_x, data_y, data_z;
-logic [31:0] rd_data, rs1_data, rs2_data, pc_data, next_pc_data, mem_data;
-logic [31:0] memory_address, verification_address;
-logic branched_jumped;
-
-
-//instruction components for verification
-int instruction_failure;
-logic [11:0] imm_i, imm_s;
-logic [12:0] imm_b; // not necessary, but helps keep consistency with ISA
-logic [19:0] imm_u;
-logic [20:0] imm_j; //same consistency reasons
-logic [4:0]  rs1, rs2, rd;
-logic [2:0]  func3;
-logic [6:0]  func7;
-logic [6:0]  opcode;
-logic [31:0] data_mem_addr;
-logic [31:0] expected_result, additional_result;
-logic signed [63:0] product;
+`include "sig_declare.inc";
+logic [UIP_WIDTH-1:0] UIP;
 
 //golden logic signals
 
@@ -89,43 +53,184 @@ end
 
 /*Start of new top file*/
 
-//golden sginals, these need to be verififed, they are stored in a 5x1 array, one or each clk of the execution in the DUT
-logic PC [4:0];
+    //golden sginals, these are what the DUT is verfied against, they are stored in a 5x1 array, one or each clk of the execution in the DUT
+    logic [31:0] PC [5:0];
+    logic [31:0] PC_TARGET [5:0];
+    logic [31:0] INSTR_ASYNC;
+    logic [31:0] INSTR [5:0];
 
-logic [4:0] RS1 [4:0];
-logic [4:0] RS2 [4:0];
-logic [31:0] RS1_DATA [4:0];
-logic [31:0] RS2_DATA [4:0];
-logic [31:0] REGFILE [ NUMS OF REGS ] [4:0]; //address this monstrosity of a array is as follows REGFILE [regnum] [clk cycle (4 through 0)]
-                                            // or REGFILE [regnum] [clk cycle (4 through 0)] [bit]
+    logic [4:0] RS1 [5:0];
+    logic [4:0] RS2 [5:0];
+    logic [31:0] RS1_DATA [5:0];
+    logic [31:0] RS2_DATA [5:0];
+    logic [31:0] REGFILE [31:0] [5:0]; //address this monstrosity of a array is as follows REGFILE [regnum] [clk cycle (4 through 0)]
+                                                    // or REGFILE [regnum] [clk cycle (4 through 0)] [bit]
 
-logic [31:0] ALU_OPERAND_A [4:0];
-logic [31:0] ALU_OPERAND_A [4:0];
-logic [31:0] ALU [4:0];
+    logic [31:0] DATA_MEM_IN [5:0];
+    logic [31:0] DATA_MEM_IN_ADDR [5:0];
+    logic [31:0] DATA_MEM_OUT [5:0];
+    logic [31:0] DATA_MEM_OUT_ADDR [5:0];
+    logic [31:0] DATA_MEM [ TODO_ENTRY_COUNT ] [5:0];
 
-logic [31:0] DATA_MEM_IN [4:0];
-logic [31:0] DATA_MEM_IN_ADDR [4:0];
-logic [31:0] DATA_MEM_OUT [4:0];
-logic [31:0] DATA_MEM_OUT_ADDR [4:0];
-logic [31:0] DATA_MEM [ENTRY_COUNT] [4:0];
-
-//these signals, while being in the IF stage, are more akin to being in the WB stage, thuse they are down here
-//something to think about, maybe we dont actually verify these two signals, but the contents of the regfile itself?
-//like for example in add t0 t1 t2, we just need to check the contents of t0 after the end of the DUT exectution
-//with the calculated result in the regfile in the golden, that being said its kinda wierd cus the regile in two stages
-//at the same time
-logic [4:0] RD_W [4:0];
-logic [31:0] RD_DATA [4:0];
-//REGFILE, declared above
-
+    //these signals, while being in the IF stage, are more akin to being in the WB stage, thuse they are down here
+    //something to think about, maybe we dont actually verify these two signals, but the contents of the regfile itself?
+    //like for example in add t0 t1 t2, we just need to check the contents of t0 after the end of the DUT exectution
+    //with the calculated result in the regfile in the golden, that being said its kinda wierd cus the regile in two stages
+    //at the same time
+    logic [4:0] RD_W [5:0];
+    logic [31:0] RD_DATA [5:0];
+    //REGFILE, declared above
 
 
+/* borrowed modules, i could think of a beter way to get these signals that didnt make me want to kys so i just borrowed modules
+if there is a better way to get these signals (RS1, INSTR, etc.) feel free to replace*/
+
+    //declaration of golden_cpus instr mem, this instansiation should be a perfect mirror of whats instasiated in the DUT (i think)
+    //if the DUT.sv's declaration changes, it should be mirrored here
+    instruction_memory #(
+        .BIT_WIDTH(32),
+        .ENTRY_COUNT(32)
+    ) instr_mem (
+        .read_address(PC[0]),
+        .read_data(INSTR_ASYNC)
+    );
+
+    UID__ my_uid ( .instr (INSTR_ASYNC), .uip(UIP) );
+    US__ my_ustore ( .uip(UIP), .sig(sig) );
+
+    //muxing of reg addrs, and imediates
+    id_t my_id_t (
+            .instr(INSTR_ASYNC),
+            .r_type,
+            .i_type,
+            .s_type,
+            .b_type,
+            .u_type,
+            .j_type,
+            .rs1(RS1_ASYNC),
+            .rs2(RS2_ASYNC),
+            .rd(RD_ASYNC),
+            .im(IM_ASYNC)
+        );
 
 
 
 
 
 
+//progress 5x5 array
+always@(posedge clk) begin
+
+    //progress instrucition snapshot
+    PC [1]                              <=PC [0];
+    PC_TARGET [1]                       <=PC_TARGET [0];
+    INSTR[1]                            <=INSTR[0];
+    RS1 [1]                             <=RS1 [0];
+    RS2 [1]                             <=RS2 [0];
+    RS1_DATA [1]                        <=RS1_DATA [0];
+    RS2_DATA [1]                        <=RS2_DATA [0];
+    REGFILE [1]   <=REGFILE [0];
+    DATA_MEM_IN [1]                     <=DATA_MEM_IN [0];
+    DATA_MEM_IN_ADDR [1]                <=DATA_MEM_IN_ADDR [0];
+    DATA_MEM_OUT [1]                    <=DATA_MEM_OUT [0];
+    DATA_MEM_OUT_ADDR [1]               <=DATA_MEM_OUT_ADDR [0];
+    DATA_MEM [TODO_ENTRY_COUNT] [1]     <=DATA_MEM [TODO_ENTRY_COUNT] [0];
+    RD_W [1]                            <=RD_W [0];
+    RD_DATA [1]                         <=RD_DATA [0];
+
+    PC [2]                              <=PC [1];
+    PC_TARGET [2]                       <=PC_TARGET [1];
+    INSTR[2]                            <=INSTR[1];
+    RS1 [2]                             <=RS1 [1];
+    RS2 [2]                             <=RS2 [1];
+    RS1_DATA [2]                        <=RS1_DATA [1];
+    RS2_DATA [2]                        <=RS2_DATA [1];
+    REGFILE [2]   <=REGFILE [1];
+    DATA_MEM_IN [2]                     <=DATA_MEM_IN [1];
+    DATA_MEM_IN_ADDR [2]                <=DATA_MEM_IN_ADDR [1];
+    DATA_MEM_OUT [2]                    <=DATA_MEM_OUT [1];
+    DATA_MEM_OUT_ADDR [2]               <=DATA_MEM_OUT_ADDR [1];
+    DATA_MEM [TODO_ENTRY_COUNT] [2]     <=DATA_MEM [TODO_ENTRY_COUNT] [1];
+    RD_W [2]                            <=RD_W [1];
+    RD_DATA [2]                         <=RD_DATA [1];
+
+    PC [3]                              <=PC [2];
+    PC_TARGET [3]                       <=PC_TARGET [2];
+    INSTR[3]                            <=INSTR[2];
+    RS1 [3]                             <=RS1 [2];
+    RS2 [3]                             <=RS2 [2];
+    RS1_DATA [3]                        <=RS1_DATA [2];
+    RS2_DATA [3]                        <=RS2_DATA [2];
+    REGFILE [3]   <=REGFILE [2];
+    DATA_MEM_IN [3]                     <=DATA_MEM_IN [2];
+    DATA_MEM_IN_ADDR [3]                <=DATA_MEM_IN_ADDR [2];
+    DATA_MEM_OUT [3]                    <=DATA_MEM_OUT [2];
+    DATA_MEM_OUT_ADDR [3]               <=DATA_MEM_OUT_ADDR [2];
+    DATA_MEM [TODO_ENTRY_COUNT] [3]     <=DATA_MEM [TODO_ENTRY_COUNT] [2];
+    RD_W [3]                            <=RD_W [2];
+    RD_DATA [3]                         <=RD_DATA [2];
+
+    PC [4]                              <=PC [3];
+    PC_TARGET [4]                       <=PC_TARGET [3];
+    INSTR[4]                            <=INSTR[3];
+    RS1 [4]                             <=RS1 [3];
+    RS2 [4]                             <=RS2 [3];
+    RS1_DATA [4]                        <=RS1_DATA [3];
+    RS2_DATA [4]                        <=RS2_DATA [3];
+    REGFILE [4]   <=REGFILE [3];
+    DATA_MEM_IN [4]                     <=DATA_MEM_IN [3];
+    DATA_MEM_IN_ADDR [4]                <=DATA_MEM_IN_ADDR [3];
+    DATA_MEM_OUT [4]                    <=DATA_MEM_OUT [3];
+    DATA_MEM_OUT_ADDR [4]               <=DATA_MEM_OUT_ADDR [3];
+    DATA_MEM [TODO_ENTRY_COUNT] [4]     <=DATA_MEM [TODO_ENTRY_COUNT] [3];
+    RD_W [4]                            <=RD_W [3];
+    RD_DATA [4]                         <=RD_DATA [3];
+
+    //this timestamp might not need to be used
+    PC [5]                              <=PC [4];
+    PC_TARGET [5]                       <=PC_TARGET [4];
+    INSTR[5]                            <=INSTR[4];
+    RS1 [5]                             <=RS1 [4];
+    RS2 [5]                             <=RS2 [4];
+    RS1_DATA [5]                        <=RS1_DATA [4];
+    RS2_DATA [5]                        <=RS2_DATA [4];
+    REGFILE [5]   <=REGFILE [4];
+    DATA_MEM_IN [5]                     <=DATA_MEM_IN [4];
+    DATA_MEM_IN_ADDR [5]                <=DATA_MEM_IN_ADDR [4];
+    DATA_MEM_OUT [5]                    <=DATA_MEM_OUT [4];
+    DATA_MEM_OUT_ADDR [5]               <=DATA_MEM_OUT_ADDR [4];
+    DATA_MEM [TODO_ENTRY_COUNT] [5]     <=DATA_MEM [TODO_ENTRY_COUNT] [4];
+    RD_W [5]                            <=RD_W [4];
+    RD_DATA [5]                         <=RD_DATA [4];
+
+end
+
+//calulate golden signals and store in row zero of 5x5
+always@(posedge clk) begin  //TODO I DONT KNOW HOW SEPARATING THIS CODE INTO A SEPARATE ALWAYS BLOCK AFFECT THE ORDER OF EXECUTION OF THESE
+                            //ARRAY MOVEMENT, I SEPARATED THEM FOR READABILITY BUT THEY MAY VERY WELL FUCK UP THE ARRAY MOVMENT
+
+    PC [0]                                  <= PC_TARGET[1];    //TODO pay attention to the order of pc[0] -> instr_mem & inst_asyn -> inst, i think as it is the timing is fucked up where pc[0] might be "null" when we fetch the instruction
+    PC_TARGET[0]                            <= 
+    INSTR[0]                                <= INSTR_ASYNC;
+    RS1 [0]                                 <= RS1_ASYNC;
+    RS2 [0]                                 <= RS2_ASYNC;
+    RS1_DATA [0]                            <=
+    RS2_DATA [0]                            <=
+    REGFILE [RD_W] [0]                      <= RD_DATA[0]
+    DATA_MEM_IN [0]                         <=
+    DATA_MEM_IN_ADDR [0]                    <=
+    DATA_MEM_OUT [0]                        <=
+    DATA_MEM_OUT_ADDR [0]                   <=
+    DATA_MEM [TODO_ENTRY_COUNT] [0]         <=
+    RD_W [0]                                <=
+    RD_DATA [0]                             <=
+
+end
+
+
+//TODO all of these should be blocking (syncronouse)
+
+/* start of old code */
 
 //DUAL PIPELINE ----------------------------------------------------------------------------------------------------------------
 //sequential logic to create the pipeline
