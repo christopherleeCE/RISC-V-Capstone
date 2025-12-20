@@ -1,0 +1,9 @@
+BEGIN 1:riscv_cpu:fast:work
+    PC :  1:top_riscv_cpu:fast:work
+END 
+BEGIN 1:reg_file:fast:work
+    regs_out :  1:top_riscv_cpu:fast:work
+END 
+BEGIN 1:data_memory:fast:work
+    data_mem :  1:top_riscv_cpu:fast:work
+END 

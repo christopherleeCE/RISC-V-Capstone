@@ -1,0 +1,269 @@
+# Questa Intel Starter FPGA Edition-64 vlog 2024.3 Compiler 2024.09 Sep 10 2024
+# Start time: 16:03:39 on Dec 20,2025
+# vlog -reportprogress 300 alu.sv data_memory.sv dff_async_reset.sv id_t.sv instruction_memory.sv pc.sv reg_file.sv riscv_cpu.sv self_checking_cpu_tb.sv top_riscv_cpu.sv uid.sv ustore.sv 
+# -- Compiling module alu
+# -- Compiling module data_memory
+# -- Compiling module dff_async_reset
+# -- Compiling module id_t
+# -- Compiling module instruction_memory
+# -- Compiling module pc
+# -- Compiling module reg_file
+# -- Compiling module riscv_cpu
+# -- Compiling module self_checking_cpu_tb
+# -- Compiling module top_riscv_cpu
+# -- Compiling module UID__
+# -- Compiling module US__
+# 
+# Top level modules:
+# 	self_checking_cpu_tb
+# 	top_riscv_cpu
+# End time: 16:03:39 on Dec 20,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vsim -voptargs="+acc" work.top_riscv_cpu 
+# Start time: 16:03:39 on Dec 20,2025
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Warning: (vopt-10908) Some optimizations are turned off because the +acc switch is in effect.
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
+# Loading sv_std.std
+# Loading work.top_riscv_cpu(fast)
+# Loading work.riscv_cpu(fast)
+# Loading work.pc(fast)
+# Loading work.dff_async_reset(fast)
+# Loading work.instruction_memory(fast)
+# Loading work.dff_async_reset(fast__1)
+# Loading work.UID__(fast)
+# Loading work.US__(fast)
+# Loading work.id_t(fast)
+# Loading work.reg_file(fast)
+# Loading work.dff_async_reset(fast__2)
+# Loading work.dff_async_reset(fast__3)
+# Loading work.alu(fast)
+# Loading work.dff_async_reset(fast__4)
+# Loading work.dff_async_reset(fast__5)
+# Loading work.data_memory(fast)
+# Loading work.dff_async_reset(fast__6)
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: xxxxxxxx
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000000
+# 	INSTR_ASYNC: 00a00513
+# 	opcode: 13
+# 	I-Type: imm: 0b000000001010, rs1: 0b00000, func3: 0b000, rd: 0b01010, opcode: 0b0010011
+# 	Identified as ADDI.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000004
+# 	INSTR_ASYNC: 00000293
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00101, opcode: 0b0010011
+# 	Identified as ADDI.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000008
+# 	INSTR_ASYNC: 00000013
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00000, opcode: 0b0010011
+# 	Identified as NOP.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 0000000c
+# 	INSTR_ASYNC: 00000013
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00000, opcode: 0b0010011
+# 	Identified as NOP.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000010
+# 	INSTR_ASYNC: 00000013
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00000, opcode: 0b0010011
+# 	Identified as NOP.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000014
+# 	INSTR_ASYNC: 014000ef
+# 	opcode: 6f
+# 	J-Type: imm: 0b00000000000000001010, rsd: 0b00001, opcode: 0b1101111
+# 	Identified as JAL.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000018
+# 	INSTR_ASYNC: 00000013
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00000, opcode: 0b0010011
+# 	Identified as NOP.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 0000001c
+# 	INSTR_ASYNC: 00000013
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00000, opcode: 0b0010011
+# 	Identified as NOP.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000020
+# 	INSTR_ASYNC: 00000013
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00000, opcode: 0b0010011
+# 	Identified as NOP.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000024
+# 	INSTR_ASYNC: 00000073
+# 	opcode: 73
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000028
+# 	INSTR_ASYNC: 00128293
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000001, rs1: 0b00101, func3: 0b000, rd: 0b00101, opcode: 0b0010011
+# 	Identified as ADDI.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 0000002c
+# 	INSTR_ASYNC: 00000013
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00000, opcode: 0b0010011
+# 	Identified as NOP.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000030
+# 	INSTR_ASYNC: 00000013
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00000, opcode: 0b0010011
+# 	Identified as NOP.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000034
+# 	INSTR_ASYNC: 00000013
+# 	opcode: 13
+# 	I-Type: imm: 0b000000000000, rs1: 0b00000, func3: 0b000, rd: 0b00000, opcode: 0b0010011
+# 	Identified as NOP.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000038
+# 	INSTR_ASYNC: 00550463
+# 	opcode: 63
+# 	B-Type: imm: 0b000000000100, rs2: 0b00101, rs1: 0b01010, func3: 0b000, opcode: 0b1100011
+# 	Identified as BEQ.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 0000003c
+# 	INSTR_ASYNC: fedff06f
+# 	opcode: 6f
+# 	J-Type: imm: 0b11111111111111110110, rsd: 0b00000, opcode: 0b1101111
+# 	Identified as JAL.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000040
+# 	INSTR_ASYNC: 00008067
+# 	opcode: 67
+# 	I-Type: imm: 0b000000000000, rs1: 0b00001, func3: 0b000, rd: 0b00000, opcode: 0b1100111
+# 	Identified as JALR.
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000044
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000048
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 0000004c
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000050
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000054
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000058
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 0000005c
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# 
+# 
+# 
+# ========================================================================================
+# 	Current PC: 00000060
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# 	<### WARNING: Instruction type not currently recognized by TB ###>
+# sim.log

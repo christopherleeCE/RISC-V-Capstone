@@ -14,3 +14,9 @@ Usage
 =====
 riscv64-unknown-elf-as -march=rv32im test.s -o test.o
 riscv64-unknown-elf-objdump -d test.o
+
+Questia
+=======
+in gui, change directory to git directory
+in questia cmd, cd into modules
+run: type nul > sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu; run 1us; transcript file
