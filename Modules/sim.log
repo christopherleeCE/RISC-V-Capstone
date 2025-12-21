@@ -1,5 +1,5 @@
 # Questa Intel Starter FPGA Edition-64 vlog 2024.3 Compiler 2024.09 Sep 10 2024
-# Start time: 16:03:39 on Dec 20,2025
+# Start time: 12:46:39 on Dec 21,2025
 # vlog -reportprogress 300 alu.sv data_memory.sv dff_async_reset.sv id_t.sv instruction_memory.sv pc.sv reg_file.sv riscv_cpu.sv self_checking_cpu_tb.sv top_riscv_cpu.sv uid.sv ustore.sv 
 # -- Compiling module alu
 # -- Compiling module data_memory
@@ -17,13 +17,11 @@
 # Top level modules:
 # 	self_checking_cpu_tb
 # 	top_riscv_cpu
-# End time: 16:03:39 on Dec 20,2025, Elapsed time: 0:00:00
+# End time: 12:46:39 on Dec 21,2025, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # vsim -voptargs="+acc" work.top_riscv_cpu 
-# Start time: 16:03:39 on Dec 20,2025
-# ** Note: (vsim-3812) Design is being optimized...
-# ** Warning: (vopt-10908) Some optimizations are turned off because the +acc switch is in effect.
-# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
+# Start time: 12:46:40 on Dec 21,2025
+# ** Note: (vsim-8009) Loading existing optimized design _opt
 # Loading sv_std.std
 # Loading work.top_riscv_cpu(fast)
 # Loading work.riscv_cpu(fast)
@@ -267,3 +265,4 @@
 # 	opcode: xx
 # 	<### WARNING: Instruction type not currently recognized by TB ###>
 # sim.log
+
