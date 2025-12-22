@@ -12,12 +12,20 @@ WSL
 
 Usage
 =====
-riscv64-unknown-elf-as -march=rv32im test.s -o test.o
-riscv64-unknown-elf-objdump -d test.o
+riscv64-unknown-elf-as -march=rv32im test.s -o test.o; riscv64-unknown-elf-objdump -d test.o
 
+//chris's person command string
+riscv64-unknown-elf-as -march=rv32im chris_prog.s -o chris_prog.o; riscv64-unknown-elf-objdump -d chris_prog.o | tee chris_prog.log; python3 ./load_instr_mem_file.py
 Questia
 =======
 in gui, change directory to git directory
 in questia cmd, cd into modules
 run:
 type nul > sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu; run 1us; transcript file
+
+Writing asm
+===========
+the .s file ONLY expects labels in the jal and jalr, so if i give it
+jal ra, 0x10, it thinks 0x10 is a lable, and not an offset or absolute address, it then sees that that label doesnt exist
+so it then interprets that label to point to the current instruction, that is the jal or jalr. when we objdump it will give 
+us the absolute address that the instruction will actually jump to, which is the location of the jal/jalr instruciton in memmory

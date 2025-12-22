@@ -32,6 +32,12 @@ module top_riscv_cpu();
     logic [31:0] RD_DATA [5:0];
 
 
+    logic [31:0] INSTR_ASYNC;
+    logic [31:0] REGFILE_ASYNC [31:0] = '{default: 32'b0}; // this should not be written to directly, however you can read from it directly 
+    logic [31:0] PC_ASYNC;
+
+
+
 
     //DUT---------------------------------------------------------------------------------------------------------------------
     //instantiate the CPU
@@ -48,14 +54,16 @@ module top_riscv_cpu();
 
     //RESET/MEMORY SETUP ------------------------------------------------------------------------------------------------------
     initial begin
-        //WARNING - reset could potentially mask bugs, your choice to comment or uncomment.
-        rst = 1'b0; //reset the CPU and golden model during startup
-        instruction_failure = 0;
-        repeat(1)@(posedge clk);
+        repeat(1) begin 
+            rst = 1'b0; //tbh reset doesnt really do anything i think
+            instruction_failure = 0;
+            PC_ASYNC <= '0;
+            @(posedge clk);
+        end
+
         rst = 1'b1; //disable the reset
     end
 
-    logic [31:0] INSTR_ASYNC;
     logic [6:0] func7;
     logic [4:0] rs2;
     logic [4:0] rs1;
@@ -67,36 +75,39 @@ module top_riscv_cpu();
     logic [19:0] imm_u;
     logic [20:0] imm_j;
 
-    assign opcode = INSTR_ASYNC[6:0];
-
-    logic [31:0] TEMP_PC;
-    initial begin
-        TEMP_PC <= '0;
-    end
-
-    always @(posedge clk) begin
-        if(rst == 1) begin
-            TEMP_PC <= TEMP_PC + 32'h4;
-        end else begin
-            TEMP_PC <= '0;
-        end
-    end
-
     //declaration of golden_cpus instr mem, this instansiation should be a perfect mirror of whats instasiated in the DUT (i think)
     //if the DUT.sv's declaration changes, it should be mirrored here
     instruction_memory #(
         .BIT_WIDTH(32),
         .ENTRY_COUNT(32)
     ) instr_mem (
-        .read_address(TEMP_PC),
+        .read_address(PC_ASYNC),
         .read_data(INSTR_ASYNC)
     );
 
+    assign opcode = INSTR_ASYNC[6:0];
+  
+    //abstracted write access to prevent writing to the zero register
+    task automatic write_reg(
+        input int unsigned addr,
+        input logic [31:0] word
+    );
 
-    always @(negedge clk) begin //read on negative edge to give everything time to settle
+        if (addr != 0)
+            REGFILE_ASYNC[addr] <= word;
+
+    endtask
+
+
+    always @(posedge clk) begin //golden results calculated on posedge
+
+        logic [63:0] product;
+
+        reg_async_dump();
+
         $write("\n\n\n");
         $display("========================================================================================");
-        $display("\tCurrent PC: %h", TEMP_PC);
+        $display("\tCurrent PC: %h", PC_ASYNC);
         $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
         $display("\topcode: %h", opcode);
 
@@ -110,27 +121,48 @@ module top_riscv_cpu();
             if (func7 == 7'b0000000) begin
                 if (func3 == 3'b000) begin //----ADD------------------------------
                     $display("\tIdentified as ADD.");
+                    write_reg(rd, REGFILE_ASYNC[rs2] + REGFILE_ASYNC[rs1]);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+                    
                 end
 
             end else if (func7 == 7'b0100000) begin     
                 if (func3 == 3'b000) begin //----SUB---------------------------
                     $display("\tIdentified as SUB.");
+                    write_reg(rd, REGFILE_ASYNC[rs1] - REGFILE_ASYNC[rs2]);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+                    
                 end
 
-            //-M-TYPE---------------
+            //-M-TYPE--------------- TODO, li isnt properly loading all of the 1's into the 32bits
             end else if (func7 == 7'b0000001) begin
                 if (func3 == 3'b000) begin //----MUL------------------------------
                     $display("\tIdentified as MUL.");
+                    product = $signed(REGFILE_ASYNC[rs1]) * $signed(REGFILE_ASYNC[rs2]);
+                    write_reg(rd, product[31:0]);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b001) begin //----MULH------------------------------
                     $display("\tIdentified as MULH.");
+                    product = $signed(REGFILE_ASYNC[rs1]) * $signed(REGFILE_ASYNC[rs2]);
+                    $display("%h = %h * %h", product, $signed(REGFILE_ASYNC[rs1]), $signed(REGFILE_ASYNC[rs2]));
+                    write_reg(rd, product[63:32]);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b010) begin //----MULHSU------------------------------
                     $display("\tIdentified as MULHSU.");
+                    product = $signed(REGFILE_ASYNC[rs1]) * $unsigned(REGFILE_ASYNC[rs2]);
+                                        $display("%h", product);
+                    write_reg(rd, product[63:32]);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b011) begin //----MULHU------------------------------
                     $display("\tIdentified as MULHU.");
-                
+                    product = $unsigned(REGFILE_ASYNC[rs1]) * $unsigned(REGFILE_ASYNC[rs2]);
+                                                            $display("%h", product);
+                    write_reg(rd, product[63:32]);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
                 end
 
             end
@@ -143,8 +175,13 @@ module top_riscv_cpu();
             if(func3 == 3'b000) begin //-------ADDI-------------------------------
                 if(imm_i == 20'd0 & rs1 == 5'd0 & rd == 5'd0) begin
                     $display("\tIdentified as NOP.");
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
                 end else begin
                     $display("\tIdentified as ADDI.");
+                    write_reg(rd, REGFILE_ASYNC[rs1] + imm_i);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
                 end
             end
 
@@ -166,6 +203,8 @@ module top_riscv_cpu();
 
             if(func3 == 3'b000) begin //-------JALR-------------------------------
                 $display("\tIdentified as JALR.");
+                write_reg(rd, PC_ASYNC + 4);
+                PC_ASYNC <= REGFILE_ASYNC[rs1] + imm_i;
 
             end
 
@@ -199,6 +238,8 @@ module top_riscv_cpu();
 
             //----JAL------------
             $display("\tIdentified as JAL.");
+            write_reg(rd, PC_ASYNC + 4);
+            PC_ASYNC <= PC_ASYNC + imm_j;
 
         end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
             {imm_u, rd} = INSTR_ASYNC[31:7];
@@ -206,6 +247,8 @@ module top_riscv_cpu();
 
             //----LUI---------------
             $display("\tIdentified as LUI.");
+            write_reg(rd, imm_u << 12);
+            PC_ASYNC <= PC_ASYNC + 32'h4;
 
         end else begin
             //UNKNOWN ------------------------------
@@ -338,13 +381,13 @@ module top_riscv_cpu();
         if (ohalt == 1'b1) begin //HALT SIGNAL --------------------------------------------------------------
             $display("\nWARNING: Recieved halt signal. Pausing verification.");
             $display("Program counter: %d", cpu_dut.PC);
-            reg_mem_dump();
+            reg_async_dump();
             $stop(); //pauses verification if CPU outputs halt signal
 
         end else if(instruction_failure == 1) begin //INSTRUCTION FAILURE----------------------------------
             $display("\nWARNING: Mismatch between model and CPU. Pausing verification.");
             $display("\tPlease check for data hazards and issues in this instruction's datapath/control.");
-            reg_mem_dump();
+            reg_async_dump();
             $stop(); //pauses verification if an instruction has failed OR a data hazard has occured.
             instruction_failure = 0; //resets to zero after pause to check other instructions (OPTIONAL).
 
@@ -353,21 +396,15 @@ module top_riscv_cpu();
     end
 
     //VERIFICATION -----------------------------------------------------------------------------------------------------------------
-    task reg_mem_dump;
+    task reg_async_dump();
         begin
-            //CPU REGISTER DUMP - comment/uncomment as needed
-            $display("CPU REGISTER DUMP, POST WB:");
-            for(int k = 0; k < 32; k++) begin
-                $display("\t\tx%d: 0x%h", k, cpu_dut.my_reg_file.regs_out[k]);
-            end
-
-            //CPU DATA MEMORY DUMP
-            // WARNING: Can be very long, uncomment at your convenience.
-            $display("CPU DATA MEMORY DUMP: ");
-            for (int k = 0; k < NUM_DATA_WORDS; k++) begin
-                $display("\t\t0x%h: 0x%h", k*4, cpu_dut.data_mem.data_mem[k]);
+            $display("REGFILE_ASYNC Dump");
+            for(int ii = 0; ii < 32; ii++) begin
+                $display("\tx%d: 0x%h", ii, REGFILE_ASYNC[ii]);
             end
         end
     endtask
+
+
 
 endmodule
