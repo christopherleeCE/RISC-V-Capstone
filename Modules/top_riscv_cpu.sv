@@ -1,3 +1,7 @@
+/*
+instructions working in the golden, all but mul's
+*/
+
 `timescale 1ns/1ns
 
 module top_riscv_cpu();
@@ -33,7 +37,7 @@ module top_riscv_cpu();
 
 
     logic [31:0] INSTR_ASYNC;
-    logic [31:0] REGFILE_ASYNC [31:0] = '{default: 32'b0}; // this should not be written to directly, however you can read from it directly 
+    logic [31:0] REG_FILE_ASYNC [31:0] = '{default: 32'b0}; // this should not be written to directly, however you can read from it directly 
     logic [31:0] PC_ASYNC;
 
 
@@ -94,10 +98,12 @@ module top_riscv_cpu();
     );
 
         if (addr != 0)
-            REGFILE_ASYNC[addr] <= word;
+            REG_FILE_ASYNC[addr] <= word;
 
     endtask
 
+    //no abstraction needed
+    logic [31:0] DATA_MEM_ASYNC [31:0] = '{default: 32'b0};
 
     always @(posedge clk) begin //golden results calculated on posedge
 
@@ -121,7 +127,7 @@ module top_riscv_cpu();
             if (func7 == 7'b0000000) begin
                 if (func3 == 3'b000) begin //----ADD------------------------------
                     $display("\tIdentified as ADD.");
-                    write_reg(rd, REGFILE_ASYNC[rs2] + REGFILE_ASYNC[rs1]);
+                    write_reg(rd, REG_FILE_ASYNC[rs2] + REG_FILE_ASYNC[rs1]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
                     
                 end
@@ -129,36 +135,36 @@ module top_riscv_cpu();
             end else if (func7 == 7'b0100000) begin     
                 if (func3 == 3'b000) begin //----SUB---------------------------
                     $display("\tIdentified as SUB.");
-                    write_reg(rd, REGFILE_ASYNC[rs1] - REGFILE_ASYNC[rs2]);
+                    write_reg(rd, REG_FILE_ASYNC[rs1] - REG_FILE_ASYNC[rs2]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
                     
                 end
 
-            //-M-TYPE--------------- TODO, li isnt properly loading all of the 1's into the 32bits
+            //-M-TYPE--------------- TODO, the top file fail the test program that chat gave me, not sure if that actually means that its not working, ill go through the math l8r
             end else if (func7 == 7'b0000001) begin
                 if (func3 == 3'b000) begin //----MUL------------------------------
                     $display("\tIdentified as MUL.");
-                    product = $signed(REGFILE_ASYNC[rs1]) * $signed(REGFILE_ASYNC[rs2]);
+                    product = $signed(REG_FILE_ASYNC[rs1]) * $signed(REG_FILE_ASYNC[rs2]);
                     write_reg(rd, product[31:0]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b001) begin //----MULH------------------------------
                     $display("\tIdentified as MULH.");
-                    product = $signed(REGFILE_ASYNC[rs1]) * $signed(REGFILE_ASYNC[rs2]);
-                    $display("%h = %h * %h", product, $signed(REGFILE_ASYNC[rs1]), $signed(REGFILE_ASYNC[rs2]));
+                    product = $signed(REG_FILE_ASYNC[rs1]) * $signed(REG_FILE_ASYNC[rs2]);
+                    $display("%h = %h * %h", product, $signed(REG_FILE_ASYNC[rs1]), $signed(REG_FILE_ASYNC[rs2]));
                     write_reg(rd, product[63:32]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b010) begin //----MULHSU------------------------------
                     $display("\tIdentified as MULHSU.");
-                    product = $signed(REGFILE_ASYNC[rs1]) * $unsigned(REGFILE_ASYNC[rs2]);
+                    product = $signed(REG_FILE_ASYNC[rs1]) * $unsigned(REG_FILE_ASYNC[rs2]);
                                         $display("%h", product);
                     write_reg(rd, product[63:32]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b011) begin //----MULHU------------------------------
                     $display("\tIdentified as MULHU.");
-                    product = $unsigned(REGFILE_ASYNC[rs1]) * $unsigned(REGFILE_ASYNC[rs2]);
+                    product = $unsigned(REG_FILE_ASYNC[rs1]) * $unsigned(REG_FILE_ASYNC[rs2]);
                                                             $display("%h", product);
                     write_reg(rd, product[63:32]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
@@ -179,7 +185,7 @@ module top_riscv_cpu();
 
                 end else begin
                     $display("\tIdentified as ADDI.");
-                    write_reg(rd, REGFILE_ASYNC[rs1] + imm_i);
+                    write_reg(rd, REG_FILE_ASYNC[rs1] + imm_i);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end
@@ -192,6 +198,8 @@ module top_riscv_cpu();
 
             if(func3 == 3'b010) begin //----LW------------------------------------
                 $display("\tIdentified as LW.");
+                write_reg(rd, DATA_MEM_ASYNC[rs1 + imm_i]);
+                PC_ASYNC <= PC_ASYNC + 32'h4;
 
             end
 
@@ -204,7 +212,7 @@ module top_riscv_cpu();
             if(func3 == 3'b000) begin //-------JALR-------------------------------
                 $display("\tIdentified as JALR.");
                 write_reg(rd, PC_ASYNC + 4);
-                PC_ASYNC <= REGFILE_ASYNC[rs1] + imm_i;
+                PC_ASYNC <= REG_FILE_ASYNC[rs1] + imm_i;
 
             end
 
@@ -216,6 +224,8 @@ module top_riscv_cpu();
 
             if(func3 == 3'b010) begin //----SW-------------------------------------
                 $display("\tIdentified as SW.");
+                DATA_MEM_ASYNC[rs1 + imm_s] <= REG_FILE_ASYNC[rs2];
+                PC_ASYNC <= PC_ASYNC + 32'h4;
 
             end
 
@@ -228,7 +238,11 @@ module top_riscv_cpu();
 
             if(func3 == 3'b000) begin //----BEQ------------------------------------------------
                 $display("\tIdentified as BEQ.");
-
+                if(REG_FILE_ASYNC[rs1] == REG_FILE_ASYNC[rs2]) begin
+                    PC_ASYNC <= PC_ASYNC + imm_b;
+                end else begin
+                    PC_ASYNC <= PC_ASYNC + 4;
+                end
             end 
         
         end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
@@ -247,7 +261,7 @@ module top_riscv_cpu();
 
             //----LUI---------------
             $display("\tIdentified as LUI.");
-            write_reg(rd, imm_u << 12);
+            write_reg(rd, {imm_u, REG_FILE_ASYNC[rd][11:0]});
             PC_ASYNC <= PC_ASYNC + 32'h4;
 
         end else begin
@@ -398,9 +412,9 @@ module top_riscv_cpu();
     //VERIFICATION -----------------------------------------------------------------------------------------------------------------
     task reg_async_dump();
         begin
-            $display("REGFILE_ASYNC Dump");
+            $display("REG_FILE_ASYNC Dump");
             for(int ii = 0; ii < 32; ii++) begin
-                $display("\tx%d: 0x%h", ii, REGFILE_ASYNC[ii]);
+                $display("\tx%d: 0x%h", ii, REG_FILE_ASYNC[ii]);
             end
         end
     endtask
