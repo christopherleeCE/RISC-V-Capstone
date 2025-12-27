@@ -69,6 +69,146 @@ R0
 R1
 R0
 R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+Z2 !s12c _opt2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
 !s12c _opt1
 R1
 R0
@@ -106,336 +246,351 @@ R1
 !i10e 25
 !i10f 100
 cModel Technology
-Z2 dC:/Users/Chris/Documents/Quartus/Prototype/RISC-V-Capstone/Modules
+Z3 dC:/Users/Chris/Documents/Quartus/Prototype/RISC-V-Capstone/Modules
 T_opt
-!s110 1766617680
-VJ=3XM8HL7N_l03d3TnfgD0
-Z3 04 13 4 work top_riscv_cpu fast 0
-=1-18c04da667d5-694c7250-151-5ee8
+!s110 1766827213
+VkH626KDJ91X?[Gg3hEzRY1
+Z4 04 13 4 work top_riscv_cpu fast 0
+=1-18c04da667d5-694fa4cc-aa-400c
 R1
-Z4 !s12f OEM100
-Z5 !s12b OEM100
-Z6 !s124 OEM10U50 
-Z7 !s135 nogc
-Z8 o-quiet -auto_acc_if_foreign -work work +acc
-Z9 tCvgOpt 0
+Z5 !s12f OEM100
+Z6 !s12b OEM100
+Z7 !s124 OEM10U50 
+Z8 !s135 nogc
+Z9 o-quiet -auto_acc_if_foreign -work work +acc
+Z10 tCvgOpt 0
 n@_opt
-Z10 OL;O;2024.3;79
+Z11 OL;O;2024.3;79
 T_opt1
 !s110 1766271820
 VXF05MI<Dlg1REGGNYZFa51
-R3
+R4
 =1-18c04da667d5-69472b4c-132-14d0
 R1
-R4
 R5
 R6
 R7
 R8
 R9
-n@_opt1
 R10
-R2
+n@_opt1
+R11
+R3
+T_opt2
+!s110 1766736481
+VHWB;lfLTU0LQim7oS5Eif3
+R4
+=1-18c04da667d5-694e4260-1c3-18d8
+R1
+R5
+R6
+R7
+R8
+R9
+R10
+n@_opt2
+R11
+R3
 valu
-Z11 2alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|uid.sv|ustore.sv
-Z12 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
-Z13 !s110 1766617676
+Z12 2alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|uid.sv|ustore.sv
+Z13 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+Z14 !s110 1766827209
 !i10b 1
 !s100 VoWi63nQKn1chMGK05m9f0
 IN3e<Z]FC`RJV_;6o?Iizd0
 S1
-R2
-Z14 w1766189829
+R3
+Z15 w1766189829
 8alu.sv
 Falu.sv
-!i122 125
+!i122 253
 L0 1 56
-Z15 VDg1SIo80bB@j0V0VzS_@n1
-Z16 OL;L;2024.3;79
+Z16 VDg1SIo80bB@j0V0VzS_@n1
+Z17 OL;L;2024.3;79
 r1
 !s85 0
 31
-Z17 !s108 1766617676.000000
-Z18 !s107 sig_declare.inc|ustore.sv|uid.sv|top_riscv_cpu.sv|self_checking_cpu_tb.sv|riscv_cpu.sv|reg_file.sv|pc.sv|instruction_memory.sv|id_t.sv|dff_async_reset.sv|data_memory.sv|alu.sv|
-Z19 !s90 -reportprogress|300|alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|uid.sv|ustore.sv|
+Z18 !s108 1766827209.000000
+Z19 !s107 sig_declare.inc|ustore.sv|uid.sv|top_riscv_cpu.sv|self_checking_cpu_tb.sv|riscv_cpu.sv|reg_file.sv|pc.sv|instruction_memory.sv|id_t.sv|dff_async_reset.sv|data_memory.sv|alu.sv|
+Z20 !s90 -reportprogress|300|alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|uid.sv|ustore.sv|
 !i113 0
-Z20 o-L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
-R9
+Z21 o-L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R10
 vdata_memory
-R11
 R12
 R13
+R14
 !i10b 1
 !s100 1=2VeTZN@UC]ZWF;35dU72
 Il=IUKQXcRGa@V<?Qo<O4b2
 S1
-R2
-R14
+R3
+w1766734673
 8data_memory.sv
 Fdata_memory.sv
-!i122 125
+!i122 253
 L0 5 32
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 vdff_async_reset
-R11
 R12
 R13
+R14
 !i10b 1
 !s100 8mCVShY00]OPaH7:^Je910
 IW:WlX;AVVRG>OfQja?l_o0
 S1
-R2
-R14
+R3
+R15
 8dff_async_reset.sv
 Fdff_async_reset.sv
-!i122 125
+!i122 253
 L0 3 18
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 vid_t
-R11
 R12
 R13
+R14
 !i10b 1
 !s100 JaoVcJkT1mIz9<m9N9?B70
 I3[XiLM0RZanMYP_O1?e991
 S1
-R2
-R14
+R3
+R15
 8id_t.sv
 Fid_t.sv
-!i122 125
+!i122 253
 L0 4 68
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 vinstruction_memory
-R11
 R12
 R13
+R14
 !i10b 1
 !s100 R8Q3Aa577Xl6AHecdKO_<3
 IeYXj^>;:Zl3cNz=@>Mlb33
 S1
-R2
-R14
+R3
+w1766734689
 8instruction_memory.sv
 Finstruction_memory.sv
-!i122 125
+!i122 253
 L0 1 21
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 vpc
-R11
 R12
 R13
+R14
 !i10b 1
 !s100 <^h>6h1Re`z?nk[7d;g4f1
 I9<KZhFdQ^WCaad0Yz2TMe2
 S1
-R2
-R14
+R3
+R15
 8pc.sv
 Fpc.sv
-!i122 125
+!i122 253
 L0 8 26
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 vreg_file
-R11
 R12
 R13
+R14
 !i10b 1
 !s100 gCzA>cGL=DCS^hGMIf@0I0
 IhjnIbaNc1i^Pi^5GeSIRC3
 S1
-R2
-R14
+R3
+R15
 8reg_file.sv
 Freg_file.sv
-!i122 125
+!i122 253
 L0 42 41
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 vriscv_cpu
-R11
 R12
 R13
-!i10b 1
-!s100 5:iBcj]TZ<H=DNHQk`_o00
-IOfTbiiYa:;`=?bF`lWTaH1
-S1
-R2
 R14
+!i10b 1
+!s100 _ozT;IVVB7GO7X[e^XjS50
+I]2Dz`I83ZOl:j:5lmdoL52
+S1
+R3
+w1766734087
 8riscv_cpu.sv
 Friscv_cpu.sv
 Fsig_declare.inc
-!i122 125
+!i122 253
 L0 9 539
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 vself_checking_cpu_tb
-R11
 R12
 R13
+R14
 !i10b 1
 !s100 QaiRM[0lAm4A`V9A8kQPn0
 IPmfWGNKo4RHcH3K;e0L]:2
 S1
-R2
-R14
+R3
+R15
 8self_checking_cpu_tb.sv
 Fself_checking_cpu_tb.sv
-!i122 125
+!i122 253
 L0 13 417
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 vtop_riscv_cpu
-R11
 R12
 R13
+R14
 !i10b 1
-!s100 6n@A6jLXH4Fn2cX2MC4gP1
-IL:E6D073a?jE:9hOdF?Vn3
+!s100 kK3UhUNT7zhZzY5F;=?3e2
+IF<^_N;_YNk0R<1c2d2GHQ0
 S1
-R2
-w1766617675
+R3
+w1766827208
 8top_riscv_cpu.sv
 Ftop_riscv_cpu.sv
-!i122 125
-L0 7 452
-R15
+!i122 253
+L0 7 692
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 vUID__
-R11
 R12
 R13
+R14
 !i10b 1
 !s100 X[nnk^nFgCN327dK:dWYO2
 I:[H5ER=VLAHi=J=z[T@k^1
 S1
-R2
-Z21 w1766189830
+R3
+Z22 w1766189830
 8uid.sv
 Fuid.sv
-!i122 125
+!i122 253
 L0 4 25
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 n@u@i@d__
 vUS__
-R11
 R12
 R13
+R14
 !i10b 1
 !s100 D:@`]VRA[V`Q:2:cGL7ih3
 I^1Ck_n:7z_Hk4RzMK>[^42
 S1
-R2
-R21
+R3
+R22
 8ustore.sv
 Fustore.sv
-!i122 125
+!i122 253
 L0 4 39
-R15
 R16
+R17
 r1
 !s85 0
 31
-R17
 R18
 R19
-!i113 0
 R20
-R9
+!i113 0
+R21
+R10
 n@u@s__

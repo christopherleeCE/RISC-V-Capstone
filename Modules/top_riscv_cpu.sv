@@ -9,9 +9,14 @@ module top_riscv_cpu();
     //PARAMETERS/BUSES----------------------------------------------------------------------------------------------------------
     //constants
     parameter int CLOCK_PERIOD = 20;
-    parameter int NUM_INSTRUCTIONS = 32;
-    parameter int NUM_DATA_WORDS = 32;
     int instruction_failure;
+
+    //dumb way to get around default output of verify_row task, TODO find better way to do this, maybe switch from task to func?
+    static int def0 = 0;
+    static int def1 = 0;
+    static int def2 = 0;
+    static int def3 = 0;
+    static int def4 = 0;
 
     //cpu ports
     logic clk, rst, ohalt;
@@ -27,9 +32,17 @@ module top_riscv_cpu();
     logic [12:0] imm_b;
     logic [19:0] imm_u;
     logic [20:0] imm_j;
-    
+
 
     //golden sginals for matrix, these are what the DUT is verfied against, they are stored in a 5x1 array, one or each clk of the execution in the DUT
+    /* golden[0], one clk delay, golden[1], two clk delays, etc. */
+    /* I THINK that...
+    [0] -> if
+    [1] -> id
+    [2] -> ex
+    [3] -> mem
+    [4] -> w
+    */
     logic [31:0] PC [5:0];
     logic [31:0] PC_TARGET [5:0];
     logic [31:0] INSTR [5:0];
@@ -79,7 +92,7 @@ module top_riscv_cpu();
     //if the DUT.sv's declaration changes, it should be mirrored here
     instruction_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(32)
+        .ENTRY_COUNT(64)
     ) instr_mem (
         .read_address(PC_ASYNC),
         .read_data(INSTR_ASYNC)
@@ -107,20 +120,21 @@ module top_riscv_cpu();
 
         logic [63:0] product;
 
+        //$display("posedgedump");
         //reg_async_dump();
-        display_golden_signals();
+        //data_mem_async_dump();
+        //display_golden_singals_history();
 
-        $write("\n\n\n");
-        $display("========================================================================================");
-        $display("\tCurrent PC: %h", PC_ASYNC);
-        $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
-        $display("\topcode: %h", opcode);
+        /* DO NOT REMOVE : DEBUG GOLD */ $display("\n\n");
+        /* DO NOT REMOVE : DEBUG GOLD */ $display("========================================================================================");
+        /* DO NOT REMOVE : DEBUG GOLD */ $display("\tCurrent PC: %h", PC_ASYNC);
+        /* DO NOT REMOVE : DEBUG GOLD */ $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
+        /* DO NOT REMOVE : DEBUG GOLD */ $display("\topcode: %h", opcode);
 
 
         if (opcode == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
             {func7, rs2, rs1, func3, rd} = INSTR_ASYNC[31:7];
-            $display("\tR/M-Type: func7: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b",
-            func7, rs2, rs1, func3, rd, opcode); //instruction info
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tR/M-Type: func7: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", func7, rs2, rs1, func3, rd, opcode); //instruction info
 
             //first entry in the matrix
             PC[0] <= PC_ASYNC;
@@ -138,7 +152,7 @@ module top_riscv_cpu();
             //-R-TYPE---------------
             if (func7 == 7'b0000000) begin
                 if (func3 == 3'b000) begin //----ADD------------------------------
-                    $display("\tIdentified as ADD.");
+                    /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADD.");
                     write_reg(rd, REG_FILE_ASYNC[rs2] + REG_FILE_ASYNC[rs1]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
                     
@@ -146,38 +160,36 @@ module top_riscv_cpu();
 
             end else if (func7 == 7'b0100000) begin     
                 if (func3 == 3'b000) begin //----SUB---------------------------
-                    $display("\tIdentified as SUB.");
+                    /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SUB.");
                     write_reg(rd, REG_FILE_ASYNC[rs1] - REG_FILE_ASYNC[rs2]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
                     
                 end
 
-            //-M-TYPE--------------- TODO, the top file fail the test program that chat gave me, not sure if that actually means that its not working, ill go through the math l8r
+            //-M-TYPE--------------- TODO i am not sure if the golden products are correct
             end else if (func7 == 7'b0000001) begin
                 if (func3 == 3'b000) begin //----MUL------------------------------
-                    $display("\tIdentified as MUL.");
+                    /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MUL.");
                     product = $signed(REG_FILE_ASYNC[rs1]) * $signed(REG_FILE_ASYNC[rs2]);
                     write_reg(rd, product[31:0]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b001) begin //----MULH------------------------------
-                    $display("\tIdentified as MULH.");
+                    /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULH.");
                     product = $signed(REG_FILE_ASYNC[rs1]) * $signed(REG_FILE_ASYNC[rs2]);
-                    $display("%h = %h * %h", product, $signed(REG_FILE_ASYNC[rs1]), $signed(REG_FILE_ASYNC[rs2]));
+                    /* DO NOT REMOVE : DEBUG GOLD */ $display("%h = %h * %h", product, $signed(REG_FILE_ASYNC[rs1]), $signed(REG_FILE_ASYNC[rs2]));
                     write_reg(rd, product[63:32]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b010) begin //----MULHSU------------------------------
-                    $display("\tIdentified as MULHSU.");
+                    /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULHSU.");
                     product = $signed(REG_FILE_ASYNC[rs1]) * $unsigned(REG_FILE_ASYNC[rs2]);
-                                        $display("%h", product);
                     write_reg(rd, product[63:32]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b011) begin //----MULHU------------------------------
-                    $display("\tIdentified as MULHU.");
+                    /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULHU.");
                     product = $unsigned(REG_FILE_ASYNC[rs1]) * $unsigned(REG_FILE_ASYNC[rs2]);
-                                                            $display("%h", product);
                     write_reg(rd, product[63:32]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
@@ -188,7 +200,7 @@ module top_riscv_cpu();
 
         end else if (opcode == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
             {imm_i, rs1, func3, rd} = INSTR_ASYNC[31:7];
-            $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
             //first entry in the matrix
             PC[0] <= PC_ASYNC;
@@ -205,11 +217,11 @@ module top_riscv_cpu();
 
             if(func3 == 3'b000) begin //-------ADDI-------------------------------
                 if(imm_i == 20'd0 & rs1 == 5'd0 & rd == 5'd0) begin
-                    $display("\tIdentified as NOP.");
+                    /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as NOP.");
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else begin
-                    $display("\tIdentified as ADDI.");
+                    /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADDI.");
                     write_reg(rd, REG_FILE_ASYNC[rs1] + imm_i);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
@@ -219,10 +231,10 @@ module top_riscv_cpu();
 
         end else if (opcode == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
             {imm_i, rs1, func3, rd} = INSTR_ASYNC[31:7];
-            $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
             if(func3 == 3'b010) begin //----LW------------------------------------
-                $display("\tIdentified as LW.");
+                /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LW.");
                 write_reg(rd, DATA_MEM_ASYNC[rs1 + imm_i]);
                 PC_ASYNC <= PC_ASYNC + 32'h4;
 
@@ -245,10 +257,10 @@ module top_riscv_cpu();
 
         end else if (opcode == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
             {imm_i, rs1, func3, rd} = INSTR_ASYNC[31:7];
-            $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
             if(func3 == 3'b000) begin //-------JALR-------------------------------
-                $display("\tIdentified as JALR.");
+                /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as JALR.");
                 write_reg(rd, PC_ASYNC + 4);
                 PC_ASYNC <= REG_FILE_ASYNC[rs1] + imm_i;
 
@@ -271,10 +283,10 @@ module top_riscv_cpu();
 
         end else if (opcode == 7'b0100011) begin //------S-TYPE----------------------------------
             {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = INSTR_ASYNC[31:7];
-            $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_s, rs2, rs1, func3, opcode); //instruction info
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_s, rs2, rs1, func3, opcode); //instruction info
 
             if(func3 == 3'b010) begin //----SW-------------------------------------
-                $display("\tIdentified as SW.");
+                /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SW.");
                 DATA_MEM_ASYNC[rs1 + imm_s] <= REG_FILE_ASYNC[rs2];
                 PC_ASYNC <= PC_ASYNC + 32'h4;
 
@@ -298,10 +310,10 @@ module top_riscv_cpu();
         end else if (opcode == 7'b1100011) begin //------B-TYPE----------------------------
             {imm_b[12], imm_b[10:5], rs2, rs1, func3, imm_b[4:1], imm_b[11]} = INSTR_ASYNC[31:7];
             imm_b[0] = 1'b0; //LSB is always zero for B-type
-            $display("\tB-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_b[12:1], rs2, rs1, func3, opcode); //instruction info
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tB-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_b[12:1], rs2, rs1, func3, opcode); //instruction info
 
             if(func3 == 3'b000) begin //----BEQ------------------------------------------------
-                $display("\tIdentified as BEQ.");
+                /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as BEQ.");
                 if(REG_FILE_ASYNC[rs1] == REG_FILE_ASYNC[rs2]) begin
                     PC_ASYNC <= PC_ASYNC + imm_b;
 
@@ -329,10 +341,10 @@ module top_riscv_cpu();
         end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
             {imm_j[20], imm_j[10:1], imm_j[11], imm_j[19:12], rd} = INSTR_ASYNC[31:7];
             imm_j[0] = 1'b0;
-            $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_j[20:1], rd, opcode); //instruction info
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_j[20:1], rd, opcode); //instruction info
 
             //----JAL------------
-            $display("\tIdentified as JAL.");
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as JAL.");
             write_reg(rd, PC_ASYNC + 4);
             PC_ASYNC <= PC_ASYNC + imm_j;
 
@@ -351,10 +363,10 @@ module top_riscv_cpu();
 
         end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
             {imm_u, rd} = INSTR_ASYNC[31:7];
-            $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_u, rd, opcode); //instruction info
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_u, rd, opcode); //instruction info
 
             //----LUI---------------
-            $display("\tIdentified as LUI.");
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LUI.");
             write_reg(rd, {imm_u, REG_FILE_ASYNC[rd][11:0]});
             PC_ASYNC <= PC_ASYNC + 32'h4;
 
@@ -373,7 +385,7 @@ module top_riscv_cpu();
 
         end else begin
             //UNKNOWN ------------------------------
-            $display("\t<### WARNING: Instruction type not currently recognized by TB ###>");
+            /* DO NOT REMOVE : DEBUG GOLD */ $display("\t<### WARNING: Instruction type not currently recognized by TB ###>");
 
         end
 
@@ -396,7 +408,23 @@ module top_riscv_cpu();
 
 
 
+
     always @(negedge clk) begin //read on negative edge to give everything time to settle
+
+        //$display("negedgedump");
+        //reg_async_dump();
+        //reg_dut_dump();
+        //data_mem_async_dump();
+        //display_golden_singals_history();
+
+        $display("\n\n");
+
+        verify_row(0, def0);
+        verify_row(1, def1);
+        verify_row(2, def2);
+        verify_row(3, def3);
+        verify_row(4, def4);
+
 
         if (ohalt == 1'b1) begin //HALT SIGNAL --------------------------------------------------------------
             $display("\nWARNING: Recieved halt signal. Pausing verification.");
@@ -416,6 +444,15 @@ module top_riscv_cpu();
     end
 
     //VERIFICATION -----------------------------------------------------------------------------------------------------------------
+    task reg_dut_dump();
+        begin
+            // all registers (example: display)
+            for (int ii = 0; ii < 32; ii++) begin
+                $display("x%0d = %h", ii, cpu_dut.my_reg_file.regs_out[ii]);
+            end
+        end
+    endtask
+
     task reg_async_dump();
         begin
             $display("REG_FILE_ASYNC Dump");
@@ -425,34 +462,237 @@ module top_riscv_cpu();
         end
     endtask
 
-    task display_golden_signals();
+    task data_mem_async_dump();
+        begin
+            $display("DATA_MEM_ASYNC Dump");
+            for(int ii = 0; ii < 32; ii++) begin
+                $display("\tx%d: 0x%h", ii, DATA_MEM_ASYNC[ii]);
+            end
+        end
+    endtask
+
+    task display_golden_singals_history();
         // loop variables
         integer c;  // column / cycle
         integer r;  // register index for REG_FILE
 
         begin
-            $display("----- Golden Signals -----");
+            $display("\n\n----- Golden Signals History -----\n");
 
             for (c = 0; c < 6; c = c + 1) begin
-                $display("Cycle %0d:", c);
-                $display("  PC        = 0x%08h", PC[c]);
-                $display("  PC_TARGET = 0x%08h", PC_TARGET[c]);
-                $display("  INSTR     = 0x%08h", INSTR[c]);
-                $display("  RS1       = %0d", RS1[c]);
-                $display("  RS2       = %0d", RS2[c]);
-                $display("  RD        = %0d", RD[c]);
+                $display("\ngolden_history[%0d]:", c);
+                $display("\tPC        = 0x%08h", PC[c]);
+                $display("\tPC_TARGET = 0x%08h", PC_TARGET[c]);
+                $display("\tINSTR     = 0x%08h", INSTR[c]);
+                $display("\tRS1       = %0d", RS1[c]);
+                $display("\tRS2       = %0d", RS2[c]);
+                $display("\tRD        = %0d", RD[c]);
 
-                $write("  REG_FILE  = ");
+                $write("\tREG_FILE");
                 for (r = 0; r < 32; r = r + 1) begin
+                    if(r % 8 == 0) begin //i know i should just use 2nd for loop shut up
+                        $write("\n\t");
+                    end
+
                     $write("%08h ", REG_FILE[c][r]);
                 end
-                $display("");  // newline after printing all registers
+                $display("");
             end
 
-            $display("--------------------------");
+            $display("========================================================================================");
+
         end
     endtask
 
 
+    task automatic verify_row(
+        input int row,
+        output int local_instruction_failure
+    );
+        begin
 
+            logic [6:0] func7_v;
+            logic [4:0] rs2_v;
+            logic [4:0] rs1_v;
+            logic [4:0] rd_v;
+            logic [2:0] func3_v;
+            logic [6:0] opcode_v;
+            logic [11:0] imm_i_v, imm_s_v;
+            logic [12:0] imm_b_v;
+            logic [19:0] imm_u_v;
+            logic [20:0] imm_j_v;
+
+            opcode_v = INSTR[row][6:0];
+
+            $write("\n");
+            if (opcode_v == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
+                {func7_v, rs2_v, rs1_v, func3_v, rd_v} = INSTR[row][31:7];
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tR/M-Type: func7_v: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", func7_v, rs2_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+
+                //-R-TYPE---------------
+                if (func7_v == 7'b0000000) begin
+                    if (func3_v == 3'b000) begin //----ADD------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ADD:");
+                        if(row == 4) begin
+
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[4][rd_v]) $display(" Success");
+                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                        end
+                    end
+
+                end else if (func7_v == 7'b0100000) begin     
+                    if (func3_v == 3'b000) begin //----SUB---------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SUB:");
+                        if(row == 4) begin
+
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[4][rd_v]) $display(" Success");
+                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                        end
+                    end
+
+                //-M-TYPE---------------
+                end else if (func7_v == 7'b0000001) begin
+                    if (func3_v == 3'b000) begin //----MUL------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MUL:");
+                        if(row == 4) begin
+
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[4][rd_v]) $display(" Success");
+                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                        end
+
+                    end else if (func3_v == 3'b001) begin //----MULH------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MULH:");
+                        if(row == 4) begin
+
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[4][rd_v]) $display(" Success");
+                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                        end
+
+                    end else if (func3_v == 3'b010) begin //----MULHSU------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MULHSU:");
+                        if(row == 4) begin
+
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[4][rd_v]) $display(" Success");
+                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                        end
+
+                    end else if (func3_v == 3'b011) begin //----MULHU------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MULHU:");
+                        if(row == 4) begin
+
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[4][rd_v]) $display(" Success");
+                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                        end
+
+                    end
+
+                end
+
+            end else if (opcode_v == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
+                {imm_i_v, rs1_v, func3_v, rd_v} = INSTR[row][31:7];
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+
+                if(func3_v == 3'b000) begin //-------ADDI-------------------------------
+                    if(imm_i_v == 20'd0 & rs1_v == 5'd0 & rd_v == 5'd0) begin
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as NOP.");
+
+                    end else begin
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ADDI:");
+                        if(row == 4) begin
+
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[4][rd_v]) $display(" Success");
+                            else begin $display(" FAILURE||| %d, %d",cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[4][rd_v] ); local_instruction_failure = 1; end
+
+                        end
+                    end
+
+                    
+                end
+
+            end else if (opcode_v == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
+                {imm_i_v, rs1_v, func3_v, rd_v} = INSTR[row][31:7];
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+
+                if(func3_v == 3'b010) begin //----LW------------------------------------
+                    /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as LW.");
+
+                    // else local_instruction_failure = 1;
+
+                end
+
+            end else if (opcode_v == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
+                {imm_i_v, rs1_v, func3_v, rd_v} = INSTR[row][31:7];
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+
+                if(func3_v == 3'b000) begin //-------JALR-------------------------------
+                    /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as JALR.");
+
+                    // else local_instruction_failure = 1; //ensure the PC and rd_v have changed to appropiate values
+
+                end
+
+            end else if (opcode_v == 7'b0100011) begin //------S-TYPE----------------------------------
+                {imm_s_v[11:5], rs2_v, rs1_v, func3_v, imm_s_v[4:0]} = INSTR[row][31:7];
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tS-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, opcode_v: 0b%b", imm_s_v, rs2_v, rs1_v, func3_v, opcode_v); //instruction info
+
+                if(func3_v == 3'b010) begin //----SW-------------------------------------
+                    /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as SW.");
+
+                    // else local_instruction_failure = 1;//ensure source register was written to CPU memory
+
+                end
+
+            end else if (opcode_v == 7'b1100011) begin //------B-TYPE----------------------------
+                {imm_b_v[12], imm_b_v[10:5], rs2_v, rs1_v, func3_v, imm_b_v[4:1], imm_b_v[11]} = INSTR[row][31:7];
+                imm_b_v[0] = 1'b0; //LSB is always zero for B-type
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tB-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, opcode_v: 0b%b", imm_b_v[12:1], rs2_v, rs1_v, func3_v, opcode_v); //instruction info
+
+                if(func3_v == 3'b000) begin //----BEQ------------------------------------------------
+                    /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as BEQ.");
+
+                    // else local_instruction_failure = 1; //ensure the PC has changed to the correct address
+
+                end
+            
+            end else if (opcode_v == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
+                {imm_j_v[20], imm_j_v[10:1], imm_j_v[11], imm_j_v[19:12], rd_v} = INSTR[row][31:7];
+                imm_j_v[0] = 1'b0;
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_j_v[20:1], rd_v, opcode_v); //instruction info
+
+                //----JAL------------
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as JAL.");
+
+                // else local_instruction_failure = 1; //ensure the PC and rd_v have changed to appropiate values
+
+            end else if (opcode_v == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
+                {imm_u_v, rd_v} = INSTR[row][31:7];
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_u_v, rd_v, opcode_v); //instruction info
+
+                //----LUI---------------
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as LUI.");
+
+                // else local_instruction_failure = 1;
+
+            end else begin
+                //UNKNOWN ------------------------------
+                /* DO NOT REMOVE : DEBUG VERIFY */ $display("WARNING: Instruction type not currently recognized by TB.");
+
+            end
+
+            if(local_instruction_failure == 1) begin 
+
+                $display("\nError: Mismatch between model and CPU. Pausing verification.");
+                reg_dut_dump();
+                display_golden_singals_history();
+                //$stop();
+
+            end
+        end
+    endtask
 endmodule

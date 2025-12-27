@@ -203,7 +203,7 @@ module riscv_cpu
     // response - This should now function as a ROM, and I believe it's async (no clk needed)
     instruction_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(32)
+        .ENTRY_COUNT(64)
     ) instr_mem (
         .read_address(PC),
         .read_data(INSTR_F)

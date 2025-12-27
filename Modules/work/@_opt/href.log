@@ -1,3 +1,6 @@
 BEGIN 1:riscv_cpu:fast:work
     PC :  1:top_riscv_cpu:fast:work
 END 
+BEGIN 1:reg_file:fast:work
+    regs_out :  1:top_riscv_cpu:fast:work
+END 

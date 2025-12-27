@@ -4,17 +4,38 @@ chris_prog.o:     file format elf32-littleriscv
 
 Disassembly of section .text:
 
-00000000 <_start>:
-   0:	01000293          	li	t0,16
-   4:	00300313          	li	t1,3
-   8:	ffc00393          	li	t2,-4
-   c:	fffff3b7          	lui	t2,0xfffff
-  10:	ffe00e13          	li	t3,-2
-  14:	fffffe37          	lui	t3,0xfffff
-  18:	02628533          	mul	a0,t0,t1
-  1c:	026395b3          	mulh	a1,t2,t1
-  20:	03c3a633          	mulhsu	a2,t2,t3
-  24:	03c2b6b3          	mulhu	a3,t0,t3
+00000000 <start>:
+   0:	01050513          	addi	a0,a0,16
+   4:	01758593          	addi	a1,a1,23
+   8:	00b50633          	add	a2,a0,a1
+   c:	0000f6b7          	lui	a3,0xf
+  10:	40a58733          	sub	a4,a1,a0
+  14:	004000ef          	jal	ra,18 <start+0x18>
+  18:	03000793          	li	a5,48
+  1c:	03400793          	li	a5,52
+  20:	03800793          	li	a5,56
+  24:	010000ef          	jal	ra,34 <label+0x4>
+  28:	03c00793          	li	a5,60
+  2c:	04000793          	li	a5,64
 
-00000028 <end>:
-  28:	0000006f          	j	28 <end>
+00000030 <label>:
+  30:	04400793          	li	a5,68
+  34:	00f02023          	sw	a5,0(zero) # 0 <start>
+  38:	00002803          	lw	a6,0(zero) # 0 <start>
+  3c:	04000893          	li	a7,64
+  40:	008880e7          	jalr	8(a7)
+  44:	00000013          	nop
+  48:	00078863          	beqz	a5,58 <beq_label>
+  4c:	00000013          	nop
+  50:	01078463          	beq	a5,a6,58 <beq_label>
+  54:	00000013          	nop
+
+00000058 <beq_label>:
+  58:	00a02023          	sw	a0,0(zero) # 0 <start>
+  5c:	00b020a3          	sw	a1,1(zero) # 1 <start+0x1>
+  60:	00c02123          	sw	a2,2(zero) # 2 <start+0x2>
+  64:	00d021a3          	sw	a3,3(zero) # 3 <start+0x3>
+  68:	00e02223          	sw	a4,4(zero) # 4 <start+0x4>
+  6c:	00f022a3          	sw	a5,5(zero) # 5 <start+0x5>
+  70:	01002323          	sw	a6,6(zero) # 6 <start+0x6>
+  74:	011023a3          	sw	a7,7(zero) # 7 <start+0x7>
