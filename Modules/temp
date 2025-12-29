@@ -6,15 +6,15 @@ task verify_row(int row);
             logic [4:0] rs1_v;
             logic [4:0] rd_v;
             logic [2:0] func3_v;
-            logic [6:0] opcode_v;
+            logic [6:0] ;
             logic [11:0] imm_i_v, imm_s_v;
             logic [12:0] imm_b_v;
             logic [19:0] imm_u_v;
             logic [20:0] imm_j_v;
 
-            if (opcode_v == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
+            if ( == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
                 {func7_v, rs2_v, rs1_v, func3_v, rd_v} = cpu_dut.INSTR_D_FLUSH[31:7];
-                // $display("\tR/M-Type: func7_v: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", func7_v, rs2_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+                // $display("\tR/M-Type: func7_v: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, : 0b%b", func7_v, rs2_v, rs1_v, func3_v, rd_v, ); //instruction info
 
                 //-R-TYPE---------------
                 if (func7_v == 7'b0000000) begin
@@ -59,9 +59,9 @@ task verify_row(int row);
 
                 end
 
-            end else if (opcode_v == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
+            end else if ( == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
                 {imm_i_v, rs1_v, func3_v, rd_v} = cpu_dut.INSTR_D_FLUSH[31:7];
-                // $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+                // $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, : 0b%b", imm_i_v, rs1_v, func3_v, rd_v, ); //instruction info
 
                 if(func3_v == 3'b000) begin //-------ADDI-------------------------------
                     if(imm_i_v == 20'd0 & rs1_v == 5'd0 & rd_v == 5'd0) begin
@@ -76,9 +76,9 @@ task verify_row(int row);
 
                 end
 
-            end else if (opcode_v == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
+            end else if ( == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
                 {imm_i_v, rs1_v, func3_v, rd_v} = cpu_dut.INSTR_D_FLUSH[31:7];
-                // $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+                // $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, : 0b%b", imm_i_v, rs1_v, func3_v, rd_v, ); //instruction info
 
                 if(func3_v == 3'b010) begin //----LW------------------------------------
                     // $display("\tIdentified as LW.");
@@ -87,9 +87,9 @@ task verify_row(int row);
 
                 end
 
-            end else if (opcode_v == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
+            end else if ( == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
                 {imm_i_v, rs1_v, func3_v, rd_v} = cpu_dut.INSTR_D_FLUSH[31:7];
-                // $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+                // $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, : 0b%b", imm_i_v, rs1_v, func3_v, rd_v, ); //instruction info
 
                 if(func3_v == 3'b000) begin //-------JALR-------------------------------
                     // $display("\tIdentified as JALR.");
@@ -98,9 +98,9 @@ task verify_row(int row);
 
                 end
 
-            end else if (opcode_v == 7'b0100011) begin //------S-TYPE----------------------------------
+            end else if ( == 7'b0100011) begin //------S-TYPE----------------------------------
                 {imm_s_v[11:5], rs2_v, rs1_v, func3_v, imm_s_v[4:0]} = cpu_dut.INSTR_D_FLUSH[31:7];
-                // $display("\tS-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, opcode_v: 0b%b", imm_s_v, rs2_v, rs1_v, func3_v, opcode_v); //instruction info
+                // $display("\tS-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, : 0b%b", imm_s_v, rs2_v, rs1_v, func3_v, ); //instruction info
 
                 if(func3_v == 3'b010) begin //----SW-------------------------------------
                     // $display("\tIdentified as SW.");
@@ -109,10 +109,10 @@ task verify_row(int row);
 
                 end
 
-            end else if (opcode_v == 7'b1100011) begin //------B-TYPE----------------------------
+            end else if ( == 7'b1100011) begin //------B-TYPE----------------------------
                 {imm_b_v[12], imm_b_v[10:5], rs2_v, rs1_v, func3_v, imm_b_v[4:1], imm_b_v[11]} = cpu_dut.INSTR_D_FLUSH[31:7];
                 imm_b_v[0] = 1'b0; //LSB is always zero for B-type
-                // $display("\tB-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, opcode_v: 0b%b", imm_b_v[12:1], rs2_v, rs1_v, func3_v, opcode_v); //instruction info
+                // $display("\tB-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, : 0b%b", imm_b_v[12:1], rs2_v, rs1_v, func3_v, ); //instruction info
 
                 if(func3_v == 3'b000) begin //----BEQ------------------------------------------------
                     // $display("\tIdentified as BEQ.");
@@ -121,24 +121,32 @@ task verify_row(int row);
 
                 end
             
-            end else if (opcode_v == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
+            end else if ( == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
                 {imm_j_v[20], imm_j_v[10:1], imm_j_v[11], imm_j_v[19:12], rd_v} = cpu_dut.INSTR_D_FLUSH[31:7];
                 imm_j_v[0] = 1'b0;
-                // $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_j_v[20:1], rd_v, opcode_v); //instruction info
+                // $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, : 0b%b", imm_j_v[20:1], rd_v, ); //instruction info
 
                 //----JAL------------
                 // $display("\tIdentified as JAL.");
 
                 // else instruction_failure = 1; //ensure the PC and rd_v have changed to appropiate values
 
-            end else if (opcode_v == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
+            end else if ( == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
+
+
+
+            
                 {imm_u_v, rd_v} = cpu_dut.INSTR_D_FLUSH[31:7];
-                // $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_u_v, rd_v, opcode_v); //instruction info
+                // $display("\tU-Type: imm: 0b%b, rsd: 0b%b, : 0b%b", imm_u_v, rd_v, opcode_v); //instruction info
 
                 //----LUI---------------
                 // $display("\tIdentified as LUI.");
 
                 // else instruction_failure = 1;//compare contents of model register with CPU register
+
+
+
+
 
             end else begin
                 //UNKNOWN ------------------------------

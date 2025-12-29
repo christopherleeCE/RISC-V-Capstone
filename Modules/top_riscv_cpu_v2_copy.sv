@@ -36,7 +36,7 @@ dut has to wait 3 clks, so by the time that dut has jumped to start:, gold is al
 
 `timescale 1ns/1ns
 
-module top_riscv_cpu();
+module top_riscv_cpu_v2_copy();
 
     //PARAMETERS/BUSES----------------------------------------------------------------------------------------------------------
     //constants
@@ -112,10 +112,8 @@ module top_riscv_cpu();
 
     //RESET/MEMORY SETUP ------------------------------------------------------------------------------------------------------
     initial begin
-        repeat(1) begin 
+        repeat(3) begin 
             rst = 1'b0; //tbh reset doesnt really do anything i think
-            instruction_failure = 0;
-            PC_ASYNC <= '0;
             @(posedge clk);
         end
 
@@ -150,159 +148,104 @@ module top_riscv_cpu();
 
 
 
-    always @(posedge clk) begin //golden results calculated on posedge
+    always_ff @(posedge clk) begin //golden results calculated on posedge
 
         logic [63:0] product;
 
-        //$display("posedgedump");
-        //reg_async_dump();
-        //data_mem_async_dump();
-        //display_golden_singals_history();
+        if (!rst) begin
 
-        // /* DO NOT REMOVE : DEBUG GOLD */ $write("\n\n\n");
-        // /* DO NOT REMOVE : DEBUG GOLD */ $display("Posedge block output");
-        // /* DO NOT REMOVE : DEBUG GOLD */ $display("========================================================================================");
-        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tPC_ASYNC: %h", PC_ASYNC);
-        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
-        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\topcode: %h", opcode);
+            $display("\n\n\n<* rst = 0, intializing *>");
+            PC_ASYNC <= '0;
+            instruction_failure <= 0;
 
+        end else if(1) begin
 
-        if (opcode == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
-            {func7, rs2, rs1, func3, rd} = INSTR_ASYNC[31:7];
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tR/M-Type: func7: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", func7, rs2, rs1, func3, rd, opcode); //instruction info
+            //$display("posedgedump");
+            //reg_async_dump();
+            //data_mem_async_dump();
+            //display_golden_singals_history();
 
-            //first entry in the matrix
-            PC[1] <= PC_ASYNC;
-            PC_TARGET[1] <= PC_ASYNC + 32'h4;
-            INSTR[1] <= INSTR_ASYNC;
-            RS1[1] <= rs1;
-            RS2[1] <= rs2;
-            RD[1] <= rd;
-            REG_FILE[1] <= REG_FILE_ASYNC;
-            DATA_MEM_ADDR[1] <= 'x;
-            DATA_MEM_IN[1] <= 'x;
-            DATA_MEM_OUT[1] <= 'x;
-            DATA_MEM[1] <= DATA_MEM_ASYNC;
-
-            //-R-TYPE---------------
-            if (func7 == 7'b0000000) begin
-                if (func3 == 3'b000) begin //----ADD------------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADD.");
-                    write_reg(rd, REG_FILE_ASYNC[rs2] + REG_FILE_ASYNC[rs1]);
-                    PC_ASYNC <= PC_ASYNC + 32'h4;
-                    
-                end
-
-            end else if (func7 == 7'b0100000) begin     
-                if (func3 == 3'b000) begin //----SUB---------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SUB.");
-                    write_reg(rd, REG_FILE_ASYNC[rs1] - REG_FILE_ASYNC[rs2]);
-                    PC_ASYNC <= PC_ASYNC + 32'h4;
-                    
-                end
-
-            //-M-TYPE--------------- TODO i am not sure if the golden products are correct
-            end else if (func7 == 7'b0000001) begin
-                if (func3 == 3'b000) begin //----MUL------------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MUL.");
-                    product = $signed(REG_FILE_ASYNC[rs1]) * $signed(REG_FILE_ASYNC[rs2]);
-                    write_reg(rd, product[31:0]);
-                    PC_ASYNC <= PC_ASYNC + 32'h4;
-
-                end else if (func3 == 3'b001) begin //----MULH------------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULH.");
-                    product = $signed(REG_FILE_ASYNC[rs1]) * $signed(REG_FILE_ASYNC[rs2]);
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("%h = %h * %h", product, $signed(REG_FILE_ASYNC[rs1]), $signed(REG_FILE_ASYNC[rs2]));
-                    write_reg(rd, product[63:32]);
-                    PC_ASYNC <= PC_ASYNC + 32'h4;
-
-                end else if (func3 == 3'b010) begin //----MULHSU------------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULHSU.");
-                    product = $signed(REG_FILE_ASYNC[rs1]) * $unsigned(REG_FILE_ASYNC[rs2]);
-                    write_reg(rd, product[63:32]);
-                    PC_ASYNC <= PC_ASYNC + 32'h4;
-
-                end else if (func3 == 3'b011) begin //----MULHU------------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULHU.");
-                    product = $unsigned(REG_FILE_ASYNC[rs1]) * $unsigned(REG_FILE_ASYNC[rs2]);
-                    write_reg(rd, product[63:32]);
-                    PC_ASYNC <= PC_ASYNC + 32'h4;
-
-                end
-
-            end
+            // /* DO NOT REMOVE : DEBUG GOLD */ $write("\n\n\n");
+            // /* DO NOT REMOVE : DEBUG GOLD */ $display("Posedge block output");
+            // /* DO NOT REMOVE : DEBUG GOLD */ $display("========================================================================================");
+            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tPC_ASYNC: %h", PC_ASYNC);
+            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
+            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\topcode: %h", opcode);
 
 
-        end else if (opcode == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
-            {imm_i, rs1, func3, rd} = INSTR_ASYNC[31:7];
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
-
-            //first entry in the matrix
-            PC[1] <= PC_ASYNC;
-            PC_TARGET[1] <= PC_ASYNC + 32'h4;
-            INSTR[1] <= INSTR_ASYNC;
-            RS1[1] <= rs1;
-            RS2[1] <= 'x;
-            RD[1] <= rd;
-            REG_FILE[1] <= REG_FILE_ASYNC;
-            DATA_MEM_ADDR[1] <= 'x;
-            DATA_MEM_IN[1] <= 'x;
-            DATA_MEM_OUT[1] <= 'x;
-            DATA_MEM[1] <= DATA_MEM_ASYNC;
-
-            if(func3 == 3'b000) begin //-------ADDI-------------------------------
-                if(imm_i == 20'd0 & rs1 == 5'd0 & rd == 5'd0) begin
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as NOP.");
-                    PC_ASYNC <= PC_ASYNC + 32'h4;
-
-                end else begin
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADDI.");
-                    $display("data: %h | rd: %d | rs1: %d", REG_FILE_ASYNC[rs1] + imm_i, rd, rs1);
-                    write_reg(rd, REG_FILE_ASYNC[rs1] + imm_i);
-                    PC_ASYNC <= PC_ASYNC + 32'h4;
-
-                end
-            end
-
-
-        end else if (opcode == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
-            {imm_i, rs1, func3, rd} = INSTR_ASYNC[31:7];
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
-
-            if(func3 == 3'b010) begin //----LW------------------------------------
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LW.");
-                write_reg(rd, DATA_MEM_ASYNC[rs1 + imm_i]);
-                PC_ASYNC <= PC_ASYNC + 32'h4;
+            if (opcode == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
+                {func7, rs2, rs1, func3, rd} = INSTR_ASYNC[31:7];
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tR/M-Type: func7: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", func7, rs2, rs1, func3, rd, opcode); //instruction info
 
                 //first entry in the matrix
                 PC[1] <= PC_ASYNC;
                 PC_TARGET[1] <= PC_ASYNC + 32'h4;
                 INSTR[1] <= INSTR_ASYNC;
                 RS1[1] <= rs1;
-                RS2[1] <= 'x;
+                RS2[1] <= rs2;
                 RD[1] <= rd;
                 REG_FILE[1] <= REG_FILE_ASYNC;
-                DATA_MEM_ADDR[1] <= rs1 + imm_i;
+                DATA_MEM_ADDR[1] <= 'x;
                 DATA_MEM_IN[1] <= 'x;
-                DATA_MEM_OUT[1] <= DATA_MEM_ASYNC[rs1 + imm_i];
+                DATA_MEM_OUT[1] <= 'x;
                 DATA_MEM[1] <= DATA_MEM_ASYNC;
 
-            end
+                //-R-TYPE---------------
+                if (func7 == 7'b0000000) begin
+                    if (func3 == 3'b000) begin //----ADD------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADD.");
+                        write_reg(rd, REG_FILE_ASYNC[rs2] + REG_FILE_ASYNC[rs1]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+                        
+                    end
 
-            
+                end else if (func7 == 7'b0100000) begin     
+                    if (func3 == 3'b000) begin //----SUB---------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SUB.");
+                        write_reg(rd, REG_FILE_ASYNC[rs1] - REG_FILE_ASYNC[rs2]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+                        
+                    end
 
-        end else if (opcode == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
-            {imm_i, rs1, func3, rd} = INSTR_ASYNC[31:7];
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
+                //-M-TYPE--------------- TODO i am not sure if the golden products are correct
+                end else if (func7 == 7'b0000001) begin
+                    if (func3 == 3'b000) begin //----MUL------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MUL.");
+                        product = $signed(REG_FILE_ASYNC[rs1]) * $signed(REG_FILE_ASYNC[rs2]);
+                        write_reg(rd, product[31:0]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
 
-            if(func3 == 3'b000) begin //-------JALR-------------------------------
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as JALR.");
-                write_reg(rd, PC_ASYNC + 4);
-                PC_ASYNC <= REG_FILE_ASYNC[rs1] + {{20{imm_j[11]}}, imm_j[11:0]};
+                    end else if (func3 == 3'b001) begin //----MULH------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULH.");
+                        product = $signed(REG_FILE_ASYNC[rs1]) * $signed(REG_FILE_ASYNC[rs2]);
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("%h = %h * %h", product, $signed(REG_FILE_ASYNC[rs1]), $signed(REG_FILE_ASYNC[rs2]));
+                        write_reg(rd, product[63:32]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b010) begin //----MULHSU------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULHSU.");
+                        product = $signed(REG_FILE_ASYNC[rs1]) * $unsigned(REG_FILE_ASYNC[rs2]);
+                        write_reg(rd, product[63:32]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b011) begin //----MULHU------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULHU.");
+                        product = $unsigned(REG_FILE_ASYNC[rs1]) * $unsigned(REG_FILE_ASYNC[rs2]);
+                        write_reg(rd, product[63:32]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end
+
+                end
+
+
+            end else if (opcode == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
+                {imm_i, rs1, func3, rd} = INSTR_ASYNC[31:7];
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
                 //first entry in the matrix
                 PC[1] <= PC_ASYNC;
-                PC_TARGET[1] <= REG_FILE_ASYNC[rs1] + {{20{imm_j[11]}}, imm_j[11:0]};
+                PC_TARGET[1] <= PC_ASYNC + 32'h4;
                 INSTR[1] <= INSTR_ASYNC;
                 RS1[1] <= rs1;
                 RS2[1] <= 'x;
@@ -313,132 +256,200 @@ module top_riscv_cpu();
                 DATA_MEM_OUT[1] <= 'x;
                 DATA_MEM[1] <= DATA_MEM_ASYNC;
 
-            end
+                $display("%h", INSTR_ASYNC);
+                reg_async_dump();
+                $write("\n\n\n");
 
-    
+                if(func3 == 3'b000) begin //-------ADDI-------------------------------
+                    if(imm_i == 20'd0 & rs1 == 5'd0 & rd == 5'd0) begin
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as NOP.");
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
 
-        end else if (opcode == 7'b0100011) begin //------S-TYPE----------------------------------
-            {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = INSTR_ASYNC[31:7];
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_s, rs2, rs1, func3, opcode); //instruction info
+                    end else begin
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADDI.");
+                        $display("data: %h | rd: %d | rs1: %d", REG_FILE_ASYNC[rs1] + imm_i, rd, rs1);
+                        //write_reg(rd, REG_FILE_ASYNC[rs1] + imm_i);
+                        REG_FILE_ASYNC[rd] <= REG_FILE_ASYNC[rs1] + imm_i;
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
 
-            if(func3 == 3'b010) begin //----SW-------------------------------------
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SW.");
-                DATA_MEM_ASYNC[rs1 + imm_s] <= REG_FILE_ASYNC[rs2];
-                PC_ASYNC <= PC_ASYNC + 32'h4;
-
-                //first entry in the matrix
-                PC[1] <= PC_ASYNC;
-                PC_TARGET[1] <= PC_ASYNC + 32'h4;
-                INSTR[1] <= INSTR_ASYNC;
-                RS1[1] <= rs1;
-                RS2[1] <= rs2;
-                RD[1] <= 'x;
-                REG_FILE[1] <= REG_FILE_ASYNC;
-                DATA_MEM_ADDR[1] <= rs1 + imm_s;
-                DATA_MEM_IN[1] <= REG_FILE_ASYNC[rs2];
-                DATA_MEM_OUT[1] <= 'x;
-                DATA_MEM[1] <= DATA_MEM_ASYNC;
-
-            end
-
-
-
-        end else if (opcode == 7'b1100011) begin //------B-TYPE----------------------------
-            {imm_b[12], imm_b[10:5], rs2, rs1, func3, imm_b[4:1], imm_b[11]} = INSTR_ASYNC[31:7];
-            imm_b[0] = 1'b0; //LSB is always zero for B-type
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tB-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_b[12:1], rs2, rs1, func3, opcode); //instruction info
-
-            if(func3 == 3'b000) begin //----BEQ------------------------------------------------
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as BEQ.");
-                if(REG_FILE_ASYNC[rs1] == REG_FILE_ASYNC[rs2]) begin
-                    PC_ASYNC <= PC_ASYNC + imm_b;
-
-                    PC_TARGET[1] <= PC_ASYNC + imm_b;
-                end else begin
-                    PC_ASYNC <= PC_ASYNC + 4;
-
-                    PC_TARGET[1] <= PC_ASYNC + 4;
+                    end
                 end
 
-                //first entry in the matrix
-                PC[1] <= PC_ASYNC;
-                INSTR[1] <= INSTR_ASYNC;
-                RS1[1] <= rs1;
-                RS2[1] <= rs2;
-                RD[1] <= 'x;
-                REG_FILE[1] <= REG_FILE_ASYNC;
-                DATA_MEM_ADDR[1] <= 'x;
-                DATA_MEM_IN[1] <= 'x;
-                DATA_MEM_OUT[1] <= 'x;
-                DATA_MEM[1] <= DATA_MEM_ASYNC;
+
+            end else if (opcode == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
+                {imm_i, rs1, func3, rd} = INSTR_ASYNC[31:7];
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
+
+                if(func3 == 3'b010) begin //----LW------------------------------------
+                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LW.");
+                    write_reg(rd, DATA_MEM_ASYNC[rs1 + imm_i]);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    PC_TARGET[1] <= PC_ASYNC + 32'h4;
+                    INSTR[1] <= INSTR_ASYNC;
+                    RS1[1] <= rs1;
+                    RS2[1] <= 'x;
+                    RD[1] <= rd;
+                    REG_FILE[1] <= REG_FILE_ASYNC;
+                    DATA_MEM_ADDR[1] <= rs1 + imm_i;
+                    DATA_MEM_IN[1] <= 'x;
+                    DATA_MEM_OUT[1] <= DATA_MEM_ASYNC[rs1 + imm_i];
+                    DATA_MEM[1] <= DATA_MEM_ASYNC;
+
+                end
+
                 
-            end 
+
+            end else if (opcode == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
+                {imm_i, rs1, func3, rd} = INSTR_ASYNC[31:7];
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
+
+                if(func3 == 3'b000) begin //-------JALR-------------------------------
+                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as JALR.");
+                    write_reg(rd, PC_ASYNC + 4);
+                    PC_ASYNC <= REG_FILE_ASYNC[rs1] + {{20{imm_j[11]}}, imm_j[11:0]};
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    PC_TARGET[1] <= REG_FILE_ASYNC[rs1] + {{20{imm_j[11]}}, imm_j[11:0]};
+                    INSTR[1] <= INSTR_ASYNC;
+                    RS1[1] <= rs1;
+                    RS2[1] <= 'x;
+                    RD[1] <= rd;
+                    REG_FILE[1] <= REG_FILE_ASYNC;
+                    DATA_MEM_ADDR[1] <= 'x;
+                    DATA_MEM_IN[1] <= 'x;
+                    DATA_MEM_OUT[1] <= 'x;
+                    DATA_MEM[1] <= DATA_MEM_ASYNC;
+
+                end
+
         
-        end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
-            {imm_j[20], imm_j[10:1], imm_j[11], imm_j[19:12], rd} = INSTR_ASYNC[31:7];
-            imm_j[0] = 1'b0;
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_j[20:1], rd, opcode); //instruction info
 
-            //----JAL------------
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as JAL.");
-            write_reg(rd, PC_ASYNC + 4);
-            PC_ASYNC <= PC_ASYNC + {{11{imm_j[20]}}, imm_j[20:0]};
+            end else if (opcode == 7'b0100011) begin //------S-TYPE----------------------------------
+                {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = INSTR_ASYNC[31:7];
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_s, rs2, rs1, func3, opcode); //instruction info
 
-            //first entry in the matrix
-            PC[1] <= PC_ASYNC;
-            PC_TARGET[1] <= PC_ASYNC + imm_j;
-            INSTR[1] <= INSTR_ASYNC;
-            RS1[1] <= 'x;
-            RS2[1] <= 'x;
-            RD[1] <= rd;
-            REG_FILE[1] <= REG_FILE_ASYNC;
-            DATA_MEM_ADDR[1] <= 'x;
-            DATA_MEM_IN[1] <= 'x;
-            DATA_MEM_OUT[1] <= 'x;
-            DATA_MEM[1] <= DATA_MEM_ASYNC;
+                if(func3 == 3'b010) begin //----SW-------------------------------------
+                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SW.");
+                    DATA_MEM_ASYNC[rs1 + imm_s] <= REG_FILE_ASYNC[rs2];
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
 
-        end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
-            {imm_u, rd} = INSTR_ASYNC[31:7];
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_u, rd, opcode); //instruction info
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    PC_TARGET[1] <= PC_ASYNC + 32'h4;
+                    INSTR[1] <= INSTR_ASYNC;
+                    RS1[1] <= rs1;
+                    RS2[1] <= rs2;
+                    RD[1] <= 'x;
+                    REG_FILE[1] <= REG_FILE_ASYNC;
+                    DATA_MEM_ADDR[1] <= rs1 + imm_s;
+                    DATA_MEM_IN[1] <= REG_FILE_ASYNC[rs2];
+                    DATA_MEM_OUT[1] <= 'x;
+                    DATA_MEM[1] <= DATA_MEM_ASYNC;
 
-            //----LUI---------------
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LUI.");
-            write_reg(rd, {imm_u, REG_FILE_ASYNC[rd][11:0]});
-            PC_ASYNC <= PC_ASYNC + 32'h4;
+                end
 
-            //first entry in the matrix
-            PC[1] <= PC_ASYNC;
-            PC_TARGET[1] <= PC_ASYNC + 4;
-            INSTR[1] <= INSTR_ASYNC;
-            RS1[1] <= 'x;
-            RS2[1] <= 'x;
-            RD[1] <= rd;
-            REG_FILE[1] <= REG_FILE_ASYNC;
-            DATA_MEM_ADDR[1] <= 'x;
-            DATA_MEM_IN[1] <= 'x;
-            DATA_MEM_OUT[1] <= 'x;
-            DATA_MEM[1] <= DATA_MEM_ASYNC;
 
-        end else begin
-            //UNKNOWN ------------------------------
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\t<### WARNING: Instruction type not currently recognized by TB ###>");
 
+            end else if (opcode == 7'b1100011) begin //------B-TYPE----------------------------
+                {imm_b[12], imm_b[10:5], rs2, rs1, func3, imm_b[4:1], imm_b[11]} = INSTR_ASYNC[31:7];
+                imm_b[0] = 1'b0; //LSB is always zero for B-type
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tB-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_b[12:1], rs2, rs1, func3, opcode); //instruction info
+
+                if(func3 == 3'b000) begin //----BEQ------------------------------------------------
+                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as BEQ.");
+                    if(REG_FILE_ASYNC[rs1] == REG_FILE_ASYNC[rs2]) begin
+                        PC_ASYNC <= PC_ASYNC + imm_b;
+
+                        PC_TARGET[1] <= PC_ASYNC + imm_b;
+                    end else begin
+                        PC_ASYNC <= PC_ASYNC + 4;
+
+                        PC_TARGET[1] <= PC_ASYNC + 4;
+                    end
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    INSTR[1] <= INSTR_ASYNC;
+                    RS1[1] <= rs1;
+                    RS2[1] <= rs2;
+                    RD[1] <= 'x;
+                    REG_FILE[1] <= REG_FILE_ASYNC;
+                    DATA_MEM_ADDR[1] <= 'x;
+                    DATA_MEM_IN[1] <= 'x;
+                    DATA_MEM_OUT[1] <= 'x;
+                    DATA_MEM[1] <= DATA_MEM_ASYNC;
+                    
+                end 
+            
+            end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
+                {imm_j[20], imm_j[10:1], imm_j[11], imm_j[19:12], rd} = INSTR_ASYNC[31:7];
+                imm_j[0] = 1'b0;
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_j[20:1], rd, opcode); //instruction info
+
+                //----JAL------------
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as JAL.");
+                write_reg(rd, PC_ASYNC + 4);
+                PC_ASYNC <= PC_ASYNC + {{11{imm_j[20]}}, imm_j[20:0]};
+
+                //first entry in the matrix
+                PC[1] <= PC_ASYNC;
+                PC_TARGET[1] <= PC_ASYNC + imm_j;
+                INSTR[1] <= INSTR_ASYNC;
+                RS1[1] <= 'x;
+                RS2[1] <= 'x;
+                RD[1] <= rd;
+                REG_FILE[1] <= REG_FILE_ASYNC;
+                DATA_MEM_ADDR[1] <= 'x;
+                DATA_MEM_IN[1] <= 'x;
+                DATA_MEM_OUT[1] <= 'x;
+                DATA_MEM[1] <= DATA_MEM_ASYNC;
+
+            end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
+                {imm_u, rd} = INSTR_ASYNC[31:7];
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_u, rd, opcode); //instruction info
+
+                //----LUI---------------
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LUI.");
+                write_reg(rd, {imm_u, REG_FILE_ASYNC[rd][11:0]});
+                PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                //first entry in the matrix
+                PC[1] <= PC_ASYNC;
+                PC_TARGET[1] <= PC_ASYNC + 4;
+                INSTR[1] <= INSTR_ASYNC;
+                RS1[1] <= 'x;
+                RS2[1] <= 'x;
+                RD[1] <= rd;
+                REG_FILE[1] <= REG_FILE_ASYNC;
+                DATA_MEM_ADDR[1] <= 'x;
+                DATA_MEM_IN[1] <= 'x;
+                DATA_MEM_OUT[1] <= 'x;
+                DATA_MEM[1] <= DATA_MEM_ASYNC;
+
+            end else begin
+                //UNKNOWN ------------------------------
+                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\t<### WARNING: Instruction type not currently recognized by TB ###>");
+
+            end
+
+            for (int ii = 5; ii > 1; ii--) begin
+                PC[ii]            <= PC[ii-1];
+                PC_TARGET[ii]     <= PC_TARGET[ii-1];
+                INSTR[ii]         <= INSTR[ii-1];
+                RS1[ii]           <= RS1[ii-1];
+                RS2[ii]           <= RS2[ii-1];
+                RD[ii]            <= RD[ii-1];
+                REG_FILE[ii]      <= REG_FILE[ii-1];
+                DATA_MEM_ADDR[ii] <= DATA_MEM_ADDR[ii-1];
+                DATA_MEM_IN[ii]   <= DATA_MEM_IN[ii-1];
+                DATA_MEM_OUT[ii]  <= DATA_MEM_OUT[ii-1];
+                DATA_MEM[ii]      <= DATA_MEM[ii-1];
+            end
         end
-
-        for (int ii = 5; ii > 1; ii--) begin
-            PC[ii]            <= PC[ii-1];
-            PC_TARGET[ii]     <= PC_TARGET[ii-1];
-            INSTR[ii]         <= INSTR[ii-1];
-            RS1[ii]           <= RS1[ii-1];
-            RS2[ii]           <= RS2[ii-1];
-            RD[ii]            <= RD[ii-1];
-            REG_FILE[ii]      <= REG_FILE[ii-1];
-            DATA_MEM_ADDR[ii] <= DATA_MEM_ADDR[ii-1];
-            DATA_MEM_IN[ii]   <= DATA_MEM_IN[ii-1];
-            DATA_MEM_OUT[ii]  <= DATA_MEM_OUT[ii-1];
-            DATA_MEM[ii]      <= DATA_MEM[ii-1];
-        end
-
     end
 
 
@@ -453,7 +464,7 @@ module top_riscv_cpu();
         $display("\tPC_ASYNC: %h", PC_ASYNC);
         $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
         $display("\topcode: %h", opcode);
-        
+
         dut_dump();
         reg_dut_dump();
         //reg_async_dump();
@@ -479,7 +490,6 @@ module top_riscv_cpu();
             $display("\tPlease check for data hazards and issues in this instruction's datapath/control.");
             reg_async_dump();
             $stop(); //pauses verification if an instruction has failed OR a data hazard has occured.
-            instruction_failure = 0; //resets to zero after pause to check other instructions (OPTIONAL).
 
         end
 
@@ -761,7 +771,7 @@ module top_riscv_cpu();
 
                 if(func3_v == 3'b000) begin //-------JALR-------------------------------
                     /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as JALR:");
-                    if(row == 5) begin
+                    if(row == 3) begin
 
                         assert(cpu_dut.pc_reg.q == PC[3]) $display(" Success");
                         else begin $display(" FAILURE"); local_instruction_failure = 1; end
@@ -801,7 +811,7 @@ module top_riscv_cpu();
 $display("cpu_dut.pc_reg.q: %h PC[%0d]: %h", cpu_dut.pc_reg.q, row, PC[row-1]);
                 //----JAL------------
                 /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as JAL:");
-                if(row == 5) begin
+                if(row == 3) begin
                     
                     assert(cpu_dut.pc_reg.q == PC[3]) $display(" Success");
                     else begin $display(" FAILURE"); local_instruction_failure = 1; end

@@ -1,8 +1,8 @@
-#  transcript file sim.log
+#  transcript file sim_v2.log
 #  vlog *.sv
 # Questa Intel Starter FPGA Edition-64 vlog 2024.3 Compiler 2024.09 Sep 10 2024
-# Start time: 22:50:20 on Dec 28,2025
-# vlog alu.sv data_memory.sv dff_async_reset.sv id_t.sv instruction_memory.sv pc.sv reg_file.sv riscv_cpu.sv riscv_cpu_v2.sv self_checking_cpu_tb.sv top_riscv_cpu copy.sv top_riscv_cpu.sv top_riscv_cpu_v2.sv uid.sv ustore.sv 
+# Start time: 00:00:41 on Dec 29,2025
+# vlog alu.sv data_memory.sv dff_async_reset.sv id_t.sv instruction_memory.sv pc.sv reg_file.sv riscv_cpu.sv riscv_cpu_v2.sv self_checking_cpu_tb.sv top_riscv_cpu.sv top_riscv_cpu_v2.sv top_riscv_cpu_v2_copy.sv uid.sv ustore.sv 
 # -- Compiling module alu
 # -- Compiling module data_memory
 # -- Compiling module dff_async_reset
@@ -14,9 +14,8 @@
 # -- Compiling module riscv_cpu_v2
 # -- Compiling module self_checking_cpu_tb
 # -- Compiling module top_riscv_cpu
-# -- Compiling module top_riscv_cpu
-# ** Warning: top_riscv_cpu.sv(39): (vlog-2275) Existing module 'top_riscv_cpu' at top_riscv_cpu copy.sv(39) will be overwritten.
 # -- Compiling module top_riscv_cpu_v2
+# -- Compiling module top_riscv_cpu_v2_copy
 # -- Compiling module UID__
 # -- Compiling module US__
 # 
@@ -24,11 +23,12 @@
 # 	self_checking_cpu_tb
 # 	top_riscv_cpu
 # 	top_riscv_cpu_v2
-# End time: 22:50:20 on Dec 28,2025, Elapsed time: 0:00:00
-# Errors: 0, Warnings: 1
-#  vsim -voptargs=+acc work.top_riscv_cpu
-# vsim -voptargs="+acc" work.top_riscv_cpu 
-# Start time: 22:50:21 on Dec 28,2025
+# 	top_riscv_cpu_v2_copy
+# End time: 00:00:41 on Dec 29,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+#  vsim -voptargs=+acc work.top_riscv_cpu_v2
+# vsim -voptargs="+acc" work.top_riscv_cpu_v2 
+# Start time: 00:00:41 on Dec 29,2025
 # ** Note: (vsim-3813) Design is being optimized due to module recompilation...
 # ** Warning: (vopt-10908) Some optimizations are turned off because the +acc switch is in effect.
 # ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
@@ -47,7 +47,7 @@
 # // and may not be used in any way not expressly authorized by SISW.
 # //
 # Loading sv_std.std
-# Loading work.top_riscv_cpu(fast)
+# Loading work.top_riscv_cpu_v2(fast)
 # Loading work.riscv_cpu_v2(fast)
 # Loading work.pc(fast)
 # Loading work.dff_async_reset(fast)
@@ -102,6 +102,7 @@
 # [WB ] RD_W=x   DATA=0x00000000  WR_EN=x
 # [CTL] halt_D=0 halt_E=x halt_M=x halt_W=x ohalt=x
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
 # 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
@@ -109,8 +110,6 @@
 # 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
 # 	PC        = 0xxxxxxxxx
 # 	PC_TARGET = 0xxxxxxxxx
@@ -119,10 +118,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[2]:
 # 	PC        = 0xxxxxxxxx
@@ -132,10 +131,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[3]:
 # 	PC        = 0xxxxxxxxx
@@ -145,10 +144,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[4]:
 # 	PC        = 0xxxxxxxxx
@@ -158,10 +157,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[5]:
 # 	PC        = 0xxxxxxxxx
@@ -171,10 +170,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # ========================================================================================
 # 
 # 
@@ -201,14 +200,17 @@
 # verify_row(5) output
 # ========================================================================================
 # WARNING: Instruction type not currently recognized by TB.
-# data: 00000010 | rd: 10 | rs1:  0
+# 
+# 
+# 
+# <* rst = 0, intializing *>
 # 
 # 
 # 
 # Negedge block output
 # ========================================================================================
-# 	PC_ASYNC: 00000004
-# 	INSTR_ASYNC: 02000593
+# 	PC_ASYNC: 00000000
+# 	INSTR_ASYNC: 01000513
 # 	opcode: 13
 # ================================================================================================
 # Cycle @ time 40
@@ -239,6 +241,7 @@
 # [WB ] RD_W=0   DATA=0x00000000  WR_EN=0
 # [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -246,15 +249,13 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
-# 	PC        = 0x00000000
-# 	PC_TARGET = 0x00000004
-# 	INSTR     = 0x01000513
-# 	RS1       = 0
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
 # 	RS2       = x
-# 	RD        = 10
+# 	RD        = x
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -269,10 +270,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[3]:
 # 	PC        = 0xxxxxxxxx
@@ -282,10 +283,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[4]:
 # 	PC        = 0xxxxxxxxx
@@ -295,10 +296,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[5]:
 # 	PC        = 0xxxxxxxxx
@@ -308,19 +309,17 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # ========================================================================================
 # 
 # 
 # verify_row(1) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         x
-# 	Identified as ADDI:
+# WARNING: Instruction type not currently recognized by TB.
+# 
 # 
 # verify_row(2) output
 # ========================================================================================
@@ -340,17 +339,294 @@
 # verify_row(5) output
 # ========================================================================================
 # WARNING: Instruction type not currently recognized by TB.
-# data: 00000020 | rd: 11 | rs1:  0
+# 
+# 
+# 
+# <* rst = 0, intializing *>
 # 
 # 
 # 
 # Negedge block output
 # ========================================================================================
-# 	PC_ASYNC: 00000008
-# 	INSTR_ASYNC: 06400513
+# 	PC_ASYNC: 00000000
+# 	INSTR_ASYNC: 01000513
 # 	opcode: 13
 # ================================================================================================
 # Cycle @ time 80
+# [IF ] PC              = 0x00000000
+# [IF ] INSTR_F         = 0x01000513
+# [IF ] INSTR_F_FLUSH   = 0x01000513
+# [ID ] PC_D            = 0x00000000
+# [ID ] INSTR_D         = 0x00000000
+# [ID ] INSTR_D_FLUSH   = 0x00000000
+# [ID ] RS1=0 RS2=0 RD=0
+# [ID ] RS1_DATA    = 0x00000000
+# [ID ] RS2_DATA    = 0x00000000
+# [ID ] IM          = 0x00000000
+# [EX ] PC_E        = 0x00000000
+# [EX ] RS1_E_DATA  = 0x00000000
+# [EX ] RS2_E_DATA  = 0x00000000
+# [EX ] ALU_OUT     = 0x00000000
+# [EX ] ZERO_FLAG   = 1
+# [EX ] BR_TAKEN    = 0
+# [EX ] JMP_TAKEN   = 0
+# [EX ] PC_TARGET   = 0x00000000
+# [MEM] ALU_M       = 0x00000000
+# [MEM] RS2_M_DATA  = 0x00000000
+# [MEM] DMEM_OUT   = 0xxxxxxxxx
+# [MEM] MEM_WR_EN  = 0
+# [WB ] ALU_W       = 0x00000000
+# [WB ] DMEM_W     = 0x00000000
+# [WB ] RD_W=0   DATA=0x00000000  WR_EN=0
+# [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
+# ================================================================================================
+# 
+# REG_FILE_DUT Dump
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# ----- Golden Signals History -----
+# golden_history[1]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[2]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[3]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[4]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[5]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# ========================================================================================
+# 
+# 
+# verify_row(1) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# verify_row(2) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# verify_row(3) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# verify_row(4) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# verify_row(5) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# 
+# <* rst = 0, intializing *>
+# 
+# 
+# 
+# Negedge block output
+# ========================================================================================
+# 	PC_ASYNC: 00000000
+# 	INSTR_ASYNC: 01000513
+# 	opcode: 13
+# ================================================================================================
+# Cycle @ time 120
+# [IF ] PC              = 0x00000000
+# [IF ] INSTR_F         = 0x01000513
+# [IF ] INSTR_F_FLUSH   = 0x01000513
+# [ID ] PC_D            = 0x00000000
+# [ID ] INSTR_D         = 0x00000000
+# [ID ] INSTR_D_FLUSH   = 0x00000000
+# [ID ] RS1=0 RS2=0 RD=0
+# [ID ] RS1_DATA    = 0x00000000
+# [ID ] RS2_DATA    = 0x00000000
+# [ID ] IM          = 0x00000000
+# [EX ] PC_E        = 0x00000000
+# [EX ] RS1_E_DATA  = 0x00000000
+# [EX ] RS2_E_DATA  = 0x00000000
+# [EX ] ALU_OUT     = 0x00000000
+# [EX ] ZERO_FLAG   = 1
+# [EX ] BR_TAKEN    = 0
+# [EX ] JMP_TAKEN   = 0
+# [EX ] PC_TARGET   = 0x00000000
+# [MEM] ALU_M       = 0x00000000
+# [MEM] RS2_M_DATA  = 0x00000000
+# [MEM] DMEM_OUT   = 0xxxxxxxxx
+# [MEM] MEM_WR_EN  = 0
+# [WB ] ALU_W       = 0x00000000
+# [WB ] DMEM_W     = 0x00000000
+# [WB ] RD_W=0   DATA=0x00000000  WR_EN=0
+# [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
+# ================================================================================================
+# 
+# REG_FILE_DUT Dump
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# ----- Golden Signals History -----
+# golden_history[1]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[2]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[3]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[4]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[5]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# ========================================================================================
+# 
+# 
+# verify_row(1) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# verify_row(2) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# verify_row(3) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# verify_row(4) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# verify_row(5) output
+# ========================================================================================
+# WARNING: Instruction type not currently recognized by TB.
+# 
+# 
+# 
+# Negedge block output
+# ========================================================================================
+# 	PC_ASYNC: 00000004
+# 	INSTR_ASYNC: 02000593
+# 	opcode: 13
+# ================================================================================================
+# Cycle @ time 160
 # [IF ] PC              = 0x00000004
 # [IF ] INSTR_F         = 0x02000593
 # [IF ] INSTR_F_FLUSH   = 0x02000593
@@ -378,6 +654,7 @@
 # [WB ] RD_W=0   DATA=0x00000000  WR_EN=0
 # [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -385,15 +662,13 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
-# 	PC        = 0x00000004
-# 	PC_TARGET = 0x00000008
-# 	INSTR     = 0x02000593
+# 	PC        = 0x00000000
+# 	PC_TARGET = 0x00000004
+# 	INSTR     = 0x01000513
 # 	RS1       = 0
 # 	RS2       = x
-# 	RD        = 11
+# 	RD        = 10
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000010 00000000 00000000 00000000 00000000 00000000 
@@ -401,12 +676,12 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[2]:
-# 	PC        = 0x00000000
-# 	PC_TARGET = 0x00000004
-# 	INSTR     = 0x01000513
-# 	RS1       = 0
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
 # 	RS2       = x
-# 	RD        = 10
+# 	RD        = x
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -421,10 +696,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[4]:
 # 	PC        = 0xxxxxxxxx
@@ -434,10 +709,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[5]:
 # 	PC        = 0xxxxxxxxx
@@ -447,26 +722,22 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # ========================================================================================
 # 
 # 
 # verify_row(1) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
-# rd_v: 11
-# dut:         0 gold:         x
+# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         x
-# 	Identified as ADDI:
+# WARNING: Instruction type not currently recognized by TB.
+# 
 # 
 # verify_row(3) output
 # ========================================================================================
@@ -481,17 +752,16 @@
 # verify_row(5) output
 # ========================================================================================
 # WARNING: Instruction type not currently recognized by TB.
-# data: 00000064 | rd: 10 | rs1:  0
 # 
 # 
 # 
 # Negedge block output
 # ========================================================================================
-# 	PC_ASYNC: 0000000c
+# 	PC_ASYNC: 00000008
 # 	INSTR_ASYNC: 06400513
 # 	opcode: 13
 # ================================================================================================
-# Cycle @ time 120
+# Cycle @ time 200
 # [IF ] PC              = 0x00000008
 # [IF ] INSTR_F         = 0x06400513
 # [IF ] INSTR_F_FLUSH   = 0x06400513
@@ -519,6 +789,7 @@
 # [WB ] RD_W=0   DATA=0x00000000  WR_EN=0
 # [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -526,22 +797,7 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
-# 	PC        = 0x00000008
-# 	PC_TARGET = 0x0000000c
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[2]:
 # 	PC        = 0x00000004
 # 	PC_TARGET = 0x00000008
 # 	INSTR     = 0x02000593
@@ -550,17 +806,30 @@
 # 	RD        = 11
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000010 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
-# golden_history[3]:
+# golden_history[2]:
 # 	PC        = 0x00000000
 # 	PC_TARGET = 0x00000004
 # 	INSTR     = 0x01000513
 # 	RS1       = 0
 # 	RS2       = x
 # 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000010 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[3]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -575,10 +844,10 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[5]:
 # 	PC        = 0xxxxxxxxx
@@ -588,33 +857,27 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # ========================================================================================
 # 
 # 
 # verify_row(1) output
 # ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         x
+# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
-# rd_v: 11
-# dut:         0 gold:         x
+# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         x
-# 	Identified as ADDI:
+# WARNING: Instruction type not currently recognized by TB.
+# 
 # 
 # verify_row(4) output
 # ========================================================================================
@@ -624,17 +887,16 @@
 # verify_row(5) output
 # ========================================================================================
 # WARNING: Instruction type not currently recognized by TB.
-# data: 00000064 | rd: 10 | rs1:  0
 # 
 # 
 # 
 # Negedge block output
 # ========================================================================================
-# 	PC_ASYNC: 00000010
+# 	PC_ASYNC: 0000000c
 # 	INSTR_ASYNC: 06400513
 # 	opcode: 13
 # ================================================================================================
-# Cycle @ time 160
+# Cycle @ time 240
 # [IF ] PC              = 0x0000000c
 # [IF ] INSTR_F         = 0x06400513
 # [IF ] INSTR_F_FLUSH   = 0x06400513
@@ -662,6 +924,7 @@
 # [WB ] RD_W=0   DATA=0x00000000  WR_EN=0
 # [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -669,11 +932,9 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
-# 	PC        = 0x0000000c
-# 	PC_TARGET = 0x00000010
+# 	PC        = 0x00000008
+# 	PC_TARGET = 0x0000000c
 # 	INSTR     = 0x06400513
 # 	RS1       = 0
 # 	RS2       = x
@@ -685,19 +946,6 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # golden_history[2]:
-# 	PC        = 0x00000008
-# 	PC_TARGET = 0x0000000c
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[3]:
 # 	PC        = 0x00000004
 # 	PC_TARGET = 0x00000008
 # 	INSTR     = 0x02000593
@@ -706,17 +954,30 @@
 # 	RD        = 11
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000010 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
-# golden_history[4]:
+# golden_history[3]:
 # 	PC        = 0x00000000
 # 	PC_TARGET = 0x00000004
 # 	INSTR     = 0x01000513
 # 	RS1       = 0
 # 	RS2       = x
 # 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000010 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[4]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -731,55 +992,46 @@
 # 	RS2       = x
 # 	RD        = x
 # 	REG_FILE
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
-# 	xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # ========================================================================================
 # 
 # 
 # verify_row(1) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         x
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         x
+# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
-# rd_v: 11
-# dut:         0 gold:         x
+# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
 # 	Identified as ADDI:
 # 
 # verify_row(4) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         x
-# 	Identified as ADDI:
+# WARNING: Instruction type not currently recognized by TB.
+# 
 # 
 # verify_row(5) output
 # ========================================================================================
 # WARNING: Instruction type not currently recognized by TB.
-# data: 00000064 | rd: 10 | rs1:  0
 # 
 # 
 # 
 # Negedge block output
 # ========================================================================================
-# 	PC_ASYNC: 00000014
-# 	INSTR_ASYNC: 04800613
+# 	PC_ASYNC: 00000010
+# 	INSTR_ASYNC: 06400513
 # 	opcode: 13
 # ================================================================================================
-# Cycle @ time 200
+# Cycle @ time 280
 # [IF ] PC              = 0x00000010
 # [IF ] INSTR_F         = 0x06400513
 # [IF ] INSTR_F_FLUSH   = 0x06400513
@@ -807,6 +1059,7 @@
 # [WB ] RD_W=10   DATA=0x00000010  WR_EN=1
 # [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -814,22 +1067,7 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
-# 	PC        = 0x00000010
-# 	PC_TARGET = 0x00000014
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[2]:
 # 	PC        = 0x0000000c
 # 	PC_TARGET = 0x00000010
 # 	INSTR     = 0x06400513
@@ -842,7 +1080,7 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
-# golden_history[3]:
+# golden_history[2]:
 # 	PC        = 0x00000008
 # 	PC_TARGET = 0x0000000c
 # 	INSTR     = 0x06400513
@@ -851,11 +1089,11 @@
 # 	RD        = 10
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
-# golden_history[4]:
+# golden_history[3]:
 # 	PC        = 0x00000004
 # 	PC_TARGET = 0x00000008
 # 	INSTR     = 0x02000593
@@ -864,17 +1102,30 @@
 # 	RD        = 11
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000010 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
-# golden_history[5]:
+# golden_history[4]:
 # 	PC        = 0x00000000
 # 	PC_TARGET = 0x00000004
 # 	INSTR     = 0x01000513
 # 	RS1       = 0
 # 	RS2       = x
 # 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000010 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[5]:
+# 	PC        = 0xxxxxxxxx
+# 	PC_TARGET = 0xxxxxxxxx
+# 	INSTR     = 0xxxxxxxxx
+# 	RS1       = x
+# 	RS2       = x
+# 	RD        = x
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
@@ -886,48 +1137,36 @@
 # verify_row(1) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         0
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         0
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         0
+# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
 # 	Identified as ADDI:
 # 
 # verify_row(4) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
-# rd_v: 11
-# dut:         0 gold:         0
+# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
 # 	Identified as ADDI:
 # 
 # verify_row(5) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:         0 gold:         0
-# 	Identified as ADDI: Success
-# data: 00000048 | rd: 12 | rs1:  0
+# WARNING: Instruction type not currently recognized by TB.
 # 
 # 
 # 
 # Negedge block output
 # ========================================================================================
-# 	PC_ASYNC: 00000018
-# 	INSTR_ASYNC: 06400513
+# 	PC_ASYNC: 00000014
+# 	INSTR_ASYNC: 04800613
 # 	opcode: 13
 # ================================================================================================
-# Cycle @ time 240
+# Cycle @ time 320
 # [IF ] PC              = 0x00000014
 # [IF ] INSTR_F         = 0x04800613
 # [IF ] INSTR_F_FLUSH   = 0x04800613
@@ -955,6 +1194,7 @@
 # [WB ] RD_W=11   DATA=0x00000020  WR_EN=1
 # [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000010 00000000 00000000 00000000 00000000 00000000 
@@ -962,22 +1202,7 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
-# 	PC        = 0x00000014
-# 	PC_TARGET = 0x00000018
-# 	INSTR     = 0x04800613
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 12
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[2]:
 # 	PC        = 0x00000010
 # 	PC_TARGET = 0x00000014
 # 	INSTR     = 0x06400513
@@ -990,7 +1215,7 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
-# golden_history[3]:
+# golden_history[2]:
 # 	PC        = 0x0000000c
 # 	PC_TARGET = 0x00000010
 # 	INSTR     = 0x06400513
@@ -1003,7 +1228,7 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
-# golden_history[4]:
+# golden_history[3]:
 # 	PC        = 0x00000008
 # 	PC_TARGET = 0x0000000c
 # 	INSTR     = 0x06400513
@@ -1012,17 +1237,30 @@
 # 	RD        = 10
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
-# golden_history[5]:
+# golden_history[4]:
 # 	PC        = 0x00000004
 # 	PC_TARGET = 0x00000008
 # 	INSTR     = 0x02000593
 # 	RS1       = 0
 # 	RS2       = x
 # 	RD        = 11
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[5]:
+# 	PC        = 0x00000000
+# 	PC_TARGET = 0x00000004
+# 	INSTR     = 0x01000513
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 10
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000010 00000000 00000000 00000000 00000000 00000000 
@@ -1033,49 +1271,38 @@
 # 
 # verify_row(1) output
 # ========================================================================================
-# 	I-Type: imm: 0b000001001000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01100, opcode_v: 0b0010011
-# rd_v: 12
-# dut:         0 gold:         0
+# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:        16 gold:        16
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:        16 gold:        16
 # 	Identified as ADDI:
 # 
 # verify_row(4) output
 # ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:        16 gold:        16
+# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
 # 	Identified as ADDI:
 # 
 # verify_row(5) output
 # ========================================================================================
-# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
-# rd_v: 11
-# dut:         0 gold:         0
+# 	I-Type: imm: 0b000000010000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
 # 	Identified as ADDI: Success
-# data: 00000064 | rd: 10 | rs1:  0
 # 
 # 
 # 
 # Negedge block output
 # ========================================================================================
-# 	PC_ASYNC: 0000001c
+# 	PC_ASYNC: 00000018
 # 	INSTR_ASYNC: 06400513
 # 	opcode: 13
 # ================================================================================================
-# Cycle @ time 280
+# Cycle @ time 360
 # [IF ] PC              = 0x00000018
 # [IF ] INSTR_F         = 0x06400513
 # [IF ] INSTR_F_FLUSH   = 0x06400513
@@ -1103,6 +1330,7 @@
 # [WB ] RD_W=10   DATA=0x00000064  WR_EN=1
 # [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
@@ -1110,8 +1338,142 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
+# golden_history[1]:
+# 	PC        = 0x00000014
+# 	PC_TARGET = 0x00000018
+# 	INSTR     = 0x04800613
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 12
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[2]:
+# 	PC        = 0x00000010
+# 	PC_TARGET = 0x00000014
+# 	INSTR     = 0x06400513
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[3]:
+# 	PC        = 0x0000000c
+# 	PC_TARGET = 0x00000010
+# 	INSTR     = 0x06400513
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[4]:
+# 	PC        = 0x00000008
+# 	PC_TARGET = 0x0000000c
+# 	INSTR     = 0x06400513
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[5]:
+# 	PC        = 0x00000004
+# 	PC_TARGET = 0x00000008
+# 	INSTR     = 0x02000593
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 11
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# ========================================================================================
 # 
 # 
+# verify_row(1) output
+# ========================================================================================
+# 	I-Type: imm: 0b000001001000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01100, opcode_v: 0b0010011
+# 	Identified as ADDI:
+# 
+# verify_row(2) output
+# ========================================================================================
+# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
+# 	Identified as ADDI:
+# 
+# verify_row(3) output
+# ========================================================================================
+# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
+# 	Identified as ADDI:
+# 
+# verify_row(4) output
+# ========================================================================================
+# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
+# 	Identified as ADDI:
+# 
+# verify_row(5) output
+# ========================================================================================
+# 	I-Type: imm: 0b000000100000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01011, opcode_v: 0b0010011
+# 	Identified as ADDI: Success
+# 
+# 
+# 
+# Negedge block output
+# ========================================================================================
+# 	PC_ASYNC: 0000001c
+# 	INSTR_ASYNC: 06400513
+# 	opcode: 13
+# ================================================================================================
+# Cycle @ time 400
+# [IF ] PC              = 0x0000001c
+# [IF ] INSTR_F         = 0x06400513
+# [IF ] INSTR_F_FLUSH   = 0x06400513
+# [ID ] PC_D            = 0x00000018
+# [ID ] INSTR_D         = 0x06400513
+# [ID ] INSTR_D_FLUSH   = 0x06400513
+# [ID ] RS1=0 RS2=0 RD=10
+# [ID ] RS1_DATA    = 0x00000000
+# [ID ] RS2_DATA    = 0x00000000
+# [ID ] IM          = 0x00000064
+# [EX ] PC_E        = 0x00000014
+# [EX ] RS1_E_DATA  = 0x00000000
+# [EX ] RS2_E_DATA  = 0x00000000
+# [EX ] ALU_OUT     = 0x00000048
+# [EX ] ZERO_FLAG   = 0
+# [EX ] BR_TAKEN    = 0
+# [EX ] JMP_TAKEN   = 0
+# [EX ] PC_TARGET   = 0x0000005c
+# [MEM] ALU_M       = 0x00000064
+# [MEM] RS2_M_DATA  = 0x00000000
+# [MEM] DMEM_OUT   = 0xxxxxxxxx
+# [MEM] MEM_WR_EN  = 0
+# [WB ] ALU_W       = 0x00000064
+# [WB ] DMEM_W     = 0xxxxxxxxx
+# [WB ] RD_W=10   DATA=0x00000064  WR_EN=1
+# [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
+# ================================================================================================
+# 
+# REG_FILE_DUT Dump
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# ----- Golden Signals History -----
 # golden_history[1]:
 # 	PC        = 0x00000018
 # 	PC_TARGET = 0x0000001c
@@ -1134,7 +1496,7 @@
 # 	RD        = 12
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
@@ -1173,7 +1535,7 @@
 # 	RD        = 10
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000010 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # ========================================================================================
@@ -1182,38 +1544,27 @@
 # verify_row(1) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:        16 gold:        16
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001001000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01100, opcode_v: 0b0010011
-# rd_v: 12
-# dut:         0 gold:         0
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:        16 gold:        16
 # 	Identified as ADDI:
 # 
 # verify_row(4) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:        16 gold:        16
 # 	Identified as ADDI:
 # 
 # verify_row(5) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:        16 gold:        16
 # 	Identified as ADDI: Success
-# data: 00000064 | rd: 10 | rs1:  0
 # 
 # 
 # 
@@ -1223,26 +1574,26 @@
 # 	INSTR_ASYNC: 06400513
 # 	opcode: 13
 # ================================================================================================
-# Cycle @ time 320
-# [IF ] PC              = 0x0000001c
+# Cycle @ time 440
+# [IF ] PC              = 0x00000020
 # [IF ] INSTR_F         = 0x06400513
 # [IF ] INSTR_F_FLUSH   = 0x06400513
-# [ID ] PC_D            = 0x00000018
+# [ID ] PC_D            = 0x0000001c
 # [ID ] INSTR_D         = 0x06400513
 # [ID ] INSTR_D_FLUSH   = 0x06400513
 # [ID ] RS1=0 RS2=0 RD=10
 # [ID ] RS1_DATA    = 0x00000000
 # [ID ] RS2_DATA    = 0x00000000
 # [ID ] IM          = 0x00000064
-# [EX ] PC_E        = 0x00000014
+# [EX ] PC_E        = 0x00000018
 # [EX ] RS1_E_DATA  = 0x00000000
 # [EX ] RS2_E_DATA  = 0x00000000
-# [EX ] ALU_OUT     = 0x00000048
+# [EX ] ALU_OUT     = 0x00000064
 # [EX ] ZERO_FLAG   = 0
 # [EX ] BR_TAKEN    = 0
 # [EX ] JMP_TAKEN   = 0
-# [EX ] PC_TARGET   = 0x0000005c
-# [MEM] ALU_M       = 0x00000064
+# [EX ] PC_TARGET   = 0x0000007c
+# [MEM] ALU_M       = 0x00000048
 # [MEM] RS2_M_DATA  = 0x00000000
 # [MEM] DMEM_OUT   = 0xxxxxxxxx
 # [MEM] MEM_WR_EN  = 0
@@ -1251,6 +1602,7 @@
 # [WB ] RD_W=10   DATA=0x00000064  WR_EN=1
 # [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
@@ -1258,8 +1610,6 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
 # 	PC        = 0x0000001c
 # 	PC_TARGET = 0x00000020
@@ -1295,7 +1645,7 @@
 # 	RD        = 12
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
@@ -1330,184 +1680,26 @@
 # verify_row(1) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001001000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01100, opcode_v: 0b0010011
-# rd_v: 12
-# dut:         0 gold:         0
 # 	Identified as ADDI:
 # 
 # verify_row(4) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(5) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
-# 	Identified as ADDI: Success
-# data: 00000064 | rd: 10 | rs1:  0
-# 
-# 
-# 
-# Negedge block output
-# ========================================================================================
-# 	PC_ASYNC: 00000024
-# 	INSTR_ASYNC: xxxxxxxx
-# 	opcode: xx
-# ================================================================================================
-# Cycle @ time 360
-# [IF ] PC              = 0x00000020
-# [IF ] INSTR_F         = 0x06400513
-# [IF ] INSTR_F_FLUSH   = 0x06400513
-# [ID ] PC_D            = 0x0000001c
-# [ID ] INSTR_D         = 0x06400513
-# [ID ] INSTR_D_FLUSH   = 0x06400513
-# [ID ] RS1=0 RS2=0 RD=10
-# [ID ] RS1_DATA    = 0x00000000
-# [ID ] RS2_DATA    = 0x00000000
-# [ID ] IM          = 0x00000064
-# [EX ] PC_E        = 0x00000018
-# [EX ] RS1_E_DATA  = 0x00000000
-# [EX ] RS2_E_DATA  = 0x00000000
-# [EX ] ALU_OUT     = 0x00000064
-# [EX ] ZERO_FLAG   = 0
-# [EX ] BR_TAKEN    = 0
-# [EX ] JMP_TAKEN   = 0
-# [EX ] PC_TARGET   = 0x0000007c
-# [MEM] ALU_M       = 0x00000048
-# [MEM] RS2_M_DATA  = 0x00000000
-# [MEM] DMEM_OUT   = 0xxxxxxxxx
-# [MEM] MEM_WR_EN  = 0
-# [WB ] ALU_W       = 0x00000064
-# [WB ] DMEM_W     = 0xxxxxxxxx
-# [WB ] RD_W=10   DATA=0x00000064  WR_EN=1
-# [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
-# ================================================================================================
-# REG_FILE_DUT Dump
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# ----- Golden Signals History -----
-# 
-# 
-# golden_history[1]:
-# 	PC        = 0x00000020
-# 	PC_TARGET = 0x00000024
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[2]:
-# 	PC        = 0x0000001c
-# 	PC_TARGET = 0x00000020
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[3]:
-# 	PC        = 0x00000018
-# 	PC_TARGET = 0x0000001c
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[4]:
-# 	PC        = 0x00000014
-# 	PC_TARGET = 0x00000018
-# 	INSTR     = 0x04800613
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 12
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[5]:
-# 	PC        = 0x00000010
-# 	PC_TARGET = 0x00000014
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# ========================================================================================
-# 
-# 
-# verify_row(1) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
-# 	Identified as ADDI:
-# 
-# verify_row(2) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
-# 	Identified as ADDI:
-# 
-# verify_row(3) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
-# 	Identified as ADDI:
-# 
-# verify_row(4) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001001000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01100, opcode_v: 0b0010011
-# rd_v: 12
-# dut:         0 gold:         0
-# 	Identified as ADDI:
-# 
-# verify_row(5) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI: Success
 # 
 # 
@@ -1518,7 +1710,7 @@
 # 	INSTR_ASYNC: xxxxxxxx
 # 	opcode: xx
 # ================================================================================================
-# Cycle @ time 400
+# Cycle @ time 480
 # [IF ] PC              = 0x00000024
 # [IF ] INSTR_F         = 0xxxxxxxxx
 # [IF ] INSTR_F_FLUSH   = 0xxxxxxxxx
@@ -1546,6 +1738,7 @@
 # [WB ] RD_W=12   DATA=0x00000048  WR_EN=1
 # [CTL] halt_D=0 halt_E=0 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
@@ -1553,8 +1746,142 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
+# golden_history[1]:
+# 	PC        = 0x00000020
+# 	PC_TARGET = 0x00000024
+# 	INSTR     = 0x06400513
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[2]:
+# 	PC        = 0x0000001c
+# 	PC_TARGET = 0x00000020
+# 	INSTR     = 0x06400513
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[3]:
+# 	PC        = 0x00000018
+# 	PC_TARGET = 0x0000001c
+# 	INSTR     = 0x06400513
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[4]:
+# 	PC        = 0x00000014
+# 	PC_TARGET = 0x00000018
+# 	INSTR     = 0x04800613
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 12
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# golden_history[5]:
+# 	PC        = 0x00000010
+# 	PC_TARGET = 0x00000014
+# 	INSTR     = 0x06400513
+# 	RS1       = 0
+# 	RS2       = x
+# 	RD        = 10
+# 	REG_FILE
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# ========================================================================================
 # 
 # 
+# verify_row(1) output
+# ========================================================================================
+# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
+# 	Identified as ADDI:
+# 
+# verify_row(2) output
+# ========================================================================================
+# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
+# 	Identified as ADDI:
+# 
+# verify_row(3) output
+# ========================================================================================
+# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
+# 	Identified as ADDI:
+# 
+# verify_row(4) output
+# ========================================================================================
+# 	I-Type: imm: 0b000001001000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01100, opcode_v: 0b0010011
+# 	Identified as ADDI:
+# 
+# verify_row(5) output
+# ========================================================================================
+# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
+# 	Identified as ADDI: Success
+# 
+# 
+# 
+# Negedge block output
+# ========================================================================================
+# 	PC_ASYNC: 00000024
+# 	INSTR_ASYNC: xxxxxxxx
+# 	opcode: xx
+# ================================================================================================
+# Cycle @ time 520
+# [IF ] PC              = 0x00000028
+# [IF ] INSTR_F         = 0xxxxxxxxx
+# [IF ] INSTR_F_FLUSH   = 0xxxxxxxxx
+# [ID ] PC_D            = 0x00000024
+# [ID ] INSTR_D         = 0xxxxxxxxx
+# [ID ] INSTR_D_FLUSH   = 0xxxxxxxxx
+# [ID ] RS1=0 RS2=0 RD=0
+# [ID ] RS1_DATA    = 0x00000000
+# [ID ] RS2_DATA    = 0x00000000
+# [ID ] IM          = 0x00000000
+# [EX ] PC_E        = 0x00000020
+# [EX ] RS1_E_DATA  = 0x00000000
+# [EX ] RS2_E_DATA  = 0x00000000
+# [EX ] ALU_OUT     = 0x00000064
+# [EX ] ZERO_FLAG   = 0
+# [EX ] BR_TAKEN    = 0
+# [EX ] JMP_TAKEN   = 0
+# [EX ] PC_TARGET   = 0x00000084
+# [MEM] ALU_M       = 0x00000064
+# [MEM] RS2_M_DATA  = 0x00000000
+# [MEM] DMEM_OUT   = 0xxxxxxxxx
+# [MEM] MEM_WR_EN  = 0
+# [WB ] ALU_W       = 0x00000064
+# [WB ] DMEM_W     = 0xxxxxxxxx
+# [WB ] RD_W=10   DATA=0x00000064  WR_EN=1
+# [CTL] halt_D=1 halt_E=0 halt_M=0 halt_W=0 ohalt=0
+# ================================================================================================
+# 
+# REG_FILE_DUT Dump
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+# 
+# ----- Golden Signals History -----
 # golden_history[1]:
 # 	PC        = 0x00000020
 # 	PC_TARGET = 0x00000024
@@ -1616,7 +1943,7 @@
 # 	RD        = 12
 # 	REG_FILE
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000000 00000000 00000000 00000000 
+# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # ========================================================================================
@@ -1625,36 +1952,26 @@
 # verify_row(1) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(4) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(5) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001001000, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01100, opcode_v: 0b0010011
-# rd_v: 12
-# dut:         0 gold:         0
 # 	Identified as ADDI: Success
 # 
 # 
@@ -1665,25 +1982,25 @@
 # 	INSTR_ASYNC: xxxxxxxx
 # 	opcode: xx
 # ================================================================================================
-# Cycle @ time 440
-# [IF ] PC              = 0x00000028
+# Cycle @ time 560
+# [IF ] PC              = 0x0000002c
 # [IF ] INSTR_F         = 0xxxxxxxxx
 # [IF ] INSTR_F_FLUSH   = 0xxxxxxxxx
-# [ID ] PC_D            = 0x00000024
+# [ID ] PC_D            = 0x00000028
 # [ID ] INSTR_D         = 0xxxxxxxxx
 # [ID ] INSTR_D_FLUSH   = 0xxxxxxxxx
 # [ID ] RS1=0 RS2=0 RD=0
 # [ID ] RS1_DATA    = 0x00000000
 # [ID ] RS2_DATA    = 0x00000000
 # [ID ] IM          = 0x00000000
-# [EX ] PC_E        = 0x00000020
+# [EX ] PC_E        = 0x00000024
 # [EX ] RS1_E_DATA  = 0x00000000
 # [EX ] RS2_E_DATA  = 0x00000000
-# [EX ] ALU_OUT     = 0x00000064
-# [EX ] ZERO_FLAG   = 0
+# [EX ] ALU_OUT     = 0x00000000
+# [EX ] ZERO_FLAG   = 1
 # [EX ] BR_TAKEN    = 0
 # [EX ] JMP_TAKEN   = 0
-# [EX ] PC_TARGET   = 0x00000084
+# [EX ] PC_TARGET   = 0x00000024
 # [MEM] ALU_M       = 0x00000064
 # [MEM] RS2_M_DATA  = 0x00000000
 # [MEM] DMEM_OUT   = 0xxxxxxxxx
@@ -1691,8 +2008,9 @@
 # [WB ] ALU_W       = 0x00000064
 # [WB ] DMEM_W     = 0xxxxxxxxx
 # [WB ] RD_W=10   DATA=0x00000064  WR_EN=1
-# [CTL] halt_D=1 halt_E=0 halt_M=0 halt_W=0 ohalt=0
+# [CTL] halt_D=1 halt_E=1 halt_M=0 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
@@ -1700,8 +2018,6 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
 # 	PC        = 0x00000020
 # 	PC_TARGET = 0x00000024
@@ -1772,36 +2088,26 @@
 # verify_row(1) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(4) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(5) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI: Success
 # 
 # 
@@ -1812,34 +2118,35 @@
 # 	INSTR_ASYNC: xxxxxxxx
 # 	opcode: xx
 # ================================================================================================
-# Cycle @ time 480
-# [IF ] PC              = 0x0000002c
+# Cycle @ time 600
+# [IF ] PC              = 0x00000030
 # [IF ] INSTR_F         = 0xxxxxxxxx
 # [IF ] INSTR_F_FLUSH   = 0xxxxxxxxx
-# [ID ] PC_D            = 0x00000028
+# [ID ] PC_D            = 0x0000002c
 # [ID ] INSTR_D         = 0xxxxxxxxx
 # [ID ] INSTR_D_FLUSH   = 0xxxxxxxxx
 # [ID ] RS1=0 RS2=0 RD=0
 # [ID ] RS1_DATA    = 0x00000000
 # [ID ] RS2_DATA    = 0x00000000
 # [ID ] IM          = 0x00000000
-# [EX ] PC_E        = 0x00000024
+# [EX ] PC_E        = 0x00000028
 # [EX ] RS1_E_DATA  = 0x00000000
 # [EX ] RS2_E_DATA  = 0x00000000
 # [EX ] ALU_OUT     = 0x00000000
 # [EX ] ZERO_FLAG   = 1
 # [EX ] BR_TAKEN    = 0
 # [EX ] JMP_TAKEN   = 0
-# [EX ] PC_TARGET   = 0x00000024
-# [MEM] ALU_M       = 0x00000064
+# [EX ] PC_TARGET   = 0x00000028
+# [MEM] ALU_M       = 0x00000000
 # [MEM] RS2_M_DATA  = 0x00000000
 # [MEM] DMEM_OUT   = 0xxxxxxxxx
 # [MEM] MEM_WR_EN  = 0
 # [WB ] ALU_W       = 0x00000064
 # [WB ] DMEM_W     = 0xxxxxxxxx
 # [WB ] RD_W=10   DATA=0x00000064  WR_EN=1
-# [CTL] halt_D=1 halt_E=1 halt_M=0 halt_W=0 ohalt=0
+# [CTL] halt_D=1 halt_E=1 halt_M=1 halt_W=0 ohalt=0
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
@@ -1847,8 +2154,6 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
 # 	PC        = 0x00000020
 # 	PC_TARGET = 0x00000024
@@ -1919,36 +2224,26 @@
 # verify_row(1) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(4) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(5) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI: Success
 # 
 # 
@@ -1959,154 +2254,7 @@
 # 	INSTR_ASYNC: xxxxxxxx
 # 	opcode: xx
 # ================================================================================================
-# Cycle @ time 520
-# [IF ] PC              = 0x00000030
-# [IF ] INSTR_F         = 0xxxxxxxxx
-# [IF ] INSTR_F_FLUSH   = 0xxxxxxxxx
-# [ID ] PC_D            = 0x0000002c
-# [ID ] INSTR_D         = 0xxxxxxxxx
-# [ID ] INSTR_D_FLUSH   = 0xxxxxxxxx
-# [ID ] RS1=0 RS2=0 RD=0
-# [ID ] RS1_DATA    = 0x00000000
-# [ID ] RS2_DATA    = 0x00000000
-# [ID ] IM          = 0x00000000
-# [EX ] PC_E        = 0x00000028
-# [EX ] RS1_E_DATA  = 0x00000000
-# [EX ] RS2_E_DATA  = 0x00000000
-# [EX ] ALU_OUT     = 0x00000000
-# [EX ] ZERO_FLAG   = 1
-# [EX ] BR_TAKEN    = 0
-# [EX ] JMP_TAKEN   = 0
-# [EX ] PC_TARGET   = 0x00000028
-# [MEM] ALU_M       = 0x00000000
-# [MEM] RS2_M_DATA  = 0x00000000
-# [MEM] DMEM_OUT   = 0xxxxxxxxx
-# [MEM] MEM_WR_EN  = 0
-# [WB ] ALU_W       = 0x00000064
-# [WB ] DMEM_W     = 0xxxxxxxxx
-# [WB ] RD_W=10   DATA=0x00000064  WR_EN=1
-# [CTL] halt_D=1 halt_E=1 halt_M=1 halt_W=0 ohalt=0
-# ================================================================================================
-# REG_FILE_DUT Dump
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# ----- Golden Signals History -----
-# 
-# 
-# golden_history[1]:
-# 	PC        = 0x00000020
-# 	PC_TARGET = 0x00000024
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[2]:
-# 	PC        = 0x00000020
-# 	PC_TARGET = 0x00000024
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[3]:
-# 	PC        = 0x00000020
-# 	PC_TARGET = 0x00000024
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[4]:
-# 	PC        = 0x00000020
-# 	PC_TARGET = 0x00000024
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 
-# golden_history[5]:
-# 	PC        = 0x00000020
-# 	PC_TARGET = 0x00000024
-# 	INSTR     = 0x06400513
-# 	RS1       = 0
-# 	RS2       = x
-# 	RD        = 10
-# 	REG_FILE
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# ========================================================================================
-# 
-# 
-# verify_row(1) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
-# 	Identified as ADDI:
-# 
-# verify_row(2) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
-# 	Identified as ADDI:
-# 
-# verify_row(3) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
-# 	Identified as ADDI:
-# 
-# verify_row(4) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
-# 	Identified as ADDI:
-# 
-# verify_row(5) output
-# ========================================================================================
-# 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
-# 	Identified as ADDI: Success
-# 
-# 
-# 
-# Negedge block output
-# ========================================================================================
-# 	PC_ASYNC: 00000024
-# 	INSTR_ASYNC: xxxxxxxx
-# 	opcode: xx
-# ================================================================================================
-# Cycle @ time 560
+# Cycle @ time 640
 # [IF ] PC              = 0x00000034
 # [IF ] INSTR_F         = 0xxxxxxxxx
 # [IF ] INSTR_F_FLUSH   = 0xxxxxxxxx
@@ -2134,6 +2282,7 @@
 # [WB ] RD_W=0   DATA=0x00000000  WR_EN=0
 # [CTL] halt_D=1 halt_E=1 halt_M=1 halt_W=1 ohalt=1
 # ================================================================================================
+# 
 # REG_FILE_DUT Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
@@ -2141,8 +2290,6 @@
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 
 # ----- Golden Signals History -----
-# 
-# 
 # golden_history[1]:
 # 	PC        = 0x00000020
 # 	PC_TARGET = 0x00000024
@@ -2213,46 +2360,37 @@
 # verify_row(1) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(2) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(3) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(4) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI:
 # 
 # verify_row(5) output
 # ========================================================================================
 # 	I-Type: imm: 0b000001100100, rs1_v: 0b00000, func3_v: 0b000, rd_v: 0b01010, opcode_v: 0b0010011
-# rd_v: 10
-# dut:       100 gold:       100
 # 	Identified as ADDI: Success
 # 
 # WARNING: Recieved halt signal. Pausing verification.
 # Program counter:         52
-# REG_FILE_ASYNC Dump
+# 
+# REG_FILE[1] Dump
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
 # 	00000000 00000000 00000064 00000020 00000048 00000000 00000000 00000000 
 # 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 ** Note: $stop    : top_riscv_cpu.sv(475)
-#    Time: 560 ns  Iteration: 1  Instance: /top_riscv_cpu
-# Break in Module top_riscv_cpu at top_riscv_cpu.sv line 475
-# Stopped at top_riscv_cpu.sv line 475
+# 	00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 ** Note: $stop    : top_riscv_cpu_v2.sv(467)
+#    Time: 640 ns  Iteration: 1  Instance: /top_riscv_cpu_v2
+# Break in Module top_riscv_cpu_v2 at top_riscv_cpu_v2.sv line 467
+# Stopped at top_riscv_cpu_v2.sv line 467
 #  transcript file -close

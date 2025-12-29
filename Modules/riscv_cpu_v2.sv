@@ -6,7 +6,7 @@
 // `default_nettype none
 
 //prototype of basic pattern
-module riscv_cpu
+module riscv_cpu_v2
 (
     input logic clk, rst, //This has to be a wire for explicit net type declaration (according to Questa)
     output logic ohalt //when this is asserted, CPU should stop execution. Please implement in testbench

@@ -22,8 +22,14 @@ Questia
 in gui, change directory to git directory
 in questia cmd, cd into modules
 
-run:
-type nul > sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu; run 1us; transcript file
+run in questia
+transcript file -close; file delete -force sim.log; transcript file sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu; run 1us; transcript file -close
+
+OR
+
+run in powershell
+vsim -c -do "transcript file -close; file delete -force sim.log; transcript file sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu; run 1us; transcript file -close; quit -f"
+
 
 Writing asm
 ===========
