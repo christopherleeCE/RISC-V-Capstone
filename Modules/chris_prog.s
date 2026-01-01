@@ -1,157 +1,157 @@
 ## chris's test program ##
-# start:
-#         addi a0, zero, 0x10
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         addi a1, zero, 0x17
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         add a2, a0, a1
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         lui a3, 0xF
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         sub a4, a1, a0
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         jal ra, start #switch back to . + 4
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         addi a5, zero, 0x30
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         addi a5, zero, 0x34
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         addi a5, zero, 0x38
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         jal ra, label + 4
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         addi a5, zero, 0x3C
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         addi a5, zero, 0x40
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-# label:
-#         addi a5, zero, 0x44
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         sw a5, 0x0(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         lw a6, 0x0(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         addi a7, zero, 0x40
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         jalr ra, a7, 0x8
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         nop
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         beq a5, zero, beq_label
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         nop
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         beq a5, a6, beq_label
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         nop
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-# beq_label:
-#         sw a0, 0(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         sw a1, 1(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         sw a2, 2(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         sw a3, 3(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         sw a4, 4(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         sw a5, 5(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         sw a6, 6(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
-#         sw a7, 7(zero)
-#         nop #DNR
-#         nop #DNR
-#         nop #DNR
-#         # nop #DNR0
+start:
+        addi a0, zero, 0x10
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        addi a1, zero, 0x17
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        add a2, a0, a1
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        lui a3, 0xF
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        sub a4, a1, a0
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        jal ra, start #switch back to . + 4
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        addi a5, zero, 0x30
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        addi a5, zero, 0x34
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        addi a5, zero, 0x38
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        jal ra, label + 4
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        addi a5, zero, 0x3C
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        addi a5, zero, 0x40
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+label:
+        addi a5, zero, 0x44
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        sw a5, 0x0(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        lw a6, 0x0(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        addi a7, zero, 0x40
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        jalr ra, a7, 0x8
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        nop
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        beq a5, zero, beq_label
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        nop
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        beq a5, a6, beq_label
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        nop
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+beq_label:
+        sw a0, 0(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        sw a1, 1(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        sw a2, 2(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        sw a3, 3(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        sw a4, 4(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        sw a5, 5(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        sw a6, 6(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
+        sw a7, 7(zero)
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR
+        # nop #DNR0
 
 ## addi test program ##
 # start:
@@ -205,18 +205,33 @@
 #         jal     zero, end
 
 
-start:
-        addi a0, zero, 16
-        addi a1, zero, 32
-        #jal ra, label0
-        addi a0, zero, 100
-        addi a0, zero, 100
-        addi a0, zero, 100
-
-label0:
-        addi a2, zero, 72
-        addi a0, zero, 100
-        addi a0, zero, 100
-        addi a0, zero, 100
+# start:
+#         addi a0, zero, 16
+#         addi a1, zero, 32
+        
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         jal ra, label0
+# label0:
+#         addi a2, zero, 72
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
+#         addi a0, zero, 100
 
 

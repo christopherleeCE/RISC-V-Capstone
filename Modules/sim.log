@@ -1,8 +1,8 @@
 #  transcript file sim.log
 #  vlog *.sv
 # Questa Intel Starter FPGA Edition-64 vlog 2024.3 Compiler 2024.09 Sep 10 2024
-# Start time: 22:50:20 on Dec 28,2025
-# vlog alu.sv data_memory.sv dff_async_reset.sv id_t.sv instruction_memory.sv pc.sv reg_file.sv riscv_cpu.sv riscv_cpu_v2.sv self_checking_cpu_tb.sv top_riscv_cpu copy.sv top_riscv_cpu.sv top_riscv_cpu_v2.sv uid.sv ustore.sv 
+# Start time: 23:13:15 on Dec 29,2025
+# vlog alu.sv data_memory.sv dff_async_reset.sv id_t.sv instruction_memory.sv pc.sv reg_file.sv riscv_cpu.sv riscv_cpu_v2.sv self_checking_cpu_tb.sv top_riscv_cpu.sv top_riscv_cpu_v2.sv top_riscv_cpu_v2_copy.sv uid.sv ustore.sv 
 # -- Compiling module alu
 # -- Compiling module data_memory
 # -- Compiling module dff_async_reset
@@ -14,22 +14,19 @@
 # -- Compiling module riscv_cpu_v2
 # -- Compiling module self_checking_cpu_tb
 # -- Compiling module top_riscv_cpu
-# -- Compiling module top_riscv_cpu
-# ** Warning: top_riscv_cpu.sv(39): (vlog-2275) Existing module 'top_riscv_cpu' at top_riscv_cpu copy.sv(39) will be overwritten.
 # -- Compiling module top_riscv_cpu_v2
+# ** Error: (vlog-13069) top_riscv_cpu_v2.sv(829): near "\ ": syntax error, unexpected end of source code.
+# ** Error: top_riscv_cpu_v2.sv(829): (vlog-13205) Syntax error found in the scope following '\ '. Is there a missing '::'?
+# -- Compiling module top_riscv_cpu_v2_copy
 # -- Compiling module UID__
 # -- Compiling module US__
-# 
-# Top level modules:
-# 	self_checking_cpu_tb
-# 	top_riscv_cpu
-# 	top_riscv_cpu_v2
-# End time: 22:50:20 on Dec 28,2025, Elapsed time: 0:00:00
-# Errors: 0, Warnings: 1
+# End time: 23:13:15 on Dec 29,2025, Elapsed time: 0:00:00
+# Errors: 2, Warnings: 0
+# C:/intelFPGA_lite/24.1std/questa_fse/win64/vlog failed.
 #  vsim -voptargs=+acc work.top_riscv_cpu
 # vsim -voptargs="+acc" work.top_riscv_cpu 
-# Start time: 22:50:21 on Dec 28,2025
-# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# Start time: 23:13:15 on Dec 29,2025
+# ** Note: (vsim-3812) Design is being optimized...
 # ** Warning: (vopt-10908) Some optimizations are turned off because the +acc switch is in effect.
 # ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
 # //  Questa Intel Starter FPGA Edition-64

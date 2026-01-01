@@ -25,10 +25,7 @@ specifically the last instruction of any program doesnt calculate correclty
 
 TODO fix??? (maybe dont) issue with addi when forwarding doesnt seem to work, maybe just get golden issue above fixed, or more features for top
 
-TODO negedge block IS NOT DONE
-
-TODOTODOTODO next TODO
-implement stalling on gold model baseed on dut.pcredirect (i thin thats the signal)
+TODONEXT negedge block IS NOT DONE
 
 */
 
@@ -155,10 +152,10 @@ module top_riscv_cpu_v2();
             PC_ASYNC <= '0;
             instruction_failure <= 0;
 
-        end else if(1) begin
+        end else if(stall_gold()) begin
 
             //$display("posedgedump");
-            //reg_gold_postwb_dump();
+            //reg_gold_post_write_back_dump();
             //data_mem_async_dump();
             //display_golden_singals_history();
 
@@ -450,28 +447,34 @@ module top_riscv_cpu_v2();
 
         dut_dump();
         reg_dut_dump();
-        //reg_gold_postwb_dump();
+        //reg_gold_post_write_back_dump();
         //data_mem_async_dump();
         display_golden_singals_history();
 
-        //def# is a werid way to get an output of a task, at this point its not even used
-        verify_row(1, def1);
-        verify_row(2, def2);
-        verify_row(3, def3);
-        verify_row(4, def4);
-        verify_row(5, def5);
+        //dont verify while dut is satlling
+        if(stall_gold()) begin
+
+            //def# is a werid way to get an output of a task, at this point its not even used
+            verify_row(0, def0);
+            verify_row(1, def1);
+            verify_row(2, def2);
+            verify_row(3, def3);
+            verify_row(4, def4);
+            verify_row(5, def5);
+
+        end
 
 
         if (ohalt == 1'b1) begin //HALT SIGNAL --------------------------------------------------------------
             $display("\nWARNING: Recieved halt signal. Pausing verification.");
             $display("Program counter: %d", cpu_dut.PC);
-            reg_gold_postwb_dump();
+            reg_gold_post_write_back_dump();
             $stop(); //pauses verification if CPU outputs halt signal
 
         end else if(instruction_failure == 1) begin //INSTRUCTION FAILURE----------------------------------
             $display("\nWARNING: Mismatch between model and CPU. Pausing verification.");
             $display("\tPlease check for data hazards and issues in this instruction's datapath/control.");
-            reg_gold_postwb_dump();
+            reg_gold_post_write_back_dump();
             $stop(); //pauses verification if an instruction has failed OR a data hazard has occured.
 
         end
@@ -491,6 +494,7 @@ module top_riscv_cpu_v2();
             $display("[IF ] PC              = 0x%08h", cpu_dut.PC);
             $display("[IF ] INSTR_F         = 0x%08h", cpu_dut.INSTR_F);
             $display("[IF ] INSTR_F_FLUSH   = 0x%08h", cpu_dut.INSTR_F_FLUSH);
+            $display("[IF ] redirect_pc     = 0x%08h", cpu_dut.redirect_pc);
 
             // --------------------------------
             // ID stage
@@ -559,7 +563,7 @@ module top_riscv_cpu_v2();
         end
     endtask
 
-    task reg_gold_postwb_dump();
+    task reg_gold_post_write_back_dump();
         begin
             $write("\nREG_FILE[1] Dump");
             for(int ii = 0; ii < 32; ii++) begin
@@ -754,9 +758,9 @@ module top_riscv_cpu_v2();
 
                 if(func3_v == 3'b000) begin //-------JALR-------------------------------
                     /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as JALR:");
-                    if(row == 3) begin
+                    if(row == 0) begin
 
-                        assert(cpu_dut.pc_reg.q == PC[3]) $display(" Success");
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
                         else begin $display(" FAILURE"); local_instruction_failure = 1; end
 
                     end
@@ -791,12 +795,12 @@ module top_riscv_cpu_v2();
                 {imm_j_v[20], imm_j_v[10:1], imm_j_v[11], imm_j_v[19:12], rd_v} = INSTR[row][31:7];
                 imm_j_v[0] = 1'b0;
                 /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_j_v[20:1], rd_v, opcode_v); //instruction info
-$display("cpu_dut.pc_reg.q: %h PC[%0d]: %h", cpu_dut.pc_reg.q, row, PC[row-1]);
+
                 //----JAL------------
                 /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as JAL:");
-                if(row == 3) begin
+                if(row == 0) begin
                     
-                    assert(cpu_dut.pc_reg.q == PC[3]) $display(" Success");
+                    assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
                     else begin $display(" FAILURE"); local_instruction_failure = 1; end
 
                 end
@@ -807,7 +811,12 @@ $display("cpu_dut.pc_reg.q: %h PC[%0d]: %h", cpu_dut.pc_reg.q, row, PC[row-1]);
 
                 //----LUI---------------
                 /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as LUI.");
+                if(row == 3) begin
 
+                    assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[3][rd_v]) $display(" Success");
+                    else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                end
                 // else local_instruction_failure = 1;
 
             end else begin
@@ -826,4 +835,16 @@ $display("cpu_dut.pc_reg.q: %h PC[%0d]: %h", cpu_dut.pc_reg.q, row, PC[row-1]);
             end
         end
     endtask
+
+    function automatic logic stall_gold();
+        return !(
+            cpu_dut.redirect_pc
+            || ((cpu_dut.INSTR_D[6:0]  == 7'b1100111) && (cpu_dut.INSTR_D[14:12] == 3'b000)) //JALR
+            || (cpu_dut.INSTR_D[6:0]   == 7'b1101111) && (cpu_dut.INSTR_D[14:12] == cpu_dut.INSTR_D[14:12]) //JAL
+            || (cpu_dut.INSTR_D[6:0]   == 7'b1100011) && (cpu_dut.INSTR_D[14:12] == 3'b000) //BEQ
+        );
+    endfunction
+
+
+
 endmodule

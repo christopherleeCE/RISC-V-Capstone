@@ -17,6 +17,36 @@ R0
 R1
 R0
 R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
 Z2 !s12c _opt
 R1
 R2
@@ -530,10 +560,10 @@ n@_opt2
 R12
 R4
 T_opt3
-!s110 1766991642
-VcnXaObSA]`L2i;4=:2:Li0
+!s110 1767080980
+V1QaKiV_SGVzD35_CzVXG=3
 04 16 4 work top_riscv_cpu_v2 fast 0
-=1-18c04da667d5-6952271a-6e-17d4
+=1-18c04da667d5-69538414-37-5d7c
 R1
 R6
 R7
@@ -546,7 +576,7 @@ R12
 valu
 Z13 2alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|riscv_cpu_v2.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|top_riscv_cpu_v2.sv|top_riscv_cpu_v2_copy.sv|uid.sv|ustore.sv
 Z14 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
-Z15 !s110 1766991641
+Z15 !s110 1767080979
 !i10b 1
 !s100 VoWi63nQKn1chMGK05m9f0
 IN3e<Z]FC`RJV_;6o?Iizd0
@@ -555,14 +585,14 @@ R4
 Z16 w1766189829
 8alu.sv
 Falu.sv
-!i122 417
+!i122 441
 L0 1 56
 Z17 VDg1SIo80bB@j0V0VzS_@n1
 Z18 OL;L;2024.3;79
 r1
 !s85 0
 31
-Z19 !s108 1766991641.000000
+Z19 !s108 1767080979.000000
 Z20 !s107 sig_declare.inc|ustore.sv|uid.sv|top_riscv_cpu_v2_copy.sv|top_riscv_cpu_v2.sv|top_riscv_cpu.sv|self_checking_cpu_tb.sv|riscv_cpu_v2.sv|riscv_cpu.sv|reg_file.sv|pc.sv|instruction_memory.sv|id_t.sv|dff_async_reset.sv|data_memory.sv|alu.sv|
 Z21 !s90 alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|riscv_cpu_v2.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|top_riscv_cpu_v2.sv|top_riscv_cpu_v2_copy.sv|uid.sv|ustore.sv|
 !i113 0
@@ -580,7 +610,7 @@ R4
 w1766734673
 8data_memory.sv
 Fdata_memory.sv
-!i122 417
+!i122 441
 L0 5 32
 R17
 R18
@@ -605,7 +635,7 @@ R4
 R16
 8dff_async_reset.sv
 Fdff_async_reset.sv
-!i122 417
+!i122 441
 L0 3 18
 R17
 R18
@@ -630,7 +660,7 @@ R4
 R16
 8id_t.sv
 Fid_t.sv
-!i122 417
+!i122 441
 L0 4 68
 R17
 R18
@@ -655,7 +685,7 @@ R4
 w1766734689
 8instruction_memory.sv
 Finstruction_memory.sv
-!i122 417
+!i122 441
 L0 1 21
 R17
 R18
@@ -680,7 +710,7 @@ R4
 R16
 8pc.sv
 Fpc.sv
-!i122 417
+!i122 441
 L0 8 26
 R17
 R18
@@ -705,7 +735,7 @@ R4
 R16
 8reg_file.sv
 Freg_file.sv
-!i122 417
+!i122 441
 L0 42 41
 R17
 R18
@@ -731,7 +761,7 @@ w1766910972
 8riscv_cpu.sv
 Friscv_cpu.sv
 Z23 Fsig_declare.inc
-!i122 417
+!i122 441
 Z24 L0 9 539
 R17
 R18
@@ -757,7 +787,7 @@ w1766972322
 8riscv_cpu_v2.sv
 Friscv_cpu_v2.sv
 R23
-!i122 417
+!i122 441
 R24
 R17
 R18
@@ -782,7 +812,7 @@ R4
 R16
 8self_checking_cpu_tb.sv
 Fself_checking_cpu_tb.sv
-!i122 417
+!i122 441
 L0 13 417
 R17
 R18
@@ -807,7 +837,7 @@ R4
 w1766987371
 8top_riscv_cpu.sv
 Ftop_riscv_cpu.sv
-!i122 417
+!i122 441
 L0 39 798
 R17
 R18
@@ -825,15 +855,15 @@ R13
 R14
 R15
 !i10b 1
-!s100 G;GIg=d<XYZOjB:7hfd[S1
-I_]fVQP0SziReV`jWoa^823
+!s100 W]BY2kWlFHRn>3gm_ki@B2
+ITF]`UPnUdX3=aaH]okz@Q3
 S1
 R4
-w1766991639
+w1767080977
 8top_riscv_cpu_v2.sv
 Ftop_riscv_cpu_v2.sv
-!i122 417
-L0 34 794
+!i122 441
+L0 37 817
 R17
 R18
 r1
@@ -857,7 +887,7 @@ R4
 w1766991067
 8top_riscv_cpu_v2_copy.sv
 Ftop_riscv_cpu_v2_copy.sv
-!i122 417
+!i122 441
 L0 39 808
 R17
 R18
@@ -882,7 +912,7 @@ R4
 Z25 w1766189830
 8uid.sv
 Fuid.sv
-!i122 417
+!i122 441
 L0 4 25
 R17
 R18
@@ -908,7 +938,7 @@ R4
 R25
 8ustore.sv
 Fustore.sv
-!i122 417
+!i122 441
 L0 4 39
 R17
 R18
