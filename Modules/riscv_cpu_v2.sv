@@ -442,7 +442,8 @@ module riscv_cpu_v2
         halt_M
     } = e2m_control_M;     
 
-    //TODO i think EC = 32 might mean we only have words of datamem, mabye increase at some point
+    //TODO i think EC = 32 might mean we only have words 32 of datamem, mabye increase at some point
+    //TODO implement rst, in current state data mem entries are initialized to 0xXXXXXXXX
     //-chris
     data_memory #(
         .BIT_WIDTH(32),

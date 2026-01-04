@@ -27,13 +27,14 @@ TODO fix??? (maybe dont) issue with addi when forwarding doesnt seem to work, ma
 
 TODO negedge block IS NOT DONE
 
-
+TODO datamemasync needs to be repleaced with data_mem[1] just like reg async
+TODO clean up data mem dump tasks, create a post wb datagold dump, remove data_meme_async_dump etc
 
 */
 
 `timescale 1ns/1ns
 
-module top_riscv_cpu_v2();
+module top_riscv_cpu_v2_copy_copy();
 
     //PARAMETERS/BUSES----------------------------------------------------------------------------------------------------------
     //constants
@@ -81,6 +82,9 @@ module top_riscv_cpu_v2();
     logic [4:0] RS2 [5:1];
     logic [4:0] RD [5:1];
     logic [31:0] REG_FILE [5:1] [31:0] = '{default: 32'b0};;
+    logic [31:0] DATA_MEM_ADDR [5:1];
+    logic [31:0] DATA_MEM_IN [5:1];
+    logic [31:0] DATA_MEM_OUT [5:1];
     logic [31:0] DATA_MEM [5:1] [31:0];
 
     //the "async" of the golden signals, they are calculated in the always block bellow, then the relevent signals are fed into the matrix
@@ -136,6 +140,11 @@ module top_riscv_cpu_v2();
 
     endtask
 
+    //no abstraction needed
+    logic [31:0] DATA_MEM_ASYNC [31:0] = '{default: 32'b0};
+
+
+
     always_ff @(posedge clk) begin //golden results calculated on posedge
 
         logic [63:0] product;
@@ -150,6 +159,7 @@ module top_riscv_cpu_v2();
 
             //$display("posedgedump");
             //reg_gold_post_write_back_dump();
+            //data_mem_async_dump();
             //display_golden_singals_history();
 
             // /* DO NOT REMOVE : DEBUG GOLD */ $write("\n\n\n");
@@ -171,6 +181,10 @@ module top_riscv_cpu_v2();
                 RS1[1] <= rs1;
                 RS2[1] <= rs2;
                 RD[1] <= rd;
+                DATA_MEM_ADDR[1] <= 'x;
+                DATA_MEM_IN[1] <= 'x;
+                DATA_MEM_OUT[1] <= 'x;
+                DATA_MEM[1] <= DATA_MEM_ASYNC;
 
                 //-R-TYPE---------------
                 if (func7 == 7'b0000000) begin
@@ -231,6 +245,10 @@ module top_riscv_cpu_v2();
                 RS1[1] <= rs1;
                 RS2[1] <= 'x;
                 RD[1] <= rd;
+                DATA_MEM_ADDR[1] <= 'x;
+                DATA_MEM_IN[1] <= 'x;
+                DATA_MEM_OUT[1] <= 'x;
+                DATA_MEM[1] <= DATA_MEM_ASYNC;
 
                 if(func3 == 3'b000) begin //-------ADDI-------------------------------
                     if(imm_i == 20'd0 & rs1 == 5'd0 & rd == 5'd0) begin
@@ -253,7 +271,7 @@ module top_riscv_cpu_v2();
 
                 if(func3 == 3'b010) begin //----LW------------------------------------
                     // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LW.");
-                    write_reg(rd, DATA_MEM[1][rs1 + imm_i]);
+                    write_reg(rd, DATA_MEM_ASYNC[rs1 + imm_i]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //first entry in the matrix
@@ -263,6 +281,10 @@ module top_riscv_cpu_v2();
                     RS1[1] <= rs1;
                     RS2[1] <= 'x;
                     RD[1] <= rd;
+                    DATA_MEM_ADDR[1] <= rs1 + imm_i;
+                    DATA_MEM_IN[1] <= 'x;
+                    DATA_MEM_OUT[1] <= DATA_MEM_ASYNC[rs1 + imm_i];
+                    DATA_MEM[1] <= DATA_MEM_ASYNC;
 
                 end
 
@@ -284,6 +306,10 @@ module top_riscv_cpu_v2();
                     RS1[1] <= rs1;
                     RS2[1] <= 'x;
                     RD[1] <= rd;
+                    DATA_MEM_ADDR[1] <= 'x;
+                    DATA_MEM_IN[1] <= 'x;
+                    DATA_MEM_OUT[1] <= 'x;
+                    DATA_MEM[1] <= DATA_MEM_ASYNC;
 
                 end
 
@@ -295,7 +321,7 @@ module top_riscv_cpu_v2();
 
                 if(func3 == 3'b010) begin //----SW-------------------------------------
                     // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SW.");
-                    DATA_MEM[1][rs1 + imm_s] <= REG_FILE[1][rs2];
+                    DATA_MEM_ASYNC[rs1 + imm_s] <= REG_FILE[1][rs2];
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //first entry in the matrix
@@ -305,6 +331,10 @@ module top_riscv_cpu_v2();
                     RS1[1] <= rs1;
                     RS2[1] <= rs2;
                     RD[1] <= 'x;
+                    DATA_MEM_ADDR[1] <= rs1 + imm_s;
+                    DATA_MEM_IN[1] <= REG_FILE[1][rs2];
+                    DATA_MEM_OUT[1] <= 'x;
+                    DATA_MEM[1] <= DATA_MEM_ASYNC;
 
                 end
 
@@ -333,6 +363,10 @@ module top_riscv_cpu_v2();
                     RS1[1] <= rs1;
                     RS2[1] <= rs2;
                     RD[1] <= 'x;
+                    DATA_MEM_ADDR[1] <= 'x;
+                    DATA_MEM_IN[1] <= 'x;
+                    DATA_MEM_OUT[1] <= 'x;
+                    DATA_MEM[1] <= DATA_MEM_ASYNC;
                     
                 end 
             
@@ -353,6 +387,10 @@ module top_riscv_cpu_v2();
                 RS1[1] <= 'x;
                 RS2[1] <= 'x;
                 RD[1] <= rd;
+                DATA_MEM_ADDR[1] <= 'x;
+                DATA_MEM_IN[1] <= 'x;
+                DATA_MEM_OUT[1] <= 'x;
+                DATA_MEM[1] <= DATA_MEM_ASYNC;
 
             end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
                 {imm_u, rd} = INSTR_ASYNC[31:7];
@@ -370,6 +408,10 @@ module top_riscv_cpu_v2();
                 RS1[1] <= 'x;
                 RS2[1] <= 'x;
                 RD[1] <= rd;
+                DATA_MEM_ADDR[1] <= 'x;
+                DATA_MEM_IN[1] <= 'x;
+                DATA_MEM_OUT[1] <= 'x;
+                DATA_MEM[1] <= DATA_MEM_ASYNC;
 
             end else begin
                 //UNKNOWN ------------------------------
@@ -385,6 +427,9 @@ module top_riscv_cpu_v2();
                 RS2[ii]           <= RS2[ii-1];
                 RD[ii]            <= RD[ii-1];
                 REG_FILE[ii]      <= REG_FILE[ii-1];
+                DATA_MEM_ADDR[ii] <= DATA_MEM_ADDR[ii-1];
+                DATA_MEM_IN[ii]   <= DATA_MEM_IN[ii-1];
+                DATA_MEM_OUT[ii]  <= DATA_MEM_OUT[ii-1];
                 DATA_MEM[ii]      <= DATA_MEM[ii-1];
             end
         end
@@ -403,9 +448,11 @@ module top_riscv_cpu_v2();
         $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
         $display("\topcode: %h", opcode);
 
+
         dut_dump();
         reg_dut_dump();
         //reg_gold_post_write_back_dump();
+        //data_mem_async_dump();
         display_golden_singals_history();
 
         //dont verify while dut is satlling
@@ -532,6 +579,18 @@ module top_riscv_cpu_v2();
         end
     endtask
 
+    task data_mem_async_dump();
+        begin
+            $display("DATA_MEM_ASYNC Dump");
+            for(int ii = 0; ii < 32; ii++) begin
+                if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
+                    $write("\n\t");
+                end
+                $write("\tx%d: 0x%h", ii, DATA_MEM_ASYNC[ii]);
+            end
+        end
+    endtask
+
     task data_mem_dut_dump();
         begin
             $display("DATA_MEM_DUT Dump");
@@ -550,7 +609,7 @@ module top_riscv_cpu_v2();
             $write("\n\n----- Golden Signals History -----");
 
             for (c = 1; c < 6; c = c + 1) begin
-                $display("\n\ngolden_history[%0d]:", c);
+                $display("\ngolden_history[%0d]:", c);
                 $display("\tPC        = 0x%08h", PC[c]);
                 $display("\tPC_TARGET = 0x%08h", PC_TARGET[c]);
                 $display("\tINSTR     = 0x%08h", INSTR[c]);
@@ -566,17 +625,17 @@ module top_riscv_cpu_v2();
 
                     $write("%08h ", REG_FILE[c][r]);
                 end
+                $display("");
 
-                $write("\n\tDATA_MEM");
                 for(int ii = 0; ii < 32; ii++) begin
                     if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
                         $write("\n\t");
                     end
-                    $write("\t%2d: 0x%h", ii, DATA_MEM[c][ii]);
+                    $write("\tx%d: 0x%h", ii, DATA_MEM[c][ii]);
                 end
             end
 
-            $display("\n========================================================================================");
+            $display("========================================================================================");
 
         end
     endtask
@@ -610,7 +669,7 @@ module top_riscv_cpu_v2();
             opcode_v = INSTR[row][6:0];
 
             /* DO NOT REMOVE : DEBUG VERIFY */ $write("\n\n");
-            /* DO NOT REMOVE : DEBUG VERIFY */ $display("verify_row(%0d) output: \nPC: %h", row, PC[row]);
+            /* DO NOT REMOVE : DEBUG VERIFY */ $display("verify_row(%0d) output", row);
             /* DO NOT REMOVE : DEBUG VERIFY */ $display("========================================================================================");
             if (opcode_v == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
                 {func7_v, rs2_v, rs1_v, func3_v, rd_v} = INSTR[row][31:7];
@@ -736,6 +795,8 @@ module top_riscv_cpu_v2();
                         else begin $display(" FAILURE"); local_instruction_failure = 1; end
 
                     end
+                    // else local_instruction_failure = 1; //ensure the PC and rd_v have changed to appropiate values
+
                 end
 
             end else if (opcode_v == 7'b0100011) begin //------S-TYPE----------------------------------
@@ -745,13 +806,12 @@ module top_riscv_cpu_v2();
                 if(func3_v == 3'b010) begin //----SW-------------------------------------
                     /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as SW.");
 
-                    //$display("dut: %d, gold: %d, rs1_v + imm_s: %d", cpu_dut.data_mem.data_mem[rs1_v + imm_s], DATA_MEM[4][rs1_v + imm_s], rs1_v + imm_s);
-                    //data_mem_dut_dump();
-                    if(row == 4) begin
+                    $display("dut: %d, gold: %d, rs1_v + imm_s: %d", cpu_dut.data_mem.data_mem[rs1_v + imm_s], DATA_MEM[4][rs1_v + imm_s], rs1_v + imm_s);
 
-                        assert(cpu_dut.data_mem.data_mem[rs1_v + imm_s] == DATA_MEM[4][rs1_v + imm_s]) $display(" Success");
-                        else begin $display(" FAILURE"); local_instruction_failure = 1; end
-                    end
+                    data_mem_dut_dump();
+                    assert(cpu_dut.data_mem.data_mem[rs1_v + imm_s] == DATA_MEM[4][rs1_v + imm_s]) $display(" Success");
+                    else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
                 end
 
             end else if (opcode_v == 7'b1100011) begin //------B-TYPE----------------------------
@@ -803,7 +863,8 @@ module top_riscv_cpu_v2();
             if(local_instruction_failure == 1) begin 
 
                 $display("\nError: Mismatch between model and CPU.");
-                reg_dut_dump();
+                //reg_dut_dump();
+                //display_golden_singals_history();
                 //$stop();
 
             end
