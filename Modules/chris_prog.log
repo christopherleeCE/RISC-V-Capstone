@@ -10,7 +10,7 @@ Disassembly of section .text:
    8:	00b50633          	add	a2,a0,a1
    c:	0000f6b7          	lui	a3,0xf
   10:	40a58733          	sub	a4,a1,a0
-  14:	004000ef          	jal	ra,18 <start+0x18>
+  14:	fea006e3          	beq	zero,a0,0 <start>
   18:	03000793          	li	a5,48
   1c:	03400793          	li	a5,52
   20:	03800793          	li	a5,56
@@ -24,23 +24,29 @@ Disassembly of section .text:
   38:	00002803          	lw	a6,0(zero) # 0 <start>
   3c:	04000893          	li	a7,64
   40:	00000013          	nop
-  44:	00078863          	beqz	a5,54 <beq_label>
-  48:	00000013          	nop
-  4c:	01078463          	beq	a5,a6,54 <beq_label>
-  50:	00000013          	nop
+  44:	02078463          	beqz	a5,6c <beq_label>
+  48:	00a02023          	sw	a0,0(zero) # 0 <start>
+  4c:	00b02223          	sw	a1,4(zero) # 4 <start+0x4>
+  50:	00c02423          	sw	a2,8(zero) # 8 <start+0x8>
+  54:	00d02623          	sw	a3,12(zero) # c <start+0xc>
+  58:	01078a63          	beq	a5,a6,6c <beq_label>
+  5c:	00a02023          	sw	a0,0(zero) # 0 <start>
+  60:	00b02223          	sw	a1,4(zero) # 4 <start+0x4>
+  64:	00c02423          	sw	a2,8(zero) # 8 <start+0x8>
+  68:	00d02823          	sw	a3,16(zero) # 10 <start+0x10>
 
-00000054 <beq_label>:
-  54:	00a02023          	sw	a0,0(zero) # 0 <start>
-  58:	00b020a3          	sw	a1,1(zero) # 1 <start+0x1>
-  5c:	00c02123          	sw	a2,2(zero) # 2 <start+0x2>
-  60:	00d021a3          	sw	a3,3(zero) # 3 <start+0x3>
-  64:	00e02223          	sw	a4,4(zero) # 4 <start+0x4>
-  68:	00f022a3          	sw	a5,5(zero) # 5 <start+0x5>
-  6c:	01002323          	sw	a6,6(zero) # 6 <start+0x6>
-  70:	011023a3          	sw	a7,7(zero) # 7 <start+0x7>
+0000006c <beq_label>:
+  6c:	00a02023          	sw	a0,0(zero) # 0 <start>
+  70:	00b02223          	sw	a1,4(zero) # 4 <start+0x4>
+  74:	00c02423          	sw	a2,8(zero) # 8 <start+0x8>
+  78:	00d02623          	sw	a3,12(zero) # c <start+0xc>
+  7c:	00e02823          	sw	a4,16(zero) # 10 <start+0x10>
+  80:	00f02a23          	sw	a5,20(zero) # 14 <start+0x14>
+  84:	01002c23          	sw	a6,24(zero) # 18 <start+0x18>
+  88:	01102e23          	sw	a7,28(zero) # 1c <start+0x1c>
 
-00000074 <end>:
-  74:	000000ef          	jal	ra,74 <end>
-  78:	00000013          	nop
-  7c:	00000013          	nop
-  80:	00000013          	nop
+0000008c <end>:
+  8c:	000000ef          	jal	ra,8c <end>
+  90:	00000013          	nop
+  94:	00000013          	nop
+  98:	00000013          	nop
