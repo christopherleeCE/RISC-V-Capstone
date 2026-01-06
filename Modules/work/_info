@@ -193,6 +193,30 @@ R0
 R1
 R0
 R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
 Z2 !s12c _opt
 R1
 R2
@@ -706,10 +730,10 @@ n@_opt2
 R12
 R4
 T_opt3
-!s110 1767587728
-VMIG3:XP@TIC7[4nPE_I8a2
-04 16 4 work top_riscv_cpu_v2 fast 0
-=1-8cf8c5ed6ec1-695b3f8f-196-5334
+!s110 1767690971
+V`iXBZKd[5=JNAYRYcbCUY1
+04 18 4 work top_riscv_cpu_v2_1 fast 0
+=1-18c04da667d5-695cd2da-36a-277c
 R1
 R6
 R7
@@ -720,29 +744,29 @@ R11
 n@_opt3
 R12
 valu
-Z13 2alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|riscv_cpu_v2.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|top_riscv_cpu_v2.sv|top_riscv_cpu_v2_copy.sv|top_riscv_cpu_v2_copy_copy.sv|top_riscv_cpu_v2_copy_copy_copy.sv|uid.sv|ustore.sv
+Z13 2alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|riscv_cpu_v2.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|top_riscv_cpu_v2.sv|top_riscv_cpu_v2_1.sv|top_riscv_cpu_v2_copy.sv|top_riscv_cpu_v2_copy_copy.sv|top_riscv_cpu_v2_copy_copy_copy.sv|uid.sv|ustore.sv
 Z14 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
-Z15 !s110 1767587726
+Z15 !s110 1767690970
 !i10b 1
 !s100 VoWi63nQKn1chMGK05m9f0
 IN3e<Z]FC`RJV_;6o?Iizd0
 S1
-Z16 dC:/Users/Chris/Documents/Quartus/Questa Projects/Prototype/Git_Home/Modules
-Z17 w1766617807
+R4
+Z16 w1766189829
 8alu.sv
 Falu.sv
-!i122 546
+!i122 575
 L0 1 56
-Z18 VDg1SIo80bB@j0V0VzS_@n1
-Z19 OL;L;2024.3;79
+Z17 VDg1SIo80bB@j0V0VzS_@n1
+Z18 OL;L;2024.3;79
 r1
 !s85 0
 31
-Z20 !s108 1767587725.000000
-Z21 !s107 sig_declare.inc|ustore.sv|uid.sv|top_riscv_cpu_v2_copy_copy_copy.sv|top_riscv_cpu_v2_copy_copy.sv|top_riscv_cpu_v2_copy.sv|top_riscv_cpu_v2.sv|top_riscv_cpu.sv|self_checking_cpu_tb.sv|riscv_cpu_v2.sv|riscv_cpu.sv|reg_file.sv|pc.sv|instruction_memory.sv|id_t.sv|dff_async_reset.sv|data_memory.sv|alu.sv|
-Z22 !s90 alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|riscv_cpu_v2.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|top_riscv_cpu_v2.sv|top_riscv_cpu_v2_copy.sv|top_riscv_cpu_v2_copy_copy.sv|top_riscv_cpu_v2_copy_copy_copy.sv|uid.sv|ustore.sv|
+Z19 !s108 1767690970.000000
+Z20 !s107 sig_declare.inc|ustore.sv|uid.sv|top_riscv_cpu_v2_copy_copy_copy.sv|top_riscv_cpu_v2_copy_copy.sv|top_riscv_cpu_v2_copy.sv|top_riscv_cpu_v2_1.sv|top_riscv_cpu_v2.sv|top_riscv_cpu.sv|self_checking_cpu_tb.sv|riscv_cpu_v2.sv|riscv_cpu.sv|reg_file.sv|pc.sv|instruction_memory.sv|id_t.sv|dff_async_reset.sv|data_memory.sv|alu.sv|
+Z21 !s90 alu.sv|data_memory.sv|dff_async_reset.sv|id_t.sv|instruction_memory.sv|pc.sv|reg_file.sv|riscv_cpu.sv|riscv_cpu_v2.sv|self_checking_cpu_tb.sv|top_riscv_cpu.sv|top_riscv_cpu_v2.sv|top_riscv_cpu_v2_1.sv|top_riscv_cpu_v2_copy.sv|top_riscv_cpu_v2_copy_copy.sv|top_riscv_cpu_v2_copy_copy_copy.sv|uid.sv|ustore.sv|
 !i113 0
-Z23 o-L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z22 o-L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
 R11
 vdata_memory
 R13
@@ -752,22 +776,22 @@ R15
 !s100 1=2VeTZN@UC]ZWF;35dU72
 Il=IUKQXcRGa@V<?Qo<O4b2
 S1
-R16
-Z24 w1763155021
+R4
+w1766734673
 8data_memory.sv
 Fdata_memory.sv
-!i122 546
+!i122 575
 L0 5 32
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vdff_async_reset
 R13
@@ -777,22 +801,22 @@ R15
 !s100 8mCVShY00]OPaH7:^Je910
 IW:WlX;AVVRG>OfQja?l_o0
 S1
+R4
 R16
-w1762535074
 8dff_async_reset.sv
 Fdff_async_reset.sv
-!i122 546
+!i122 575
 L0 3 18
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vid_t
 R13
@@ -802,22 +826,22 @@ R15
 !s100 JaoVcJkT1mIz9<m9N9?B70
 I3[XiLM0RZanMYP_O1?e991
 S1
+R4
 R16
-R24
 8id_t.sv
 Fid_t.sv
-!i122 546
+!i122 575
 L0 4 68
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vinstruction_memory
 R13
@@ -827,22 +851,22 @@ R15
 !s100 R8Q3Aa577Xl6AHecdKO_<3
 IeYXj^>;:Zl3cNz=@>Mlb33
 S1
-R16
-R24
+R4
+w1766734689
 8instruction_memory.sv
 Finstruction_memory.sv
-!i122 546
+!i122 575
 L0 1 21
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vpc
 R13
@@ -852,22 +876,22 @@ R15
 !s100 <^h>6h1Re`z?nk[7d;g4f1
 I9<KZhFdQ^WCaad0Yz2TMe2
 S1
+R4
 R16
-R24
 8pc.sv
 Fpc.sv
-!i122 546
+!i122 575
 L0 8 26
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vreg_file
 R13
@@ -877,22 +901,22 @@ R15
 !s100 iNYFXo4bC`R__S7^jCMTA1
 I;`=3SEhX@j9;0?`WKabej0
 S1
-R16
-w1767580476
+R4
+w1767410767
 8reg_file.sv
 Freg_file.sv
-!i122 546
+!i122 575
 L0 45 41
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vriscv_cpu
 R13
@@ -902,23 +926,23 @@ R15
 !s100 lGTz^nL8Znm0>]4GY3i3Y1
 IczkUh<<1>Abn2Bn@:TNfc2
 S1
-R16
-Z25 w1767293671
+R4
+w1766910972
 8riscv_cpu.sv
 Friscv_cpu.sv
-Z26 Fsig_declare.inc
-!i122 546
+Z23 Fsig_declare.inc
+!i122 575
 L0 9 539
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vriscv_cpu_v2
 R13
@@ -928,23 +952,23 @@ R15
 !s100 FF_mW5?39njP626iQ>I^T3
 IS=BK`Dd1MR3KzFXOdR0Z>0
 S1
-R16
-Z27 w1767552682
+R4
+w1767340898
 8riscv_cpu_v2.sv
 Friscv_cpu_v2.sv
-R26
-!i122 546
+R23
+!i122 575
 L0 9 540
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vself_checking_cpu_tb
 R13
@@ -954,22 +978,22 @@ R15
 !s100 QaiRM[0lAm4A`V9A8kQPn0
 IPmfWGNKo4RHcH3K;e0L]:2
 S1
+R4
 R16
-R17
 8self_checking_cpu_tb.sv
 Fself_checking_cpu_tb.sv
-!i122 546
+!i122 575
 L0 13 417
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vtop_riscv_cpu
 R13
@@ -979,47 +1003,72 @@ R15
 !s100 o>iLKggFala4EK7^gFbh=1
 IV8mP[2D==[<>gD;iXHeM:0
 S1
-R16
-R25
+R4
+w1766987371
 8top_riscv_cpu.sv
 Ftop_riscv_cpu.sv
-!i122 546
+!i122 575
 L0 39 798
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vtop_riscv_cpu_v2
 R13
 R14
 R15
 !i10b 1
-!s100 656c42Ga?@dY@2m?P>8;M3
-IME>31d=]1Fa=n>Qbhk5UT1
+!s100 h;=FG<T]<L4Ij4;BJ74l20
+Ib<QK9FPjdk`iVm8nkO=6[1
 S1
-R16
-w1767587717
+R4
+w1767680033
 8top_riscv_cpu_v2.sv
 Ftop_riscv_cpu_v2.sv
-!i122 546
-L0 36 859
+!i122 575
+L0 38 855
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
+R11
+vtop_riscv_cpu_v2_1
+R13
+R14
+R15
+!i10b 1
+!s100 8AU5]N:L3h1m@gF6_YcUM0
+I?WC8a5Z0Eg4LDeBPX8HWE3
+S1
+R4
+w1767690967
+8top_riscv_cpu_v2_1.sv
+Ftop_riscv_cpu_v2_1.sv
+!i122 575
+L0 38 860
+R17
+R18
+r1
+!s85 0
+31
+R19
+R20
+R21
+!i113 0
+R22
 R11
 vtop_riscv_cpu_v2_copy
 R13
@@ -1029,22 +1078,22 @@ R15
 !s100 d6I2M2@]3AiNSGk37R_l@3
 I>CbBL37BOQbnOQ:hCHehI2
 S1
-R16
-R25
+R4
+w1766991067
 8top_riscv_cpu_v2_copy.sv
 Ftop_riscv_cpu_v2_copy.sv
-!i122 546
+!i122 575
 L0 39 808
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vtop_riscv_cpu_v2_copy_copy
 R13
@@ -1054,22 +1103,22 @@ R15
 !s100 HJDA_j>TE2N<[=94@7OLB2
 I2Y3iLlzaS8dej<6hSz8Ek3
 S1
-R16
-R27
+R4
+w1767410193
 8top_riscv_cpu_v2_copy_copy.sv
 Ftop_riscv_cpu_v2_copy_copy.sv
-!i122 546
-Z28 L0 37 838
+!i122 575
+Z24 L0 37 838
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vtop_riscv_cpu_v2_copy_copy_copy
 R13
@@ -1079,22 +1128,22 @@ R15
 !s100 j6GY0YWbFXhYI2J_PHERN2
 IP=YFM=OVMKI6=?XWgXLzd3
 S1
-R16
-w1767569538
+R4
+w1767646720
 8top_riscv_cpu_v2_copy_copy_copy.sv
 Ftop_riscv_cpu_v2_copy_copy_copy.sv
-!i122 546
-R28
+!i122 575
+R24
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 vUID__
 R13
@@ -1104,22 +1153,22 @@ R15
 !s100 X[nnk^nFgCN327dK:dWYO2
 I:[H5ER=VLAHi=J=z[T@k^1
 S1
-R16
-R17
+R4
+Z25 w1766189830
 8uid.sv
 Fuid.sv
-!i122 546
+!i122 575
 L0 4 25
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 n@u@i@d__
 vUS__
@@ -1130,21 +1179,21 @@ R15
 !s100 D:@`]VRA[V`Q:2:cGL7ih3
 I^1Ck_n:7z_Hk4RzMK>[^42
 S1
-R16
-R17
+R4
+R25
 8ustore.sv
 Fustore.sv
-!i122 546
+!i122 575
 L0 4 39
+R17
 R18
-R19
 r1
 !s85 0
 31
+R19
 R20
 R21
-R22
 !i113 0
-R23
+R22
 R11
 n@u@s__

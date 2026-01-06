@@ -29,13 +29,17 @@ TODO negedge block IS NOT DONE
     TODO jal, jalr, beq validation doesnt work, need a way to not check row 1 untill gold has been reverted.
     TODO on revert instructions will be verfied twice, and on the second pass the dut will have changed, so passes on first but fails on second
 
+    old method problems
+    TODO rn in v2.1, we can revert back the async, but the regfile and datamem also need to be properly revereted too, 
+    as they are used in calculating on posedge, figure out which regfile to use for the revert, see ~line 1892 in sim.log
+
 
 
 */
 
 `timescale 1ns/1ns
 
-module top_riscv_cpu_v2();
+module top_riscv_cpu_v2_1();
 
     //PARAMETERS/BUSES----------------------------------------------------------------------------------------------------------
     //constants
@@ -166,36 +170,41 @@ module top_riscv_cpu_v2();
 
         end else if(stalled) begin
 
-            $display("REVERTED TWICE");
+                $display("FLUSHED G[1] & G[2], rolled back PC_ASYNC");
 
-            //revert golden_mat 2 clks
-            repeat(2) begin
-            PC_ASYNC <= PC[1];
-                for (int ii = 1; ii < 9; ii++) begin
-                    PC[ii]            <= PC[ii+1];
-                    PC_TARGET[ii]     <= PC_TARGET[ii+1];
-                    INSTR[ii]         <= INSTR[ii+1];
-                    RS1[ii]           <= RS1[ii+1];
-                    RS2[ii]           <= RS2[ii+1];
-                    RD[ii]            <= RD[ii+1];
-                    IM[ii]            <= IM[ii+1];
-                    REG_FILE[ii]      <= REG_FILE[ii+1];
-                    DATA_MEM[ii]      <= DATA_MEM[ii+1];
+                PC_ASYNC <=  PC[1];
+
+                PC[1]          <= 'x;
+                PC_TARGET[1]   <= 'x;
+                INSTR[1]       <= 32'h00000013;
+                RS1[1]         <= 'x;
+                RS2[1]         <= 'x;
+                RD[1]          <= 'x;
+                IM[1]          <= 'x;
+                REG_FILE[1]    <= '{default: 'x};
+                DATA_MEM[1]    <= '{default: 'x};
+
+                PC[2]          <= 'x;
+                PC_TARGET[2]   <= 'x;
+                INSTR[2]       <= 32'h00000013;
+                RS1[2]         <= 'x;
+                RS2[2]         <= 'x;
+                RD[2]          <= 'x;
+                IM[2]          <= 'x;
+                REG_FILE[2]    <= '{default: 'x};
+                DATA_MEM[2]    <= '{default: 'x};
+
+                for (int ii = 9; ii > 2; ii--) begin
+                    PC[ii]            <= PC[ii-1];
+                    PC_TARGET[ii]     <= PC_TARGET[ii-1];
+                    INSTR[ii]         <= INSTR[ii-1];
+                    RS1[ii]           <= RS1[ii-1];
+                    RS2[ii]           <= RS2[ii-1];
+                    RD[ii]            <= RD[ii-1];
+                    IM[ii]            <= IM[ii-1];
+                    REG_FILE[ii]      <= REG_FILE[ii-1];
+                    DATA_MEM[ii]      <= DATA_MEM[ii-1];
                 end
-
-                // for (int ii = 9; ii > 1; ii--) begin
-                //     PC[ii]            <= PC[ii-1];
-                //     PC_TARGET[ii]     <= PC_TARGET[ii-1];
-                //     INSTR[ii]         <= INSTR[ii-1];
-                //     RS1[ii]           <= RS1[ii-1];
-                //     RS2[ii]           <= RS2[ii-1];
-                //     RD[ii]            <= RD[ii-1];
-                //     REG_FILE[ii]      <= REG_FILE[ii-1];
-                //     DATA_MEM[ii]      <= DATA_MEM[ii-1];
-                // end
-            end
-
-            $display("Finished Reverting");
 
         end else begin
 

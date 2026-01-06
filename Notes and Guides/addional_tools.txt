@@ -30,6 +30,7 @@ OR
 run in powershell
 vsim -c -do "transcript file -close; file delete -force sim.log; transcript file sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu; run 1us; transcript file -close; quit -f"
 vsim -c -do "transcript file -close; file delete -force sim_v2.log; transcript file sim_v2.log; transcript file sim_v2.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2; run 1us; transcript file -close; quit -f"
+vsim -c -do "transcript file -close; file delete -force sim.log; transcript file sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1; run 5us; transcript file -close; quit -f"
 
 
 Writing asm

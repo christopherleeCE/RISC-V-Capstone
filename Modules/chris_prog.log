@@ -5,48 +5,23 @@ chris_prog.o:     file format elf32-littleriscv
 Disassembly of section .text:
 
 00000000 <start>:
-   0:	01000513          	li	a0,16
-   4:	01700593          	li	a1,23
-   8:	00b50633          	add	a2,a0,a1
-   c:	0000f6b7          	lui	a3,0xf
-  10:	40a58733          	sub	a4,a1,a0
-  14:	fea006e3          	beq	zero,a0,0 <start>
-  18:	03000793          	li	a5,48
-  1c:	03400793          	li	a5,52
-  20:	03800793          	li	a5,56
-  24:	010000ef          	jal	ra,34 <label+0x4>
-  28:	03c00793          	li	a5,60
-  2c:	04000793          	li	a5,64
+   0:	00000513          	li	a0,0
+   4:	00400593          	li	a1,4
+   8:	00800613          	li	a2,8
+   c:	00c00693          	li	a3,12
+  10:	0140006f          	j	24 <label>
+  14:	40050533          	sub	a0,a0,zero
+  18:	400585b3          	sub	a1,a1,zero
+  1c:	40060633          	sub	a2,a2,zero
+  20:	400686b3          	sub	a3,a3,zero
 
-00000030 <label>:
-  30:	04400793          	li	a5,68
-  34:	00f02023          	sw	a5,0(zero) # 0 <start>
-  38:	00002803          	lw	a6,0(zero) # 0 <start>
-  3c:	04000893          	li	a7,64
-  40:	00000013          	nop
-  44:	02078463          	beqz	a5,6c <beq_label>
-  48:	00a02023          	sw	a0,0(zero) # 0 <start>
-  4c:	00b02223          	sw	a1,4(zero) # 4 <start+0x4>
-  50:	00c02423          	sw	a2,8(zero) # 8 <start+0x8>
-  54:	00d02623          	sw	a3,12(zero) # c <start+0xc>
-  58:	01078a63          	beq	a5,a6,6c <beq_label>
-  5c:	00a02023          	sw	a0,0(zero) # 0 <start>
-  60:	00b02223          	sw	a1,4(zero) # 4 <start+0x4>
-  64:	00c02423          	sw	a2,8(zero) # 8 <start+0x8>
-  68:	00d02823          	sw	a3,16(zero) # 10 <start+0x10>
+00000024 <label>:
+  24:	01000713          	li	a4,16
+  28:	00000013          	nop
+  2c:	00000013          	nop
+  30:	00000013          	nop
+  34:	00000013          	nop
+  38:	00000013          	nop
 
-0000006c <beq_label>:
-  6c:	00a02023          	sw	a0,0(zero) # 0 <start>
-  70:	00b02223          	sw	a1,4(zero) # 4 <start+0x4>
-  74:	00c02423          	sw	a2,8(zero) # 8 <start+0x8>
-  78:	00d02623          	sw	a3,12(zero) # c <start+0xc>
-  7c:	00e02823          	sw	a4,16(zero) # 10 <start+0x10>
-  80:	00f02a23          	sw	a5,20(zero) # 14 <start+0x14>
-  84:	01002c23          	sw	a6,24(zero) # 18 <start+0x18>
-  88:	01102e23          	sw	a7,28(zero) # 1c <start+0x1c>
-
-0000008c <end>:
-  8c:	000000ef          	jal	ra,8c <end>
-  90:	00000013          	nop
-  94:	00000013          	nop
-  98:	00000013          	nop
+0000003c <end>:
+  3c:	0000006f          	j	3c <end>

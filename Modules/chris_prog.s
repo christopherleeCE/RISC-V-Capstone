@@ -1,54 +1,77 @@
-## chris's test program ##
+## chris's test program ##\
 start:
-        addi a0, zero, 0x10
-        addi a1, zero, 0x17
-        add a2, a0, a1
-        lui a3, 0xF
-        sub a4, a1, a0
-        beq zero, a0, start
-        #jal ra, start
-        addi a5, zero, 0x30
-        addi a5, zero, 0x34
-        addi a5, zero, 0x38
-        jal ra, label + 4
-        addi a5, zero, 0x3C
-        addi a5, zero, 0x40
+        addi a0, zero, 0
+        addi a1, zero, 4
+        addi a2, zero, 8
+        addi a3, zero, 12
+        jal zero, label
+        sub a0, a0, zero
+        sub a1, a1, zero
+        sub a2, a2, zero
+        sub a3, a3, zero
 label:
-        addi a5, zero, 0x44
-        sw a5, 0x0(zero)
-        lw a6, 0x0(zero)
-        addi a7, zero, 0x40
-        #jalr ra, a7, 0x8
-        # nop
-        # beq a5, zero, beq_label
-        # nop
-        # beq a5, a6, beq_label
-        # nop
+        addi a4, zero, 16
         nop
-        beq a5, zero, beq_label #desync here
-        sw a0, 0(zero)
-        sw a1, 4(zero)
-        sw a2, 8(zero)
-        sw a3, 12(zero)
-        beq a5, a6, beq_label
-        sw a0, 0(zero)
-        sw a1, 4(zero)
-        sw a2, 8(zero)
-        sw a3, 16(zero)
-beq_label:
-        sw a0, 0(zero)
-        sw a1, 4(zero)
-        sw a2, 8(zero)
-        sw a3, 12(zero)
-        sw a4, 16(zero)
-        sw a5, 20(zero)
-        sw a6, 24(zero)
-        sw a7, 28(zero)
+        nop
+        nop
+        nop
+        nop
 end:
-        jal ra, end
-        nop
-        nop
-        nop
+        jal zero, end
+
+
+
+
+# start:
+#         addi a0, zero, 0x10
+#         addi a1, zero, 0x17
+#         add a2, a0, a1
+#         lui a3, 0xF
+#         sub a4, a1, a0
+#         beq zero, a0, start
+#         #jal ra, start
+#         addi a5, zero, 0x30
+#         addi a5, zero, 0x34
+#         addi a5, zero, 0x38
+#         jal ra, label + 4
+#         addi a5, zero, 0x3C
+#         addi a5, zero, 0x40
+# label:
+#         addi a5, zero, 0x44
+#         sw a5, 0x0(zero)
+#         lw a6, 0x0(zero)
+#         addi a7, zero, 0x40
+#         #jalr ra, a7, 0x8
+#         # nop
+#         # beq a5, zero, beq_label
+#         # nop
+#         # beq a5, a6, beq_label
+#         # nop
+#         nop
+#         beq a5, zero, beq_label #desync here
+#         sw a0, 0(zero)
+#         sw a1, 4(zero)
+#         sw a2, 8(zero)
+#         sw a3, 12(zero)
+#         beq a5, a6, beq_label
+#         sw a0, 0(zero)
+#         sw a1, 4(zero)
+#         sw a2, 8(zero)
+#         sw a3, 16(zero)
+# beq_label:
+#         sw a0, 0(zero)
+#         sw a1, 4(zero)
+#         sw a2, 8(zero)
+#         sw a3, 12(zero)
+#         sw a4, 16(zero)
+#         sw a5, 20(zero)
+#         sw a6, 24(zero)
+#         sw a7, 28(zero)
+# end:
+#         jal ra, end
+#         nop
+#         nop
+#         nop
 
 
         # nop #DNR
