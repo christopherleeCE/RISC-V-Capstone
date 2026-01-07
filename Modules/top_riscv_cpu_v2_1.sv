@@ -1,39 +1,33 @@
 /*
+
+here is how the top file works, if you have addional questions feel free to message me (chris) with questions
+
+There are two models, the dut and the golden, the golden will only really have a pc, instr_mem, regfile, datamem.
+instr_mem is mirrored to the dut isntr_mem, hoever they are different declared modules. on the posedge the regfile/datamem/pc
+get updateed/calculated in the golden. the results are then put into a golden[5:1] on each posedge. so the clk after addi has
+been executed, then the results are now in golden[1], (that is to say there is a PC[1], REG_FILE[1], DATA_MEM[1], etc.), there
+is a few addionaly entries in the golden[1], but the important ones are the three above. on each posedge golden[1] moves to golden[2]
+and golden[2] to golden[3], etc. these golden[]'s are then compared with the dut to make sure that they are alligned. the time that
+these comparasions are made depeneds on the instruction, for example addi will be in gold[1], then on the next clk gold[2]. so addi
+will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant actually verify it until its in gold[5], so in async, 
+1, 2, 3, 4 no verificaitn is done, but it still progresses through all of those rows over the coarse of five(?) clks, once addi is in
+gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
+
 TODO for the arth instruciton compare the whole regfile instead
 just the destination register, you cant just do regdut == reggold[4],
 cause according to chat, if there is an x in the structure, even in 
 reggold[1] for example the assertion fails, so you need to do a for loop,
 and doing that is prob easier to do in a task/func but ill do that l8r
 
-TODO there is an issue in the golden calulation where 
-# start:
-#         addi a0, zero, 0x10
-#         addi a1, zero, 0x17
-#         addi a5, zero, 0x30
-#         addi a5, zero, 0x34
-#         addi a5, zero, 0x38
-#         addi a5, zero, 0x3C
-#         addi a5, zero, 0x40
-#         addi a5, zero, 0x44
-#         addi a5, zero, 0x48
-#         addi a5, zero, 0x4C
-#         #nop
+TODO build proper halding of local_instruction_failure,
+where it gets passed into the instruction failure.
+as of right now they more or less get ignored,
+the error reporting rn is done by the else of the assert
 
-of nop is commented out (not present) then that last addi doesnt execute in the golden,
-specifically the last instruction of any program doesnt calculate correclty
-
-
-TODO fix??? (maybe dont) issue with addi when forwarding doesnt seem to work, maybe just get golden issue above fixed, or more features for top
-
-TODO negedge block IS NOT DONE
-    TODO jal, jalr, beq validation doesnt work, need a way to not check row 1 untill gold has been reverted.
-    TODO on revert instructions will be verfied twice, and on the second pass the dut will have changed, so passes on first but fails on second
-
-    old method problems
-    TODO rn in v2.1, we can revert back the async, but the regfile and datamem also need to be properly revereted too, 
-    as they are used in calculating on posedge, figure out which regfile to use for the revert, see ~line 1892 in sim.log
-
-
+TODO PRIORITY: mul_test isn chris_prog.s is a failure,dut preforms sign extension,
+but golden doesnt, not sure which is complient with riscv, addionally mul instr's also fail,
+im not looking into them cus im tired but i assume it because of the li sign extension 
+disagreement previously stated
 
 */
 
@@ -41,12 +35,11 @@ TODO negedge block IS NOT DONE
 
 module top_riscv_cpu_v2_1();
 
-    //PARAMETERS/BUSES----------------------------------------------------------------------------------------------------------
-    //constants
+    //declarations
     parameter int CLOCK_PERIOD = 20;
     int instruction_failure;
 
-    //used for debug output
+    //used for debug output of reg dumps
     string reg_name [32] = '{
     "zero", "ra",   "sp",  "gp",  "tp",
     "t0",   "t1",   "t2",
@@ -80,16 +73,17 @@ module top_riscv_cpu_v2_1();
     logic [20:0] imm_j;
 
 
-    //golden sginals for matrix, these are what the DUT is verfied against, they are stored in a 5x1 array, one or each clk of the execution in the DUT
-    /* golden[0], one clk delay, golden[1], two clk delays, etc. */
+    //golden sginals for matrix, these are what the DUT is verfied against, they are stored in a 5x1 array, one for each clk of the execution in the DUT
+    /* golden[1], one clk delay, golden[2], two clk delays, etc. */
     /* I THINK that...
   ASYCN -> if
-    [0] -> id
-    [1] -> ex
-    [2] -> mem
-    [3] -> w
-    [4] -> post writeback TODO WRONG!!!
+    [1] -> id
+    [2] -> ex
+    [3] -> mem
+    [4] -> wb
+    [5] -> post wb
     */
+
     logic [31:0] PC [9:1];
     logic [31:0] PC_TARGET [9:1];
     logic [31:0] INSTR [9:1];
@@ -100,11 +94,14 @@ module top_riscv_cpu_v2_1();
     logic [31:0] REG_FILE [9:1] [31:0] = '{default: 32'b0};;
     logic [31:0] DATA_MEM [9:1] [31:0];
 
-    //the "async" of the golden signals, they are calculated in the always block bellow, then the relevent signals are fed into the matrix
-    logic [31:0] INSTR_ASYNC;
-    logic [31:0] INSTR_FLUSH;
-    logic [31:0] REG_FILE_ASYNC [31:0] = '{default: 32'b0}; // this should not be written to directly, however you can read from it directly 
-    logic [31:0] PC_ASYNC;
+    //the "async" of the golden signals, name comes from one of the early topv2 builds, just think of this as golden[0], the if stage
+    //there is no regfile_async or datamem_async, because @posedge we write str8 to regfile[1] and datamem[1], this makes the debug out
+    //easier to follow as golden_history_dump() will show an instruction, and the regfile after the writeback of that instruction, so we
+    //see the regfile/datamem after the completion of the instruciton, not the regfile/datamem before the writeback of the instruction
+    logic [31:0] INSTR_ASYNC;                                   //output of instrmem
+    logic [31:0] INSTR_FLUSH;                                   //as of right now instrflush always = instrasync
+    logic [31:0] REG_FILE_ASYNC [31:0] = '{default: 32'b0};     //this should not be written to directly, use the writereg() task, you can read from it directly 
+    logic [31:0] PC_ASYNC;                                      //simple pc reg used by golden
 
 
 
@@ -123,8 +120,8 @@ module top_riscv_cpu_v2_1();
 
     //RESET/MEMORY SETUP ------------------------------------------------------------------------------------------------------
     initial begin
-        repeat(3) begin 
-            rst = 1'b0; //tbh reset doesnt really do anything i think
+        repeat(3) begin     //arbitrarily hold reset for 3 clks
+            rst = 1'b0;
             @(posedge clk);
         end
 
@@ -141,24 +138,13 @@ module top_riscv_cpu_v2_1();
         .read_data(INSTR_ASYNC)
     );
 
-  
-    //abstracted write access to prevent writing to the zero register
-    task automatic write_reg(
-        input int unsigned addr,
-        input logic [31:0] word
-    );
+    //golden results calculated on posedge
+    always_ff @(posedge clk) begin
 
-        if (addr != 0)
-            REG_FILE[1][addr] <= word;
+        logic [63:0] product;   //used in mul's calculations
+        logic dut_pc_redirected;
 
-    endtask
-
-    always_ff @(posedge clk) begin //golden results calculated on posedge
-
-        logic [63:0] product;
-        logic stalled;
-
-        assign stalled = stall_gold();
+        assign dut_pc_redirected = dut_redirected();
         assign INSTR_FLUSH = INSTR_ASYNC;
         assign opcode = INSTR_FLUSH[6:0];
 
@@ -168,9 +154,16 @@ module top_riscv_cpu_v2_1();
             PC_ASYNC <= '0;
             instruction_failure <= 0;
 
-        end else if(stalled) begin
 
-                $display("FLUSHED G[1] & G[2], rolled back PC_ASYNC");
+        /* when dut.pc gets redirected, it will flush the if and id stage with nop, we mirror
+        this in the golden[] by flushing golden[1] & golden[2], more needs to be done on the
+        gold tho, for example the pc in the gold jumps immediately after a jump/branch instruction
+        however in the dut it takes 3ish clks, because of this for the gold to line up with the
+        dut after those 3ish clks, we need to revert the PC_ASYNC, REG_FILE[1] & DATA_MEM[1] as 
+        shown below the remaining gold[]'s get iterated through the 5x1 matrix as seen in the for loop */
+        end else if(dut_pc_redirected) begin
+
+                $write("\n\n\t@POSEDGE: FLUSHED G[1] & G[2], rolled back PC_ASYNC, REG_FILE[1] & DATA_MEM[1]");
 
                 PC_ASYNC <=  PC[1];
 
@@ -181,8 +174,8 @@ module top_riscv_cpu_v2_1();
                 RS2[1]         <= 'x;
                 RD[1]          <= 'x;
                 IM[1]          <= 'x;
-                REG_FILE[1]    <= '{default: 'x};
-                DATA_MEM[1]    <= '{default: 'x};
+                REG_FILE[1]    <= REG_FILE[2];
+                DATA_MEM[1]    <= DATA_MEM[2];
 
                 PC[2]          <= 'x;
                 PC_TARGET[2]   <= 'x;
@@ -206,11 +199,21 @@ module top_riscv_cpu_v2_1();
                     DATA_MEM[ii]      <= DATA_MEM[ii-1];
                 end
 
+        //if the pc is not being redirected in the dut, and rst is not low, gold calculations are made
+        //pc_async, isntr_async, and instr_flush (at this point they are always the same) are looked at
+        //then the instruction is decoded based on the opcode. based on the decoded instruction either the
+        //regfile[1], datamem[1], or pc_async will be written to (the gold). the reason why its not 
+        //regfile[0]/regfile_async & datamem[0]/datamem_async in on ~line 80 above
+        //additionally the golden[5:1] gets advanced in the for loop below
         end else begin
 
             //$display("posedgedump");
             //reg_gold_post_write_back_dump();
             //display_golden_singals_history();
+
+            //if you are using vscode, you can select the "/* no  not  remove : debug  gold */", then ctrl + shft + L,
+            //to place a cursor at all occurences, then ctrl + / to comment or uncomment all fo the lines which will either
+            //enable or disable a bunch of debug outputs in the sim.log the same can be done for "do  not  remove : debug  dut"
 
             // /* DO NOT REMOVE : DEBUG GOLD */ $write("\n\n\n");
             // /* DO NOT REMOVE : DEBUG GOLD */ $display("Posedge block output");
@@ -219,6 +222,7 @@ module top_riscv_cpu_v2_1();
             // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
             // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tINSTR_FLUSH: %h", INSTR_FLUSH);
             // /* DO NOT REMOVE : DEBUG GOLD */ $display("\topcode: %h", opcode);
+
 
 
             if (opcode == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
@@ -298,7 +302,7 @@ module top_riscv_cpu_v2_1();
                 if(func3 == 3'b000) begin //-------ADDI-------------------------------
                     if(imm_i == 20'd0 & rs1 == 5'd0 & rd == 5'd0) begin
                         // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as NOP.");
-                        PC_ASYNC <= stalled ? PC_ASYNC : PC_ASYNC + 32'h4;
+                        PC_ASYNC <= dut_pc_redirected ? PC_ASYNC : PC_ASYNC + 32'h4;
 
                     end else begin
                         // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADDI.");
@@ -384,10 +388,12 @@ module top_riscv_cpu_v2_1();
                 if(func3 == 3'b000) begin //----BEQ------------------------------------------------
                     // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as BEQ.");
                     if(REG_FILE[1][rs1] == REG_FILE[1][rs2]) begin
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("Branch Taken");
                         PC_ASYNC <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
                         
                         PC_TARGET[1] <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
                     end else begin
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("Branch not Taken");
                         PC_ASYNC <= PC_ASYNC + 4;
 
                         PC_TARGET[1] <= PC_ASYNC + 4;
@@ -446,6 +452,7 @@ module top_riscv_cpu_v2_1();
 
             end
 
+            //advance golden[] history
             for (int ii = 9; ii > 1; ii--) begin
                 PC[ii]            <= PC[ii-1];
                 PC_TARGET[ii]     <= PC_TARGET[ii-1];
@@ -463,8 +470,8 @@ module top_riscv_cpu_v2_1();
 
 
 
-
-    always @(negedge clk) begin //read on negative edge to give everything time to settle
+    //verification on negedge after posedge results have settled, verification is done through tasks that verify each golden[] row
+    always @(negedge clk) begin
 
         $write("\n\n\n");
         $display("Negedge block output");
@@ -492,10 +499,11 @@ module top_riscv_cpu_v2_1();
 
         if (ohalt == 1'b1) begin //HALT SIGNAL --------------------------------------------------------------
             $display("\nWARNING: Recieved halt signal. Pausing verification.");
-            $display("Program counter: %d", cpu_dut.PC);
+            $display("Program counter: 0x%h", cpu_dut.PC);
             reg_gold_post_write_back_dump();
             $stop(); //pauses verification if CPU outputs halt signal
 
+        //doesnt do anything right now, instruction_failure will never be one, see TODO @ ~line 1
         end else if(instruction_failure == 1) begin //INSTRUCTION FAILURE----------------------------------
             $display("\nWARNING: Mismatch between model and CPU. Pausing verification.");
             $display("\tPlease check for data hazards and issues in this instruction's datapath/control.");
@@ -506,7 +514,19 @@ module top_riscv_cpu_v2_1();
 
     end
 
-    //VERIFICATION -----------------------------------------------------------------------------------------------------------------
+    //task & func defintions
+    //============================================================================================================
+
+    //abstracted write access to prevent writing to the zero register
+    task automatic write_reg(
+        input int unsigned addr,
+        input logic [31:0] word
+    );
+
+        if (addr != 0)
+            REG_FILE[1][addr] <= word;
+
+    endtask
 
     task dut_dump;
         begin
@@ -665,7 +685,7 @@ module top_riscv_cpu_v2_1();
         end
     endtask
 
-    function automatic logic stall_gold();
+    function automatic logic dut_redirected();
         return (cpu_dut.redirect_pc
             //|| ((cpu_dut.INSTR_D[6:0]  == 7'b1100111) && (cpu_dut.INSTR_D[14:12] == 3'b000)) //JALR
             //|| (cpu_dut.INSTR_D[6:0]   == 7'b1101111) && (cpu_dut.INSTR_D[14:12] == cpu_dut.INSTR_D[14:12]) //JAL
@@ -673,6 +693,9 @@ module top_riscv_cpu_v2_1();
         );
     endfunction
 
+    //verify_row(1), will parse and verify golden[1], this task uses if statements that check the row to ensure
+    //that for example addi will only be verified if its in verify_row(5)/golden[5] (post writeback), hoever addi
+    //will not be veified if its in verify_row(2)/golden[2], or 1 or 4, etc.
     task automatic verify_row(
         input int row,
         output int local_instruction_failure
@@ -771,11 +794,11 @@ module top_riscv_cpu_v2_1();
                 if(func3_v == 3'b000) begin //-------ADDI-------------------------------
                     if(imm_i_v == 20'd0 & rs1_v == 5'd0 & rd_v == 5'd0) begin
                         /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as NOP.");
-                        //TODO, do a reg by reg and data by data comparasion for validation, 
+                        //TODO, do a reg by reg and data by data comparasion for validation here,
+                        //once that task has been built as seen at ~line 1
+
                         //assert() $display(" Success");
                         //else begin $display(" FAILURE"); local_instruction_failure = 1; end
-
-
 
                     end else begin
                         
@@ -813,8 +836,8 @@ module top_riscv_cpu_v2_1();
 
                 if(func3_v == 3'b000) begin //-------JALR-------------------------------
                     /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as JALR:");
-                    $display("dut: %d, gold: %d", cpu_dut.pc_reg.q, PC_ASYNC);
-                    if(row == 0) begin
+                    // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
+                    if(row == 3) begin
 
                         assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
                         else begin $display(" FAILURE"); local_instruction_failure = 1; end
@@ -848,9 +871,14 @@ module top_riscv_cpu_v2_1();
 
                 if(func3_v == 3'b000) begin //----BEQ------------------------------------------------
                     /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as BEQ:");
+                    // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
+                    if(row == 3) begin
+                        
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
+                        else begin $display(" FAILURE"); local_instruction_failure = 1; end
 
-                    // else local_instruction_failure = 1; //ensure the PC has changed to the correct address
-
+                    end
+                    
                 end
             
             end else if (opcode_v == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
@@ -860,8 +888,8 @@ module top_riscv_cpu_v2_1();
 
                 //----JAL------------
                 /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as JAL:");
-                $display("dut: %d, gold: %d", cpu_dut.pc_reg.q, PC_ASYNC);
-                if(row == 0) begin
+                // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
+                if(row == 3) begin
                     
                     assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
                     else begin $display(" FAILURE"); local_instruction_failure = 1; end

@@ -4,24 +4,18 @@ chris_prog.o:     file format elf32-littleriscv
 
 Disassembly of section .text:
 
-00000000 <start>:
-   0:	00000513          	li	a0,0
-   4:	00400593          	li	a1,4
-   8:	00800613          	li	a2,8
-   c:	00c00693          	li	a3,12
-  10:	0140006f          	j	24 <label>
-  14:	40050533          	sub	a0,a0,zero
-  18:	400585b3          	sub	a1,a1,zero
-  1c:	40060633          	sub	a2,a2,zero
-  20:	400686b3          	sub	a3,a3,zero
+00000000 <end-0x2c>:
+   0:	01000293          	li	t0,16
+   4:	00300313          	li	t1,3
+   8:	ffc00393          	li	t2,-4
+   c:	fffff3b7          	lui	t2,0xfffff
+  10:	00001e37          	lui	t3,0x1
+  14:	ffee0e13          	addi	t3,t3,-2 # ffe <end+0xfd2>
+  18:	fffffe37          	lui	t3,0xfffff
+  1c:	02628533          	mul	a0,t0,t1
+  20:	026395b3          	mulh	a1,t2,t1
+  24:	03c3a633          	mulhsu	a2,t2,t3
+  28:	03c2b6b3          	mulhu	a3,t0,t3
 
-00000024 <label>:
-  24:	01000713          	li	a4,16
-  28:	00000013          	nop
-  2c:	00000013          	nop
-  30:	00000013          	nop
-  34:	00000013          	nop
-  38:	00000013          	nop
-
-0000003c <end>:
-  3c:	0000006f          	j	3c <end>
+0000002c <end>:
+  2c:	0000006f          	j	2c <end>
