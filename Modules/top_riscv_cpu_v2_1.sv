@@ -29,6 +29,8 @@ but golden doesnt, not sure which is complient with riscv, addionally mul instr'
 im not looking into them cus im tired but i assume it because of the li sign extension 
 disagreement previously stated
 
+TODO make sure forwarding doesnt interfere with topfile verification timing
+
 */
 
 `timescale 1ns/1ns
