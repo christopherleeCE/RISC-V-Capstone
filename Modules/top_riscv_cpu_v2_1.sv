@@ -29,7 +29,7 @@ but golden doesnt, not sure which is complient with riscv, addionally mul instr'
 im not looking into them cus im tired but i assume it because of the li sign extension 
 disagreement previously stated
 
-TODO make sure forwarding doesnt interfere with topfile verification timing
+TODO make sure forwarding doesnt interfere with topfile verification timing, i dont think it will, but ask ay anyway
 
 */
 
@@ -149,6 +149,10 @@ module top_riscv_cpu_v2_1();
         assign dut_pc_redirected = dut_redirected();
         assign INSTR_FLUSH = INSTR_ASYNC;
         assign opcode = INSTR_FLUSH[6:0];
+
+        if(cpu_dut.R1_case_rf2rf || cpu_dut.R2_case_rf2rf) begin
+            $display("FORWARDED");
+        end
 
         if (!rst) begin
 
@@ -474,6 +478,10 @@ module top_riscv_cpu_v2_1();
 
     //verification on negedge after posedge results have settled, verification is done through tasks that verify each golden[] row
     always @(negedge clk) begin
+
+        if(cpu_dut.R1_case_rf2rf || cpu_dut.R2_case_rf2rf) begin
+            $display("FORWARDED");
+        end
 
         $write("\n\n\n");
         $display("Negedge block output");
