@@ -1,1 +1,0 @@
-C:/QuartusPrimeLite/questa_fse/win64/VisualizerRls/bin/viscom.exe -nolock -quiet -jmem_size 1130784 work.top_riscv_cpu_v2_1 -quiet -auto_acc_if_foreign -work work +acc -allow_unnamed -o _opt3 -id 1-20c19b209f63-696a6f3c-19c-5208 +__betafsm
