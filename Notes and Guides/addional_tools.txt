@@ -28,8 +28,7 @@ transcript file -close; file delete -force sim.log; transcript file sim.log; tra
 OR
 
 run in powershell
-vsim -c -do "transcript file -close; file delete -force sim.log; transcript file sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1; run 5us; transcript file -close; quit -f"
-
+vsim -c -do "file delete -force sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1; run 5us; quit -f"
 
 Writing asm
 ===========
