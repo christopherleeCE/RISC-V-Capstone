@@ -1,8 +1,8 @@
 #  transcript file sim.log
 #  vlog *.sv
 # Questa Intel Starter FPGA Edition-64 vlog 2024.3 Compiler 2024.09 Sep 10 2024
-# Start time: 00:15:06 on Jan 07,2026
-# vlog alu.sv data_memory.sv dff_async_reset.sv id_t.sv instruction_memory.sv pc.sv reg_file.sv riscv_cpu.sv riscv_cpu_v2.sv self_checking_cpu_tb.sv top_riscv_cpu.sv top_riscv_cpu_v2.sv top_riscv_cpu_v2_1.sv top_riscv_cpu_v2_copy.sv top_riscv_cpu_v2_copy_copy.sv top_riscv_cpu_v2_copy_copy_copy.sv uid.sv ustore.sv 
+# Start time: 22:28:56 on Jan 15,2026
+# vlog alu.sv data_memory.sv dff_async_reset.sv id_t.sv instruction_memory.sv pc.sv reg_file.sv riscv_cpu.sv riscv_cpu_v2.sv top_riscv_cpu_v2_1.sv uid.sv ustore.sv 
 # -- Compiling module alu
 # -- Compiling module data_memory
 # -- Compiling module dff_async_reset
@@ -12,29 +12,18 @@
 # -- Compiling module reg_file
 # -- Compiling module riscv_cpu
 # -- Compiling module riscv_cpu_v2
-# -- Compiling module self_checking_cpu_tb
-# -- Compiling module top_riscv_cpu
-# -- Compiling module top_riscv_cpu_v2
 # -- Compiling module top_riscv_cpu_v2_1
-# -- Compiling module top_riscv_cpu_v2_copy
-# -- Compiling module top_riscv_cpu_v2_copy_copy
-# -- Compiling module top_riscv_cpu_v2_copy_copy_copy
 # -- Compiling module UID__
 # -- Compiling module US__
 # 
 # Top level modules:
-# 	self_checking_cpu_tb
-# 	top_riscv_cpu
-# 	top_riscv_cpu_v2
+# 	riscv_cpu
 # 	top_riscv_cpu_v2_1
-# 	top_riscv_cpu_v2_copy
-# 	top_riscv_cpu_v2_copy_copy
-# 	top_riscv_cpu_v2_copy_copy_copy
-# End time: 00:15:06 on Jan 07,2026, Elapsed time: 0:00:00
+# End time: 22:28:56 on Jan 15,2026, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 #  vsim -voptargs=+acc work.top_riscv_cpu_v2_1
 # vsim -voptargs="+acc" work.top_riscv_cpu_v2_1 
-# Start time: 00:15:06 on Jan 07,2026
+# Start time: 22:28:56 on Jan 15,2026
 # ** Note: (vsim-8009) Loading existing optimized design _opt3
 # //  Questa Intel Starter FPGA Edition-64
 # //  Version 2024.3 win64 Sep 10 2024
@@ -2507,6 +2496,7 @@
 # 	Identified as LUI: Success
 # ** Warning: (vsim-8360) The if/case statement is not unique.
 #    Time: 500 ns  Iteration: 4  Process: /top_riscv_cpu_v2_1/cpu_dut/alu_again_colon_closing_parenthesis/#implicit#unique__39 File: alu.sv Line: 39
+# FORWARDED
 # 
 # 
 # 
@@ -2696,16 +2686,12 @@
 # 
 # Error: Mismatch between model and CPU.
 # 
-# 
-
-
-
-
- Dump
+# REG_FILE_DUT Dump
 # 	 zero: 00000000    ra: 00000000    sp: 00000000    gp: 00000000    tp: 00000000    t0: 00000010    t1: 00000003    t2: fffff000 
 # 	s0/fp: 00000000    s1: 00000000    a0: 00000000    a1: 00000000    a2: 00000000    a3: 00000000    a4: 00000000    a5: 00000000 
 # 	   a6: 00000000    a7: 00000000    s2: 00000000    s3: 00000000    s4: 00000000    s5: 00000000    s6: 00000000    s7: 00000000 
-# 	   s8: 00000000    s9: 00000000   s10: 00000000   s11: 00000000    t3: 00000ffe    t4: 00000000    t5: 00000000    t6: 00000000 
+# 	   s8: 00000000    s9: 00000000   s10: 00000000   s11: 00000000    t3: 00000ffe    t4: 00000000    t5: 00000000    t6: 00000000 FORWARDED
+# 
 # 
 # 
 # Negedge block output
