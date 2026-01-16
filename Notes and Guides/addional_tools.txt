@@ -36,3 +36,13 @@ the .s file ONLY expects labels in the jal and jalr, so if i give it
 jal ra, 0x10, it thinks 0x10 is a lable, and not an offset or absolute address, it then sees that that label doesnt exist
 so it then interprets that label to point to the current instruction, that is the jal or jalr. when we objdump it will give 
 us the absolute address that the instruction will actually jump to, which is the location of the jal/jalr instruciton in memmory
+
+
+
+RUNNING OLD TESTBENCH (WARNING - MAY BE OUT OF DATE)
+This command will run the old test bench (from last semester) and output the results into the "sim.log" file. Please be aware the old testbench
+could be behind the new testbench. However, I chose to leave it in case we need a backup for whatever reason. Thanks to Chris for the original
+command. - Edgar
+
+vsim -c -do "file delete -force sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.self_checking_cpu_tb; run 5us; quit -f"
+
