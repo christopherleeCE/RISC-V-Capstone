@@ -29,6 +29,7 @@ but golden doesnt, not sure which is complient with riscv, addionally mul instr'
 im not looking into them cus im tired but i assume it because of the li sign extension 
 disagreement previously stated
 
+TODO make sure forwarding doesnt interfere with topfile verification timing, i dont think it will, but ask ay anyway
 
 */
 
@@ -68,10 +69,10 @@ module top_riscv_cpu_v2_1();
     logic [4:0] rd;
     logic [2:0] func3;
     logic [6:0] opcode;
-    logic [31:0] imm_i, imm_s;
-    logic [31:0] imm_b;
-    logic [31:0] imm_u;
-    logic [31:0] imm_j;
+    logic [11:0] imm_i, imm_s;
+    logic [12:0] imm_b;
+    logic [19:0] imm_u;
+    logic [20:0] imm_j;
 
 
     //golden sginals for matrix, these are what the DUT is verfied against, they are stored in a 5x1 array, one for each clk of the execution in the DUT
@@ -292,8 +293,7 @@ module top_riscv_cpu_v2_1();
 
 
             end else if (opcode == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
-                {imm_i[11:0], rs1, func3, rd} = INSTR_FLUSH[31:7];
-                imm_i[31:12] = {20{imm_i[11]}};
+                {imm_i, rs1, func3, rd} = INSTR_FLUSH[31:7];
                 // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
                 //first entry in the matrix
@@ -321,8 +321,7 @@ module top_riscv_cpu_v2_1();
 
 
             end else if (opcode == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
-                {imm_i[11:0], rs1, func3, rd} = INSTR_FLUSH[31:7];
-                imm_i[31:12] = {20{imm_i[11]}};
+                {imm_i, rs1, func3, rd} = INSTR_FLUSH[31:7];
                 // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
                 if(func3 == 3'b010) begin //----LW------------------------------------
@@ -344,8 +343,7 @@ module top_riscv_cpu_v2_1();
                 
 
             end else if (opcode == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
-                {imm_i[11:0], rs1, func3, rd} = INSTR_FLUSH[31:7];
-                imm_i[31:12] = {20{imm_i[11]}};
+                {imm_i, rs1, func3, rd} = INSTR_FLUSH[31:7];
                 // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
                 if(func3 == 3'b000) begin //-------JALR-------------------------------
@@ -368,7 +366,6 @@ module top_riscv_cpu_v2_1();
 
             end else if (opcode == 7'b0100011) begin //------S-TYPE----------------------------------
                 {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = INSTR_FLUSH[31:7];
-                imm_s[31:12] = {20{imm_s[11]}};
                 // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_s, rs2, rs1, func3, opcode); //instruction info
 
                 if(func3 == 3'b010) begin //----SW-------------------------------------
@@ -391,7 +388,6 @@ module top_riscv_cpu_v2_1();
 
             end else if (opcode == 7'b1100011) begin //------B-TYPE----------------------------
                 {imm_b[12], imm_b[10:5], rs2, rs1, func3, imm_b[4:1], imm_b[11]} = INSTR_FLUSH[31:7];
-                imm_b[31:13] = {19{imm_b[12]}};
                 imm_b[0] = 1'b0; //LSB is always zero for B-type
                 // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tB-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_b[12:1], rs2, rs1, func3, opcode); //instruction info
 
@@ -421,7 +417,6 @@ module top_riscv_cpu_v2_1();
             
             end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
                 {imm_j[20], imm_j[10:1], imm_j[11], imm_j[19:12], rd} = INSTR_FLUSH[31:7];
-                imm_j[31:21] = {11{imm_j[20]}};
                 imm_j[0] = 1'b0;
                 // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_j[20:1], rd, opcode); //instruction info
 
@@ -440,13 +435,12 @@ module top_riscv_cpu_v2_1();
                 IM[1] <= imm_j;
 
             end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
-                {imm_u[31:12], rd} = INSTR_FLUSH[31:7];
-                imm_u[11:0] = 12'b0;
+                {imm_u, rd} = INSTR_FLUSH[31:7];
                 // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_u, rd, opcode); //instruction info
 
                 //----LUI---------------
                 // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LUI.");
-                write_reg(rd, imm_u);
+                write_reg(rd, {imm_u, 12'b0});
                 PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 //first entry in the matrix
