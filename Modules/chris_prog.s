@@ -1,16 +1,36 @@
 # chris's test program ##
 
-        addi a0, zero, 0x1
-        addi a0, zero, 0x2
-        addi a0, zero, 0x3
-        addi a0, zero, 0x4
-        addi a0, zero, 0x5
-        addi a0, zero, 0x6
-        addi a0, zero, 0x7
-        addi a0, zero, 0x8
-        addi a0, zero, 0x9
-        addi a0, zero, 0xA
-        #nop
+        li t0, 0xFF
+        sw t0, 0(zero)
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+
+        # addi a0, zero, 0x1
+        # addi a0, zero, 0x2
+        # addi a0, zero, 0x3
+        # addi a0, zero, 0x4
+        # addi a0, zero, 0x5
+        # addi a0, zero, 0x6
+        # addi a0, zero, 0x7
+        # addi a0, zero, 0x8
+        # addi a0, zero, 0x9
+        # addi a0, zero, 0xA
+        # #nop
 
 
 # start:

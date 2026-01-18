@@ -1,12 +1,20 @@
+int sum(int x, int y);
+
+void _start() __attribute__((naked, used));
+void _start() {
+    __asm__ volatile (
+        "li sp, 0x80\n"  // initialize stack pointer
+        "j main\n"             // jump to main
+    );
+}
 
 
-
-// int main() {
-//     int a = 5;
-//     int b = 10;
-//     int c = a + b;
-//     return c;
-// }
+int main() {
+    int a = 5;
+    int b = 10;
+    int c = a + b;
+    return c;
+}
 
 /*
 
@@ -45,28 +53,19 @@
 //     return d;
 // }
 
-int sum(int x, int y);
-
-void _start() __attribute__((naked, used));
-void _start() {
-    __asm__ volatile (
-        "li sp, 0x20\n"  // initialize stack pointer
-        "j main\n"             // jump to main
-    );
-}
 
 
-int main() {
+// int main() {
 
-    int a = 5;
-    int b = 10;
-    int c = sum(a, b);
-    int d = sum(c, a);
-    return d;
-}
+//     int a = 5;
+//     int b = 10;
+//     int c = sum(a, b);
+//     int d = sum(c, a);
+//     return d;
+// }
 
-int sum(int x, int y) {
-    int s = x + y;
-    int t = s * 2;  // another local variable
-    return t;
-}
+// int sum(int x, int y) {
+//     int s = x + y;
+//     int t = s * 2;  // another local variable
+//     return t;
+// }

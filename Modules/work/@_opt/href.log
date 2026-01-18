@@ -1,16 +1,15 @@
+BEGIN 1:pc:fast:work
+    q :  1:top_riscv_cpu_v2_1:fast:work
+END 
+BEGIN 1:reg_file:fast:work
+    regs_out :  1:top_riscv_cpu_v2_1:fast:work
+END 
+BEGIN 1:data_memory:fast:work
+    data_mem :  1:top_riscv_cpu_v2_1:fast:work
+END 
 BEGIN 1:riscv_cpu_v2:fast:work
-    RS2_DATA_FWD :  1:top_riscv_cpu_v2_1:fast:work
-    halt_W :  1:top_riscv_cpu_v2_1:fast:work
-    RS2 :  1:top_riscv_cpu_v2_1:fast:work
-    halt_D :  1:top_riscv_cpu_v2_1:fast:work
-    INSTR_D :  1:top_riscv_cpu_v2_1:fast:work
-    RD_W :  1:top_riscv_cpu_v2_1:fast:work
-    INSTR_F :  1:top_riscv_cpu_v2_1:fast:work
-    data_mem_wr_en_M :  1:top_riscv_cpu_v2_1:fast:work
-    R1_case_rf2rf :  1:top_riscv_cpu_v2_1:fast:work
-    ALU_M :  1:top_riscv_cpu_v2_1:fast:work
-    branch_taken :  1:top_riscv_cpu_v2_1:fast:work
     RS2_DATA_E_FWD :  1:top_riscv_cpu_v2_1:fast:work
+    redirect_pc :  1:top_riscv_cpu_v2_1:fast:work
     IM :  1:top_riscv_cpu_v2_1:fast:work
     ohalt :  1:top_riscv_cpu_v2_1:fast:work
     RD :  1:top_riscv_cpu_v2_1:fast:work
@@ -18,7 +17,6 @@ BEGIN 1:riscv_cpu_v2:fast:work
     INSTR_D_FLUSH :  1:top_riscv_cpu_v2_1:fast:work
     RD_DATA :  1:top_riscv_cpu_v2_1:fast:work
     INSTR_F_FLUSH :  1:top_riscv_cpu_v2_1:fast:work
-    redirect_pc :  1:top_riscv_cpu_v2_1:fast:work
     ALU_W :  1:top_riscv_cpu_v2_1:fast:work
     R2_case_rf2rf :  1:top_riscv_cpu_v2_1:fast:work
     RS2_DATA_M :  1:top_riscv_cpu_v2_1:fast:work
@@ -36,13 +34,15 @@ BEGIN 1:riscv_cpu_v2:fast:work
     PC_target :  1:top_riscv_cpu_v2_1:fast:work
     zero_flag :  1:top_riscv_cpu_v2_1:fast:work
     RS1_DATA_E_FWD :  1:top_riscv_cpu_v2_1:fast:work
-END 
-BEGIN 1:pc:fast:work
-    q :  1:top_riscv_cpu_v2_1:fast:work
-END 
-BEGIN 1:reg_file:fast:work
-    regs_out :  1:top_riscv_cpu_v2_1:fast:work
-END 
-BEGIN 1:data_memory:fast:work
-    data_mem :  1:top_riscv_cpu_v2_1:fast:work
+    RS2_DATA_FWD :  1:top_riscv_cpu_v2_1:fast:work
+    halt_W :  1:top_riscv_cpu_v2_1:fast:work
+    RS2 :  1:top_riscv_cpu_v2_1:fast:work
+    halt_D :  1:top_riscv_cpu_v2_1:fast:work
+    INSTR_D :  1:top_riscv_cpu_v2_1:fast:work
+    RD_W :  1:top_riscv_cpu_v2_1:fast:work
+    INSTR_F :  1:top_riscv_cpu_v2_1:fast:work
+    data_mem_wr_en_M :  1:top_riscv_cpu_v2_1:fast:work
+    R1_case_rf2rf :  1:top_riscv_cpu_v2_1:fast:work
+    ALU_M :  1:top_riscv_cpu_v2_1:fast:work
+    branch_taken :  1:top_riscv_cpu_v2_1:fast:work
 END 

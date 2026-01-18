@@ -889,7 +889,7 @@ module top_riscv_cpu_v2_1();
                         else begin $display(" FAILURE"); local_instruction_failure = 1; end
                     end
 
-                    $display("dut: %d, gold: %d, rs1_v + imm_s: %d, rs1_v: %d, imm_s: %d", cpu_dut.my_data_mem.data_mem[(rs1_v + imm_s_v)>>2], DATA_MEM[4][(rs1_v + imm_s_v)>>2], rs1_v + imm_s_v, rs1_v, imm_s_v);
+                    $display("dut: %d, gold: %d, *rs1_v + imm_s: %d, *rs1_v: %d, imm_s: %d", cpu_dut.my_data_mem.data_mem[(rs1_v + imm_s_v)>>2], DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2], REG_FILE[4][rs1_v] + imm_s_v, REG_FILE[4][rs1_v], imm_s_v);
                     data_mem_dut_dump();
                     data_mem_gold_ii_dump(row);
 

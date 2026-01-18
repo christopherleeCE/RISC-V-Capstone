@@ -1,6 +1,3 @@
-# file delete -force sim.log
-#  transcript file sim.log
-
 00000000 <_start>:
    0:   08000113                li      sp,128
    4:   0080006f                j       c <main>
