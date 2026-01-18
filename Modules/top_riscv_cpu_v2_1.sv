@@ -440,7 +440,7 @@ module top_riscv_cpu_v2_1();
 
                 //----LUI---------------
                 // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LUI.");
-                write_reg(rd, {imm_u, REG_FILE[1][rd][11:0]});
+                write_reg(rd, {imm_u, 12'b0});
                 PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 //first entry in the matrix
