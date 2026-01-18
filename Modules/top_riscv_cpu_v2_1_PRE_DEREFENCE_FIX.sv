@@ -38,7 +38,7 @@ SUCCESSFUL TESTS: ADDI/NOP, LW, SW, ADD, SUB, BEQ, JAL, JALR, LUI
 
 `timescale 1ns/1ns
 
-module top_riscv_cpu_v2_1();
+module top_riscv_cpu_v2_1_PRE_DEREFENCE_FIX();
 
     //declarations
     parameter int CLOCK_PERIOD = 20;
@@ -97,7 +97,7 @@ module top_riscv_cpu_v2_1();
     logic [4:0] RD [9:1];
     logic [31:0] IM [9:1];
     logic [31:0] REG_FILE [9:1] [31:0] = '{default: 32'b0};;
-    logic [31:0] DATA_MEM [9:1] [255:0];
+    logic [31:0] DATA_MEM [9:1] [31:0];
 
     //the "async" of the golden signals, name comes from one of the early topv2 builds, just think of this as golden[0], the if stage
     //there is no regfile_async or datamem_async, because @posedge we write str8 to regfile[1] and datamem[1], this makes the debug out
@@ -331,7 +331,7 @@ module top_riscv_cpu_v2_1();
 
                 if(func3 == 3'b010) begin //----LW------------------------------------
                     // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LW.");
-                    write_reg(rd, DATA_MEM[1][(REG_FILE[1][rs1] + imm_i)>>2]);
+                    write_reg(rd, DATA_MEM[1][(rs1 + imm_i)>>2]);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //first entry in the matrix
@@ -377,7 +377,7 @@ module top_riscv_cpu_v2_1();
 
                 if(func3 == 3'b010) begin //----SW-------------------------------------
                     // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SW.");
-                    DATA_MEM[1][(REG_FILE[1][rs1] + imm_s)>>2] <= REG_FILE[1][rs2];
+                    DATA_MEM[1][(rs1 + imm_s)>>2] <= REG_FILE[1][rs2]; //here TODO DEREFRENCE RS1 LOL IDIOT
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //first entry in the matrix
@@ -654,7 +654,7 @@ module top_riscv_cpu_v2_1();
                 if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
                     $write("\n\t");
                 end
-                $write("\t%2d: 0x%8h", ii, cpu_dut.my_data_mem.data_mem[ii]);
+                $write("\t%2d: 0x%8h", ii, cpu_dut.data_mem.data_mem[ii]);
             end
         end
     endtask
@@ -885,11 +885,11 @@ module top_riscv_cpu_v2_1();
 
                     if(row == 4) begin
 
-                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success");
+                        assert(cpu_dut.data_mem.data_mem[(rs1_v + imm_s_v)>>2] == DATA_MEM[4][(rs1_v + imm_s_v)>>2]) $display(" Success");
                         else begin $display(" FAILURE"); local_instruction_failure = 1; end
                     end
 
-                    $display("dut: %d, gold: %d, rs1_v + imm_s: %d, rs1_v: %d, imm_s: %d", cpu_dut.my_data_mem.data_mem[(rs1_v + imm_s_v)>>2], DATA_MEM[4][(rs1_v + imm_s_v)>>2], rs1_v + imm_s_v, rs1_v, imm_s_v);
+                    $display("dut: %d, gold: %d, rs1_v + imm_s: %d, rs1_v: %d, imm_s: %d", cpu_dut.data_mem.data_mem[(rs1_v + imm_s_v)>>2], DATA_MEM[4][(rs1_v + imm_s_v)>>2], rs1_v + imm_s_v, rs1_v, imm_s_v);
                     data_mem_dut_dump();
                     data_mem_gold_ii_dump(row);
 

@@ -374,7 +374,7 @@ module riscv_cpu_v2
     /* < ALU STARTS HERE > */
     alu #(
         .WIDTH(32)
-    ) alu_again_colon_closing_parenthesis (
+    ) my_alu (
         .operand_a(RS1_DATA_E_FWD),
         .operand_b(
             alu_use_im_E ? IM_E : RS2_DATA_E_FWD   // IM changed to IM_E
@@ -447,8 +447,8 @@ module riscv_cpu_v2
     //-chris
     data_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(32)
-    ) data_mem (
+        .ENTRY_COUNT(255)
+    ) my_data_mem (
         .readAddr(ALU_M),
         .writeAddr(ALU_M),
         .writeData(RS2_DATA_M),

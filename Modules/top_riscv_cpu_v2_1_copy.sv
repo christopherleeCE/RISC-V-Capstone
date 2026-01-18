@@ -35,7 +35,7 @@ TODO make sure forwarding doesnt interfere with topfile verification timing, i d
 
 `timescale 1ns/1ns
 
-module top_riscv_cpu_v2_1();
+module top_riscv_cpu_v2_1_copy();
 
     //declarations
     parameter int CLOCK_PERIOD = 20;

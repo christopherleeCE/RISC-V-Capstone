@@ -17,6 +17,8 @@ riscv64-unknown-elf-as -march=rv32im test.s -o test.o; riscv64-unknown-elf-objdu
 //chris's person command string
 riscv64-unknown-elf-as -march=rv32im chris_prog.s -o chris_prog.o; riscv64-unknown-elf-objdump -d chris_prog.o | tee chris_prog.log; python3 ./load_instr_mem_file.py
 
+riscv64-unknown-elf-gcc -O0 -march=rv32i -mabi=ilp32 -c test.c -o test.o; riscv64-unknown-elf-objdump -d test.o | tee chris_prog.log; python3 ./load_instr_mem_file.py
+
 Questia
 =======
 in gui, change directory to git directory
