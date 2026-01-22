@@ -7,8 +7,7 @@ module id_t(
     output logic [4:0] rs1,
     output logic [4:0] rs2,
     output logic [4:0] rd,
-    output logic [31:0] im,
-    input logic r_type, i_type, s_type, b_type, u_type, j_type
+    output logic [31:0] im
     
 );
 

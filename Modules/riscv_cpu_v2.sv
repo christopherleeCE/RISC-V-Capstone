@@ -244,12 +244,6 @@ module riscv_cpu_v2
     //muxing of reg addrs, and imediates
     id_t my_id_t (
             .instr(INSTR_D_FLUSH),
-            .r_type,
-            .i_type,
-            .s_type,
-            .b_type,
-            .u_type,
-            .j_type,
             .rs1(RS1),
             .rs2(RS2),
             .rd(RD),
