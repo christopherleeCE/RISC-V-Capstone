@@ -165,13 +165,13 @@ module riscv_cpu_v2
     //detecting data hazards for RS1
     assign R1_case_dm2alu = (reg_file_wr_en_M && 
                             (RD_M != 5'd0) && 
-                            (RD_M == RS1_E)    );    //DM to ALU
+                            (RD_M == RS1_E)    );    //Correct data still in DM, needed in EX
     assign R1_case_rf2alu = (reg_file_wr_en_W && 
                             (RD_W != 5'd0) && 
-                            (RD_W == RS1_E)    );    //RF to ALU
+                            (RD_W == RS1_E)    );    //Correct data still in WB, needed in EX
     assign R1_case_rf2rf = (reg_file_wr_en_W && 
                             (RD_W != 5'd0) && 
-                            (RD_W == RS1)    );      //RF to RF
+                            (RD_W == RS1)    );      //Correct data still in WB, needed in ID
 
     //detecting data hazards for RS2
     assign R2_case_dm2alu = (reg_file_wr_en_M && 
@@ -267,8 +267,8 @@ module riscv_cpu_v2
     );
 
     //Data Hazard Forwarding for Register File Read
-    assign RS1_DATA_FWD = (R1_case_rf2rf) ? ALU_W : RS1_DATA;     //Before WB clock, take from ALU_W if RF to RF case
-    assign RS2_DATA_FWD = (R2_case_rf2rf) ? ALU_W : RS2_DATA;     //Before WB clock, take from ALU_W if RF to RF case
+    assign RS1_DATA_FWD = (R1_case_rf2rf) ? RD_DATA : RS1_DATA;     //Before WB clock, take from RD_DATA if data about to be written is needed immediately
+    assign RS2_DATA_FWD = (R2_case_rf2rf) ? RD_DATA : RS2_DATA;     //Before WB clock, take from RD_DATA if data about to be written is needed immediately
 
     //preparing data and control signals for pipeline reg
     assign d2e_data_D = {RS1_DATA_FWD, RS2_DATA_FWD, IM, RD, PC_D, RS1, RS2};
@@ -343,11 +343,12 @@ module riscv_cpu_v2
 
     //Data Hazard Forwarding MUXes for RS1
     always_comb begin
-        priority case (1'b1)
+        unique case (1'b1)
 
-        (R1_case_dm2alu && !data_mem_wr_en_M) : RS1_DATA_E_FWD = ALU_M;         //Take from ALU_M if DM to ALU case and not LW operation
-        (R1_case_dm2alu && data_mem_wr_en_M)  : RS1_DATA_E_FWD = DATA_MEM_OUT;  //Take from DATA_MEM_OUT if DM to ALU case and LW operation
-        R1_case_rf2alu : RS1_DATA_E_FWD = ALU_W;                                //Take from ALU_W if RF to ALU case
+        (R1_case_dm2alu && dbus_sel_alu_M) : RS1_DATA_E_FWD = ALU_M;         //Take from ALU_M if needed in EX stage and was gotten from ALU
+        (R1_case_dm2alu && dbus_sel_data_mem_M)  : RS1_DATA_E_FWD = DATA_MEM_OUT;  //Take from DATA_MEM_OUT if needed in EX stage and was gotten from Data Memory
+        (R1_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS1_DATA_E_FWD = PC_plus_4_M;  //Take from PC_plus_4_M if needed in EX stage and was gotten from PC+4
+        R1_case_rf2alu : RS1_DATA_E_FWD = RD_DATA;                                //Take from RD_DATA if needed in EX stage and was about to be written in WB stage
 
         default : RS1_DATA_E_FWD = RS1_DATA_E;
         endcase
@@ -355,11 +356,12 @@ module riscv_cpu_v2
 
     //Data Hazard Forwarding MUXes for RS2
     always_comb begin
-        priority case (1'b1)
+        unique case (1'b1)
 
-        (R2_case_dm2alu && !data_mem_wr_en_M) : RS2_DATA_E_FWD = ALU_M;
-        (R2_case_dm2alu && data_mem_wr_en_M)  : RS2_DATA_E_FWD = DATA_MEM_OUT;        
-        R2_case_rf2alu : RS2_DATA_E_FWD = ALU_W;
+        (R2_case_dm2alu && dbus_sel_alu_M) : RS2_DATA_E_FWD = ALU_M;
+        (R2_case_dm2alu && dbus_sel_data_mem_M)  : RS2_DATA_E_FWD = DATA_MEM_OUT; 
+        (R2_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS2_DATA_E_FWD = PC_plus_4_M;       
+        R2_case_rf2alu : RS2_DATA_E_FWD = RD_DATA;
 
         default : RS2_DATA_E_FWD = RS2_DATA_E;
         endcase
@@ -387,7 +389,7 @@ module riscv_cpu_v2
     );
 
     //calculating target PC for branches and jumps
-    assign PC_target = (alu_sel_add_E && jump_en_E)?  ALU : PC_E + IM_E; //left is for JALR, right for branches and JAL
+    assign PC_target = (alu_sel_add_E) ? ALU : PC_E + IM_E; //left is for JALR, right for branches and JAL
 
     //preparing data and control signals for pipeline reg
     assign e2m_data_E = {ALU, RS2_DATA_E_FWD, RD_E, PC_plus_4_E};
