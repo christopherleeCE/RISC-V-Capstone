@@ -14,14 +14,14 @@ module id_t(
     always_comb begin
         unique case(instr[6:0]) //opcode
 
-            0110011: begin //R-type
+            7'b0110011: begin //R-type
                 rs2 = instr[24:20];
                 rs1 = instr[19:15];
                 rd = instr[11:7];
                 im = 32'h0;
             end
 
-            0010011: begin //I-type(IMMS)
+            7'b0010011: begin //I-type(IMMS)
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
@@ -29,7 +29,7 @@ module id_t(
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
-            0000011: begin //I-type(LOADS)
+            7'b0000011: begin //I-type(LOADS)
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
@@ -37,7 +37,7 @@ module id_t(
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
-            1100111: begin //I-type(JALR)
+            7'b1100111: begin //I-type(JALR)
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
@@ -45,7 +45,7 @@ module id_t(
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
-            0001111: begin //I-type(MISC-MEM)
+            7'b0001111: begin //I-type(MISC-MEM)
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
@@ -53,7 +53,7 @@ module id_t(
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
-            1110011: begin //I-type(SYSTEMS)
+            7'b1110011: begin //I-type(SYSTEMS)
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
@@ -61,7 +61,7 @@ module id_t(
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
-            0100011: begin //S-type
+            7'b0100011: begin //S-type
                 rs2 = instr[24:20];
                 rs1 = instr[19:15];
                 rd = '0;
@@ -69,7 +69,7 @@ module id_t(
                 im = {{20{instr[31]}}, instr[31:25], instr[11:7]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
-            1100011: begin //B-type
+            7'b1100011: begin //B-type
                 rs2 = instr[24:20];
                 rs1 = instr[19:15];
                 rd = '0;
@@ -77,7 +77,7 @@ module id_t(
                 im = {{19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
-            0110111: begin //U-type(LUI)
+            7'b0110111: begin //U-type(LUI)
                 rs2 = '0;
                 rs1 = '0;
                 rd = instr[11:7];
@@ -85,7 +85,7 @@ module id_t(
                 im = {instr[31:12], 12'h0};
             end
 
-            0010111: begin //U-type(AUIPC)
+            7'b0010111: begin //U-type(AUIPC)
                 rs2 = '0;
                 rs1 = '0;
                 rd = instr[11:7];
@@ -93,7 +93,7 @@ module id_t(
                 im = {instr[31:12], 12'h0};
             end                    
 
-            1101111: begin //J-type
+            7'b1101111: begin //J-type
                 rs2 = '0;
                 rs1 = '0;
                 rd = instr[11:7];
