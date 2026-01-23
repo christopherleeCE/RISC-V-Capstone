@@ -2,44 +2,48 @@
 //Do not edit under pain of losing your edits!
 
 module US__ ( 
-      input logic [3:0] uip,
+      input logic [4:0] uip,
       output logic [17:0] sig 
 
           );
 always_comb begin
   unique case ( uip ) 
 // ==== INSTRUCTION: ADD ====
-    4'd0: sig = 18'b000110000100000000; // alu_sel_add dbus_sel_alu reg_file_wr_en
+    5'd0: sig = 18'b000110000100000000; // alu_sel_add dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: SUB ====
-    4'd1: sig = 18'b000110000010000000; // alu_sel_sub dbus_sel_alu reg_file_wr_en
+    5'd1: sig = 18'b000110000010000000; // alu_sel_sub dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: OR ====
-    4'd2: sig = 18'b000110000000000010; // alu_sel_or dbus_sel_alu reg_file_wr_en
+    5'd2: sig = 18'b000110000000000010; // alu_sel_or dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: AND ====
-    4'd3: sig = 18'b000110000000000100; // alu_sel_and dbus_sel_alu reg_file_wr_en
+    5'd3: sig = 18'b000110000000000100; // alu_sel_and dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: MUL ====
-    4'd4: sig = 18'b000110000001000000; // alu_sel_mul dbus_sel_alu reg_file_wr_en
+    5'd4: sig = 18'b000110000001000000; // alu_sel_mul dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: MULH ====
-    4'd5: sig = 18'b000110000000100000; // alu_sel_mulh dbus_sel_alu reg_file_wr_en
+    5'd5: sig = 18'b000110000000100000; // alu_sel_mulh dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: MULHSU ====
-    4'd6: sig = 18'b000110000000010000; // alu_sel_mulhsu dbus_sel_alu reg_file_wr_en
+    5'd6: sig = 18'b000110000000010000; // alu_sel_mulhsu dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: MULHU ====
-    4'd7: sig = 18'b000110000000001000; // alu_sel_mulhu dbus_sel_alu reg_file_wr_en
+    5'd7: sig = 18'b000110000000001000; // alu_sel_mulhu dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: LW ====
-    4'd8: sig = 18'b000101001100000000; // alu_sel_add alu_use_im dbus_sel_data_mem reg_file_wr_en
+    5'd8: sig = 18'b000101001100000000; // alu_sel_add alu_use_im dbus_sel_data_mem reg_file_wr_en
 // ==== INSTRUCTION: SW ====
-    4'd9: sig = 18'b000000011100000000; // alu_sel_add alu_use_im data_mem_wr_en
+    5'd9: sig = 18'b000000011100000000; // alu_sel_add alu_use_im data_mem_wr_en
 // ==== INSTRUCTION: BEQ ====
-    4'd10: sig = 18'b010000000010000000; // alu_sel_sub branch_en
+    5'd10: sig = 18'b010000000010000000; // alu_sel_sub branch_en
 // ==== INSTRUCTION: ADDI ====
-    4'd11: sig = 18'b000110001100000000; // alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
+    5'd11: sig = 18'b000110001100000000; // alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
+// ==== INSTRUCTION: ORI ====
+    5'd12: sig = 18'b000110001000000010; // alu_sel_or alu_use_im dbus_sel_alu reg_file_wr_en
+// ==== INSTRUCTION: ANDI ====
+    5'd13: sig = 18'b000110001000000100; // alu_sel_and alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: LUI ====
-    4'd12: sig = 18'b000110001100000000; // alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
+    5'd14: sig = 18'b000110001100000000; // alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: JAL ====
-    4'd13: sig = 18'b001100100000000000; // jump_en dbus_sel_pc_plus_4 reg_file_wr_en
+    5'd15: sig = 18'b001100100000000000; // jump_en dbus_sel_pc_plus_4 reg_file_wr_en
 // ==== INSTRUCTION: JALR ====
-    4'd14: sig = 18'b001100101100000000; // jump_en alu_sel_add alu_use_im dbus_sel_pc_plus_4 reg_file_wr_en
+    5'd16: sig = 18'b001100101100000000; // jump_en alu_sel_add alu_use_im dbus_sel_pc_plus_4 reg_file_wr_en
 // ==== LABEL: UD_fault ====
-    4'd15: sig = 18'b100000000000000000; // halt
+    5'd17: sig = 18'b100000000000000000; // halt
     default: sig = 18'd0;
   endcase
 end
