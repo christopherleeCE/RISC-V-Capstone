@@ -165,7 +165,7 @@ module riscv_cpu_v2
     //detecting data hazards for RS1
     assign R1_case_dm2alu = (reg_file_wr_en_M && 
                             (RD_M != 5'd0) && 
-                            (RD_M == RS1_E)    );    //Correct data still in DM, needed in EX
+                            (RD_M == RS1_E)    );    //Correct data still in MEM, needed in EX
     assign R1_case_rf2alu = (reg_file_wr_en_W && 
                             (RD_W != 5'd0) && 
                             (RD_W == RS1_E)    );    //Correct data still in WB, needed in EX
