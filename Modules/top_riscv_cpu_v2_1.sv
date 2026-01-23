@@ -33,6 +33,8 @@ disagreement previously stated
 --------------TEST LOG----------------------------------------------------
 
 WAITING LIST: ...
+R-TYPE: AND, OR
+I-TYPE: ANDI, ORI
 
 SUCCESSFUL TESTS:
 R-TYPE: ADD, SUB
