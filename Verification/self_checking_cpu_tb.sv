@@ -1,4 +1,19 @@
 /*
+--------WARNING---------WARNING-------WARNING--------------------------------------------------------------------------------
+
+This testbench has been discontinued for now. Please refer to Chris' "top_risc_cpu_v_1.sv" as the updated official testbench.
+I will keep this here in case a backup testbench is ever needed or we need to refer back to this code. Thanks!
+
+-Edgar G.
+
+--------WARNING---------WARNING-------WARNING--------------------------------------------------------------------------------
+
+
+
+
+
+
+
 UNVERIFIED/UNSUCCESSFUL: MUL, MULH, MULHSU, MULHU
 SUCCESSFUL TESTS: ADDI/NOP, LW, SW, ADD, SUB, BEQ, JAL, JALR, LUI
 

@@ -30,8 +30,21 @@ im not looking into them cus im tired but i assume it because of the li sign ext
 disagreement previously stated
 
 
-ISSUES, LOOK AT TB in chris_prog: MUL, MULH, MULHSU, MULHU
-SUCCESSFUL TESTS: ADDI/NOP, LW, SW, ADD, SUB, BEQ, JAL, JALR, LUI
+--------------TEST LOG----------------------------------------------------
+
+WAITING LIST: ...
+
+SUCCESSFUL TESTS:
+R-TYPE: ADD, SUB
+I-TYPE: ADDI/NOP, LW, JALR
+S-TYPE: SW
+B-TYPE: BEQ
+J-TYPE: JAL
+U-TYPE: LUI
+M-TYPE:
+
+UNSUCCESSFUL TESTS:
+MUL, MULH, MULHSU, MULHU  (LOOK AT TB in chris_prog)
 
 
 */
@@ -248,18 +261,60 @@ module top_riscv_cpu_v2_1();
                 IM[1] <= 'x;
 
                 //-R-TYPE---------------
+                //separate by func7, then func3
                 if (func7 == 7'b0000000) begin
                     if (func3 == 3'b000) begin //----ADD------------------------------
                         // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADD.");
-                        write_reg(rd, REG_FILE[1][rs2] + REG_FILE[1][rs1]);
+                        write_reg(rd, REG_FILE[1][rs1] + REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
                         
-                    end
+                    end else if (func3 == 3'b100) begin //----XOR------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as XOR.");
+                        write_reg(rd, REG_FILE[1][rs1] ^ REG_FILE[1][rs2]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+                    
+                    end else if (func3 == 3'b110) begin //----OR-------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as OR.");
+                        write_reg(rd, REG_FILE[1][rs1] | REG_FILE[1][rs2]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b111) begin //----AND------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as AND.");
+                        write_reg(rd, REG_FILE[1][rs1] & REG_FILE[1][rs2]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b001) begin //----SLL------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SLL.");
+                        write_reg(rd, REG_FILE[1][rs1] << REG_FILE[1][rs2]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b101) begin //----SRL------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SRL.");
+                        write_reg(rd, REG_FILE[1][rs1] >> REG_FILE[1][rs2]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    //NOTE - will have to check if this is the right way compare signed vs. unsigned numbers
+                    end else if (func3 == 3'b010) begin //----SLT------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SLT.");
+                        write_reg(rd, ($signed(REG_FILE[1][rs1]) < $signed(REG_FILE[1][rs2]))? 32'd1: 32'd0);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b011) begin //----SLTU-----------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SLTU.");
+                        write_reg(rd, ($unsigned(REG_FILE[1][rs1]) < $unsigned(REG_FILE[1][rs2]))? 32'd1: 32'd0);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end 
 
                 end else if (func7 == 7'b0100000) begin     
                     if (func3 == 3'b000) begin //----SUB---------------------------
                         // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SUB.");
                         write_reg(rd, REG_FILE[1][rs1] - REG_FILE[1][rs2]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+                        
+                    end else if (func3 == 3'b101) begin //----SRA---------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SRA.");
+                        write_reg(rd, REG_FILE[1][rs1] >>> REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
                         
                     end
@@ -753,66 +808,65 @@ module top_riscv_cpu_v2_1();
                 if (func7_v == 7'b0000000) begin
                     if (func3_v == 3'b000) begin //----ADD------------------------------
                         /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ADD:");
-                        if(row == 5) begin
 
-                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                    end else if (func3_v == 3'b100) begin //---XOR----------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as XOR:");
 
-                        end
-                    end
+                    end else if (func3_v == 3'b110) begin //----OR-------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as OR:");
+
+                    end else if (func3_v == 3'b111) begin //----AND------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as AND:");
+
+                    end else if (func3_v == 3'b001) begin //----SLL------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SLL:");
+
+                    end else if (func3_v == 3'b101) begin //----SRL------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SRL:");
+
+                    end else if (func3_v == 3'b010) begin //----SLT------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SLT:");
+
+                    end else if (func3_v == 3'b011) begin //----SLTU------------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as STLU:");
+
+                    end 
 
                 end else if (func7_v == 7'b0100000) begin     
                     if (func3_v == 3'b000) begin //----SUB---------------------------
                         /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SUB:");
-                        if(row == 5) begin
 
-                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                    end else if (func3_v == 3'b101) begin //----SRA---------------------------
+                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SRA:");
 
-                        end
                     end
 
                 //-M-TYPE---------------
                 end else if (func7_v == 7'b0000001) begin
                     if (func3_v == 3'b000) begin //----MUL------------------------------
                         /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MUL:");
-                        if(row == 5) begin
-
-                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
-
-                        end
 
                     end else if (func3_v == 3'b001) begin //----MULH------------------------------
                         /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MULH:");
-                        if(row == 5) begin
-
-                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
-
-                        end
 
                     end else if (func3_v == 3'b010) begin //----MULHSU------------------------------
                         /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MULHSU:");
-                        if(row == 5) begin
-
-                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
-
-                        end
 
                     end else if (func3_v == 3'b011) begin //----MULHU------------------------------
                         /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MULHU:");
-                        if(row == 5) begin
-
-                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
-
-                        end
 
                     end
 
                 end
+
+                //Output - checks the output of rd after the writeback stage (row = 5)
+                if(row == 5) begin
+
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                end
+
 
             end else if (opcode_v == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
                 {imm_i_v[11:0], rs1_v, func3_v, rd_v} = INSTR[row][31:7];
