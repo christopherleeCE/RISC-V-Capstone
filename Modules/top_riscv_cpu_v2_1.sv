@@ -355,11 +355,11 @@ module top_riscv_cpu_v2_1();
                 if(func3 == 3'b000) begin //-------JALR-------------------------------
                     // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as JALR.");
                     write_reg(rd, PC_ASYNC + 4);
-                    PC_ASYNC <= REG_FILE[1][rs1] + {{20{imm_j[11]}}, imm_j[11:0]};
+                    PC_ASYNC <= REG_FILE[1][rs1] + {{20{imm_i[11]}}, imm_i[11:0]};
 
                     //first entry in the matrix
                     PC[1] <= PC_ASYNC;
-                    PC_TARGET[1] <= REG_FILE[1][rs1] + {{20{imm_j[11]}}, imm_j[11:0]};
+                    PC_TARGET[1] <= REG_FILE[1][rs1] + {{20{imm_i[11]}}, imm_i[11:0]};
                     INSTR[1] <= INSTR_FLUSH;
                     RS1[1] <= rs1;
                     RS2[1] <= 'x;
@@ -650,7 +650,7 @@ module top_riscv_cpu_v2_1();
     task data_mem_dut_dump();
         begin
             $display("\n\tDATA_MEM_DUT Dump");
-            for(int ii = 0; ii < 32; ii++) begin
+            for(int ii = 0; ii < 256; ii++) begin
                 if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
                     $write("\n\t");
                 end
@@ -884,12 +884,11 @@ module top_riscv_cpu_v2_1();
                     /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SW:");
 
                     if(row == 4) begin
-
                         assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success");
                         else begin $display(" FAILURE"); local_instruction_failure = 1; end
                     end
 
-                    $display("dut: %d, gold: %d, *rs1_v + imm_s: %d, *rs1_v: %d, imm_s: %d", cpu_dut.my_data_mem.data_mem[(rs1_v + imm_s_v)>>2], DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2], REG_FILE[4][rs1_v] + imm_s_v, REG_FILE[4][rs1_v], imm_s_v);
+                    $display("dut: %d, gold: %d, *rs1_v + imm_s: %d, *rs1_v: %d, imm_s: %d", cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2], DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2], REG_FILE[4][rs1_v] + imm_s_v, REG_FILE[4][rs1_v], imm_s_v);
                     data_mem_dut_dump();
                     data_mem_gold_ii_dump(row);
 
