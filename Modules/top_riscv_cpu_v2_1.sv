@@ -33,7 +33,7 @@ disagreement previously stated
 --------------TEST LOG----------------------------------------------------
 
 WAITING LIST: ...
-R-TYPE: AND, OR
+R-TYPE: AND, OR, SLT, SLTU
 I-TYPE: ANDI, ORI
 
 SUCCESSFUL TESTS:
