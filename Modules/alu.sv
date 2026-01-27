@@ -26,8 +26,8 @@ assign signed_a = operand_a;
 assign signed_b = operand_b;
 
 // Define signed products (64 bit results)
-logic [2*WIDTH-1:0] signed product_ss;   // signed * signed
-logic [2*WIDTH-1:0] signed product_su;   // signed * unsigned
+logic signed [2*WIDTH-1:0] product_ss;   // signed * signed
+logic signed [2*WIDTH-1:0] product_su;   // signed * unsigned
 logic [2*WIDTH-1:0] product_uu;   // unsigned * unsigned
 
 assign product_ss = signed_a * signed_b;
