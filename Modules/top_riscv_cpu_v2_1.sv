@@ -35,6 +35,7 @@ disagreement previously stated
 WAITING LIST: ...
 R-TYPE: AND, OR, SLT, SLTU
 I-TYPE: ANDI, ORI
+M-TYPE: MUL, MULH, MULHSU, MULHU
 
 SUCCESSFUL TESTS:
 R-TYPE: ADD, SUB
@@ -46,7 +47,7 @@ U-TYPE: LUI
 M-TYPE:
 
 UNSUCCESSFUL TESTS:
-MUL, MULH, MULHSU, MULHU  (LOOK AT TB in chris_prog)
+
 
 
 */
