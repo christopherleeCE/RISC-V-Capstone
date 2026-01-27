@@ -2,7 +2,7 @@
 set -e
 
 # Check for help flag
-if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+if [[ "$1" == "-h" || "$1" == "-help" ]]; then
     echo "Usage: $0"
     echo "Call from 'Modules' directory using ../compile_gcc.sh"
     exit 0
