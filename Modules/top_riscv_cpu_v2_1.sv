@@ -31,6 +31,10 @@ disagreement previously stated
 
 TODO see if curren beq verification can be broken at (plz dont...)
 
+TODO check if fowrding and flush debug @ posedge are still correct
+
+TODO make sure datamem access is using the abstracted
+
 
 --------------TEST LOG----------------------------------------------------
 
@@ -60,7 +64,14 @@ module top_riscv_cpu_v2_1();
 
     //declarations
     parameter int CLOCK_PERIOD = 20;
-    int instruction_failure;
+
+    //bits for storying debug level
+    bit show_posedge_golden_calc;
+    bit show_negedge_dut_dump;
+    bit show_negedge_golden_history;
+    bit show_negedge_verify_row;
+    bit verify_row_flag;
+    bit stop_at_instr_failure;
 
     //used for debug output of reg dumps
     string reg_name [32] = '{
@@ -79,12 +90,11 @@ module top_riscv_cpu_v2_1();
     }store_type_t;
 
     //dumb way to get around default output of verify_row task, TODO find better way to do this, maybe switch from task to func?
-    static int def0 = 0;
-    static int def1 = 0;
-    static int def2 = 0;
-    static int def3 = 0;
-    static int def4 = 0;
-    static int def5 = 0;
+    static int local_instruction_failure1;
+    static int local_instruction_failure2;
+    static int local_instruction_failure3;
+    static int local_instruction_failure4;
+    static int local_instruction_failure5;
 
     //cpu ports
     logic clk, rst, ohalt;
@@ -138,6 +148,37 @@ module top_riscv_cpu_v2_1();
     //instantiate the CPU
     riscv_cpu_v2 cpu_dut(.clk(clk), .rst(rst), .ohalt(ohalt));
 
+    //grabing vsim args
+    initial begin
+
+        // // other flags
+        // if ($test$plusargs("GOLDEN_CALC")) begin
+        //     $display("Received argument: GOLDEN_CALC");
+        // end
+
+        // if ($test$plusargs("DUT_DUMP")) begin
+        //     $display("Received argument: DUT_DUMP");
+        // end
+
+        // if ($test$plusargs("GOLDEN_HISTORY")) begin
+        //     $display("Received argument: GOLDEN_HISTORY");
+        // end
+
+        // if ($test$plusargs("NO_VERIFY")) begin
+        //     $display("Received argument: NO_VERIFY");
+        // end
+
+        show_posedge_golden_calc = $test$plusargs("GOLDEN_CALC");
+        show_negedge_dut_dump = $test$plusargs("DUT_DUMP");
+        show_negedge_golden_history = $test$plusargs("GOLDEN_HISTORY");
+        show_negedge_verify_row = $test$plusargs("VERIFY_OUTPUT");
+        verify_row_flag = ~$test$plusargs("NO_VERIFY");
+        stop_at_instr_failure = ~$test$plusargs("CONTINUE");
+
+        $display("Flags: %b %b %b %b %b %b", show_posedge_golden_calc, show_negedge_dut_dump, show_negedge_golden_history, show_negedge_verify_row, verify_row_flag, stop_at_instr_failure);
+
+    end
+
     //CLOCK ------------------------------------------------------------------------------------------------------------------
     initial begin
         clk = 1'b0;
@@ -173,19 +214,28 @@ module top_riscv_cpu_v2_1();
         logic [63:0] product;   //used in mul's calculations
         logic dut_pc_redirected;
 
+        if(local_instruction_failure1 || local_instruction_failure2 || local_instruction_failure3 || local_instruction_failure4 || local_instruction_failure5) begin //INSTRUCTION FAILURE----------------------------------
+        
+            $error("FATAL ERROR: Mismatch between model and CPU.");
+            $display("local_instruction_failure: %1b %1b %1b %1b %1b", local_instruction_failure1, local_instruction_failure2, local_instruction_failure3, local_instruction_failure4, local_instruction_failure5);
+            $display("\tPlease check for data hazards and issues in this instruction's datapath/control.");
+
+            if(stop_at_instr_failure) begin $display("Pausing Verification..."); $stop(); end //pauses verification on instruction fail if -continue not presesnt in args
+
+        end
+
         assign dut_pc_redirected = dut_redirected();
         assign INSTR_FLUSH = INSTR_ASYNC;
         assign opcode = INSTR_FLUSH[6:0];
 
         if(cpu_dut.R1_case_rf2rf || cpu_dut.R2_case_rf2rf) begin
-            $display("FORWARDED");
+            if(show_posedge_golden_calc) $display("FORWARDED");
         end
 
         if (!rst) begin
 
-            $display("\n\n\n<* rst = 0, intializing *>");
+            if(show_posedge_golden_calc) $display("\n\n\n<* rst = 0, intializing *>");
             PC_ASYNC <= '0;
-            instruction_failure <= 0;
 
 
         /* when dut.pc gets redirected, it will flush the if and id stage with nop, we mirror
@@ -196,7 +246,7 @@ module top_riscv_cpu_v2_1();
         shown below the remaining gold[]'s get iterated through the 5x1 matrix as seen in the for loop */
         end else if(dut_pc_redirected) begin
 
-                $write("\n\n\t@POSEDGE: FLUSHED G[1] & G[2], rolled back PC_ASYNC, REG_FILE[1] & DATA_MEM[1]");
+                if(show_posedge_golden_calc) $write("\n\n\t@POSEDGE: FLUSHED G[1] & G[2], rolled back PC_ASYNC, REG_FILE[1] & DATA_MEM[1]");
 
                 PC_ASYNC <=  PC[1];
 
@@ -244,23 +294,20 @@ module top_riscv_cpu_v2_1();
             //reg_gold_post_write_back_dump();
             //display_golden_singals_history();
 
-            //if you are using vscode, you can select the "/* no  not  remove : debug  gold */", then ctrl + shft + L,
-            //to place a cursor at all occurences, then ctrl + / to comment or uncomment all fo the lines which will either
-            //enable or disable a bunch of debug outputs in the sim.log the same can be done for "do  not  remove : debug  dut"
-
-            // /* DO NOT REMOVE : DEBUG GOLD */ $write("\n\n\n");
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("Posedge block output");
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("========================================================================================");
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tPC_ASYNC: %h", PC_ASYNC);
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tINSTR_FLUSH: %h", INSTR_FLUSH);
-            // /* DO NOT REMOVE : DEBUG GOLD */ $display("\topcode: %h", opcode);
-
+            if(show_posedge_golden_calc) begin 
+                $write("\n\n\n");
+                $display("Posedge block output");
+                $display("========================================================================================");
+                $display("\tPC_ASYNC: %h", PC_ASYNC);
+                $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
+                $display("\tINSTR_FLUSH: %h", INSTR_FLUSH);
+                $display("\topcode: %h", opcode);
+            end
 
 
             if (opcode == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
                 {func7, rs2, rs1, func3, rd} = INSTR_FLUSH[31:7];
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tR/M-Type: func7: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", func7, rs2, rs1, func3, rd, opcode); //instruction info
+                if(show_posedge_golden_calc) $display("\tR/M-Type: func7: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", func7, rs2, rs1, func3, rd, opcode); //instruction info
 
                 //first entry in the matrix
                 PC[1] <= PC_ASYNC;
@@ -275,43 +322,43 @@ module top_riscv_cpu_v2_1();
                 //separate by func7, then func3
                 if (func7 == 7'b0000000) begin
                     if (func3 == 3'b000) begin //----ADD------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADD.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as ADD.");
                         write_reg(rd, REG_FILE[1][rs1] + REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
                         
                     end else if (func3 == 3'b100) begin //----XOR------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as XOR.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as XOR.");
                         write_reg(rd, REG_FILE[1][rs1] ^ REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
                     
                     end else if (func3 == 3'b110) begin //----OR-------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as OR.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as OR.");
                         write_reg(rd, REG_FILE[1][rs1] | REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b111) begin //----AND------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as AND.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as AND.");
                         write_reg(rd, REG_FILE[1][rs1] & REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b001) begin //----SLL------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SLL.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as SLL.");
                         write_reg(rd, REG_FILE[1][rs1] << REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b101) begin //----SRL------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SRL.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as SRL.");
                         write_reg(rd, REG_FILE[1][rs1] >> REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //NOTE - will have to check if this is the right way compare signed vs. unsigned numbers
                     end else if (func3 == 3'b010) begin //----SLT------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SLT.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as SLT.");
                         write_reg(rd, ($signed(REG_FILE[1][rs1]) < $signed(REG_FILE[1][rs2]))? 32'd1: 32'd0);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b011) begin //----SLTU-----------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SLTU.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as SLTU.");
                         write_reg(rd, ($unsigned(REG_FILE[1][rs1]) < $unsigned(REG_FILE[1][rs2]))? 32'd1: 32'd0);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
@@ -319,12 +366,12 @@ module top_riscv_cpu_v2_1();
 
                 end else if (func7 == 7'b0100000) begin     
                     if (func3 == 3'b000) begin //----SUB---------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SUB.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as SUB.");
                         write_reg(rd, REG_FILE[1][rs1] - REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
                         
                     end else if (func3 == 3'b101) begin //----SRA---------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SRA.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as SRA.");
                         write_reg(rd, REG_FILE[1][rs1] >>> REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
                         
@@ -333,25 +380,25 @@ module top_riscv_cpu_v2_1();
                 //-M-TYPE---------------
                 end else if (func7 == 7'b0000001) begin
                     if (func3 == 3'b000) begin //----MUL------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MUL.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as MUL.");
                         product = $signed(REG_FILE[1][rs1]) * $signed(REG_FILE[1][rs2]);
                         write_reg(rd, product[31:0]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b001) begin //----MULH------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULH.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as MULH.");
                         product = $signed(REG_FILE[1][rs1]) * $signed(REG_FILE[1][rs2]);
                         write_reg(rd, product[63:32]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b010) begin //----MULHSU------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULHSU.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as MULHSU.");
                         product = $signed(REG_FILE[1][rs1]) * $unsigned(REG_FILE[1][rs2]);
                         write_reg(rd, product[63:32]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b011) begin //----MULHU------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as MULHU.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as MULHU.");
                         product = $unsigned(REG_FILE[1][rs1]) * $unsigned(REG_FILE[1][rs2]);
                         write_reg(rd, product[63:32]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
@@ -364,7 +411,7 @@ module top_riscv_cpu_v2_1();
             end else if (opcode == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
                 {imm_i[11:0], rs1, func3, rd} = INSTR_FLUSH[31:7];
                 imm_i[31:12] = {20{imm_i[11]}};
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
+                if(show_posedge_golden_calc) $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
                 //first entry in the matrix
                 PC[1] <= PC_ASYNC;
@@ -377,11 +424,11 @@ module top_riscv_cpu_v2_1();
 
                 if(func3 == 3'b000) begin //-------ADDI-------------------------------
                     if(imm_i == 20'd0 & rs1 == 5'd0 & rd == 5'd0) begin
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as NOP.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as NOP.");
                         PC_ASYNC <= dut_pc_redirected ? PC_ASYNC : PC_ASYNC + 32'h4;
 
                     end else begin
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ADDI.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as ADDI.");
                         //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] + imm_i, rd, rs1);
                         write_reg(rd, REG_FILE[1][rs1] + imm_i);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
@@ -389,13 +436,13 @@ module top_riscv_cpu_v2_1();
                     end
 
                 end else if (func3 == 3'b110) begin //------ORI-------------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ORI.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as ORI.");
                         //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] | imm_i, rd, rs1);
                         write_reg(rd, REG_FILE[1][rs1] | imm_i);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b111) begin //-------ANDI---------------------------------
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ANDI.");
+                        if(show_posedge_golden_calc) $display("\tIdentified as ANDI.");
                         //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] & imm_i, rd, rs1);
                         write_reg(rd, REG_FILE[1][rs1] & imm_i);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
@@ -406,10 +453,10 @@ module top_riscv_cpu_v2_1();
             end else if (opcode == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
                 {imm_i[11:0], rs1, func3, rd} = INSTR_FLUSH[31:7];
                 imm_i[31:12] = {20{imm_i[11]}};
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
+                if(show_posedge_golden_calc) $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
                 if(func3 == 3'b010) begin //----LW------------------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LW.");
+                    if(show_posedge_golden_calc) $display("\tIdentified as LW.");
                     //write_reg(rd, DATA_MEM[1][(REG_FILE[1][rs1] + imm_i)>>2]); //old implementation
                     write_reg(rd, read_data_mem(REG_FILE[1][rs1] + imm_i, FULL_WORD, .is_signed(0)));
                     PC_ASYNC <= PC_ASYNC + 32'h4;
@@ -430,10 +477,10 @@ module top_riscv_cpu_v2_1();
             end else if (opcode == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
                 {imm_i[11:0], rs1, func3, rd} = INSTR_FLUSH[31:7];
                 imm_i[31:12] = {20{imm_i[11]}};
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
+                if(show_posedge_golden_calc) $display("\tI-Type: imm: 0b%b, rs1: 0b%b, func3: 0b%b, rd: 0b%b, opcode: 0b%b", imm_i, rs1, func3, rd, opcode); //instruction info
 
                 if(func3 == 3'b000) begin //-------JALR-------------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as JALR.");
+                    if(show_posedge_golden_calc) $display("\tIdentified as JALR.");
                     write_reg(rd, PC_ASYNC + 4);
                     PC_ASYNC <= REG_FILE[1][rs1] + {{20{imm_i[11]}}, imm_i[11:0]};
 
@@ -453,10 +500,10 @@ module top_riscv_cpu_v2_1();
             end else if (opcode == 7'b0100011) begin //------S-TYPE----------------------------------
                 {imm_s[11:5], rs2, rs1, func3, imm_s[4:0]} = INSTR_FLUSH[31:7];
                 imm_s[31:12] = {20{imm_s[11]}};
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_s, rs2, rs1, func3, opcode); //instruction info
+                if(show_posedge_golden_calc) $display("\tS-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_s, rs2, rs1, func3, opcode); //instruction info
 
                 if(func3 == 3'b010) begin //----SW-------------------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SW.");
+                    if(show_posedge_golden_calc) $display("\tIdentified as SW.");
                     //DATA_MEM[1][(REG_FILE[1][rs1] + imm_s)>>2] <= REG_FILE[1][rs2]; //old implementation
                     write_data_mem(REG_FILE[1][rs2], (REG_FILE[1][rs1] + imm_s), FULL_WORD);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
@@ -478,17 +525,17 @@ module top_riscv_cpu_v2_1();
                 {imm_b[12], imm_b[10:5], rs2, rs1, func3, imm_b[4:1], imm_b[11]} = INSTR_FLUSH[31:7];
                 imm_b[31:13] = {19{imm_b[12]}};
                 imm_b[0] = 1'b0; //LSB is always zero for B-type
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tB-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_b[12:1], rs2, rs1, func3, opcode); //instruction info
+                if(show_posedge_golden_calc) $display("\tB-Type: imm: 0b%b, rs2: 0b%b, rs1: 0b%b, func3: 0b%b, opcode: 0b%b", imm_b[12:1], rs2, rs1, func3, opcode); //instruction info
 
                 if(func3 == 3'b000) begin //----BEQ------------------------------------------------
-                    // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as BEQ.");
+                    if(show_posedge_golden_calc) $display("\tIdentified as BEQ.");
                     if(REG_FILE[1][rs1] == REG_FILE[1][rs2]) begin
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("Branch Taken");
+                        if(show_posedge_golden_calc) $display("Branch Taken");
                         PC_ASYNC <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
                         
                         PC_TARGET[1] <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
                     end else begin
-                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("Branch not Taken");
+                        if(show_posedge_golden_calc) $display("Branch not Taken");
                         PC_ASYNC <= PC_ASYNC + 4;
 
                         PC_TARGET[1] <= PC_ASYNC + 4;
@@ -508,10 +555,10 @@ module top_riscv_cpu_v2_1();
                 {imm_j[20], imm_j[10:1], imm_j[11], imm_j[19:12], rd} = INSTR_FLUSH[31:7];
                 imm_j[31:21] = {11{imm_j[20]}};
                 imm_j[0] = 1'b0;
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_j[20:1], rd, opcode); //instruction info
+                if(show_posedge_golden_calc) $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_j[20:1], rd, opcode); //instruction info
 
                 //----JAL------------
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as JAL.");
+                if(show_posedge_golden_calc) $display("\tIdentified as JAL.");
                 write_reg(rd, PC_ASYNC + 4);
                 PC_ASYNC <= PC_ASYNC + {{11{imm_j[20]}}, imm_j[20:0]};
 
@@ -527,10 +574,10 @@ module top_riscv_cpu_v2_1();
             end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
                 {imm_u[31:12], rd} = INSTR_FLUSH[31:7];
                 imm_u[11:0] = 12'b0;
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_u, rd, opcode); //instruction info
+                if(show_posedge_golden_calc) $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_u, rd, opcode); //instruction info
 
                 //----LUI---------------
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LUI.");
+                if(show_posedge_golden_calc) $display("\tIdentified as LUI.");
                 write_reg(rd, imm_u);
                 PC_ASYNC <= PC_ASYNC + 32'h4;
 
@@ -545,7 +592,7 @@ module top_riscv_cpu_v2_1();
 
             end else begin
                 //UNKNOWN ------------------------------
-                // /* DO NOT REMOVE : DEBUG GOLD */ $display("\t<### WARNING: Instruction type not currently recognized by TB ###>");
+                if(show_posedge_golden_calc) $display("\t<### WARNING: Instruction type not currently recognized by TB ###>");
 
             end
 
@@ -570,70 +617,50 @@ module top_riscv_cpu_v2_1();
     //verification on negedge after posedge results have settled, verification is done through tasks that verify each golden[] row
     always @(negedge clk) begin
 
-        if(cpu_dut.R1_case_rf2rf || cpu_dut.R2_case_rf2rf) begin
-            $display("FORWARDED");
+        if(show_negedge_dut_dump) begin
+
+            $write("\n\n\n");
+            $display("Negedge block output");
+            $display("========================================================================================");
+            $display("\tPC_ASYNC: %h", PC_ASYNC);
+            $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
+            $display("\tINSTR_FLUSH: %h", INSTR_FLUSH);
+            $display("\topcode: %h", opcode);
+
+            dut_dump();
+            reg_dut_dump();
+            data_mem_dut_dump();
+
         end
 
-        // $display("signed word: %h", read_data_mem(0, FULL_WORD, .is_signed(1)));
-        // $display("unsigned word: %h", read_data_mem(0, FULL_WORD, .is_signed(0)));
-        // $write("\n");
-        // $display("signed highhalfword: %h", read_data_mem(2, HALF_WORD, .is_signed(1)));
-        // $display("unsigned highhalfword: %h", read_data_mem(2, HALF_WORD, .is_signed(0)));
-        // $write("\n");
-        // $display("signed lowhalfword: %h", read_data_mem(0, HALF_WORD, .is_signed(1)));
-        // $display("unsigned lowhalfword: %h", read_data_mem(0, HALF_WORD, .is_signed(0)));
-        // $write("\n");
-        // $display("signed byte3: %h", read_data_mem(3, BYTE, .is_signed(1)));
-        // $display("unsigned byte3: %h", read_data_mem(3, BYTE, .is_signed(0)));
-        // $write("\n");
-        // $display("signed byte2: %h", read_data_mem(2, BYTE, .is_signed(1)));
-        // $display("unsigned byte2: %h", read_data_mem(2, BYTE, .is_signed(0)));
-        // $write("\n");
-        // $display("signed byte1: %h", read_data_mem(1, BYTE, .is_signed(1)));
-        // $display("unsigned byte1: %h", read_data_mem(1, BYTE, .is_signed(0)));
-        // $write("\n");
-        // $display("signed byte0: %h", read_data_mem(0, BYTE, .is_signed(1)));
-        // $display("unsigned byte0: %h", read_data_mem(0, BYTE, .is_signed(0)));
-
-        $write("\n\n\n");
-        $display("Negedge block output");
-        $display("========================================================================================");
-        $display("\tPC_ASYNC: %h", PC_ASYNC);
-        $display("\tINSTR_ASYNC: %h", INSTR_ASYNC);
-        $display("\tINSTR_FLUSH: %h", INSTR_FLUSH);
-        $display("\topcode: %h", opcode);
-
-        dut_dump();
-        reg_dut_dump();
-        data_mem_dut_dump();
         //reg_gold_post_write_back_dump();
-        display_golden_singals_history();
+        if(show_negedge_golden_history) begin
 
+            display_golden_singals_history();
 
-        //def# is a werid way to get an output of a task, at this point its not even used
-        //verify_row(0, def0);
-        verify_row(1, def1);
-        verify_row(2, def2);
-        verify_row(3, def3);
-        verify_row(4, def4);
-        verify_row(5, def5);
+        end
 
+        if(verify_row_flag) begin
+
+            //def# is a werid way to get an output of a task, at this point its not even used
+            //verify_row(0, def0);
+            if(show_negedge_verify_row) $write("\n\n********************************************************************************************************************************************************************************");
+            if(show_negedge_verify_row) $write("\n********************************************************************************************************************************************************************************");
+            local_instruction_failure1 <= verify_row(1);
+            local_instruction_failure2 <= verify_row(2);
+            local_instruction_failure3 <= verify_row(3);
+            local_instruction_failure4 <= verify_row(4);
+            local_instruction_failure5 <= verify_row(5);
+
+        end
 
         if (ohalt == 1'b1) begin //HALT SIGNAL --------------------------------------------------------------
-            $display("\nWARNING: Recieved halt signal. Pausing verification.");
+            $error("Recieved halt signal. Pausing verification.");
             $display("Program counter: 0x%h", cpu_dut.PC);
             reg_gold_post_write_back_dump();
             $stop(); //pauses verification if CPU outputs halt signal
 
-        //doesnt do anything right now, instruction_failure will never be one, see TODO @ ~line 1
-        end else if(instruction_failure == 1) begin //INSTRUCTION FAILURE----------------------------------
-            $display("\nWARNING: Mismatch between model and CPU. Pausing verification.");
-            $display("\tPlease check for data hazards and issues in this instruction's datapath/control.");
-            reg_gold_post_write_back_dump();
-            $stop(); //pauses verification if an instruction has failed OR a data hazard has occured.
-
         end
-
     end
 
     //task & func defintions
@@ -936,9 +963,8 @@ module top_riscv_cpu_v2_1();
     //verify_row(1), will parse and verify golden[1], this task uses if statements that check the row to ensure
     //that for example addi will only be verified if its in verify_row(5)/golden[5] (post writeback), hoever addi
     //will not be veified if its in verify_row(2)/golden[2], or 1 or 4, etc.
-    task automatic verify_row(
-        input int row,
-        output int local_instruction_failure
+    function automatic verify_row(
+        input int row
     );
         begin
 
@@ -955,63 +981,63 @@ module top_riscv_cpu_v2_1();
 
             opcode_v = INSTR[row][6:0];
 
-            /* DO NOT REMOVE : DEBUG VERIFY */ $write("\n\n");
-            /* DO NOT REMOVE : DEBUG VERIFY */ $display("verify_row(%0d) output: \nPC: %h", row, PC[row]);
-            /* DO NOT REMOVE : DEBUG VERIFY */ $display("========================================================================================");
+            if(show_negedge_verify_row) $write("\n\n");
+            if(show_negedge_verify_row) $display("verify_row(%0d) output: \nPC: %h", row, PC[row]);
+            if(show_negedge_verify_row) $display("========================================================================================");
             if (opcode_v == 7'b0110011) begin //--------R-TYPE/M-TYPE----------------------------------------------
                 {func7_v, rs2_v, rs1_v, func3_v, rd_v} = INSTR[row][31:7];
-                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tR/M-Type: func7_v: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", func7_v, rs2_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+                if(show_negedge_verify_row) $display("\tR/M-Type: func7_v: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", func7_v, rs2_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
 
                 //-R-TYPE---------------
                 if (func7_v == 7'b0000000) begin
                     if (func3_v == 3'b000) begin //----ADD------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ADD:");
+                        if(show_negedge_verify_row) $write("\tIdentified as ADD:");
 
                     end else if (func3_v == 3'b100) begin //---XOR----------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as XOR:");
+                        if(show_negedge_verify_row) $write("\tIdentified as XOR:");
 
                     end else if (func3_v == 3'b110) begin //----OR-------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as OR:");
+                        if(show_negedge_verify_row) $write("\tIdentified as OR:");
 
                     end else if (func3_v == 3'b111) begin //----AND------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as AND:");
+                        if(show_negedge_verify_row) $write("\tIdentified as AND:");
 
                     end else if (func3_v == 3'b001) begin //----SLL------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SLL:");
+                        if(show_negedge_verify_row) $write("\tIdentified as SLL:");
 
                     end else if (func3_v == 3'b101) begin //----SRL------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SRL:");
+                        if(show_negedge_verify_row) $write("\tIdentified as SRL:");
 
                     end else if (func3_v == 3'b010) begin //----SLT------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SLT:");
+                        if(show_negedge_verify_row) $write("\tIdentified as SLT:");
 
                     end else if (func3_v == 3'b011) begin //----SLTU------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as STLU:");
+                        if(show_negedge_verify_row) $write("\tIdentified as STLU:");
 
                     end 
 
                 end else if (func7_v == 7'b0100000) begin     
                     if (func3_v == 3'b000) begin //----SUB---------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SUB:");
+                        if(show_negedge_verify_row) $write("\tIdentified as SUB:");
 
                     end else if (func3_v == 3'b101) begin //----SRA---------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SRA:");
+                        if(show_negedge_verify_row) $write("\tIdentified as SRA:");
 
                     end
 
                 //-M-TYPE---------------
                 end else if (func7_v == 7'b0000001) begin
                     if (func3_v == 3'b000) begin //----MUL------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MUL:");
+                        if(show_negedge_verify_row) $write("\tIdentified as MUL:");
 
                     end else if (func3_v == 3'b001) begin //----MULH------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MULH:");
+                        if(show_negedge_verify_row) $write("\tIdentified as MULH:");
 
                     end else if (func3_v == 3'b010) begin //----MULHSU------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MULHSU:");
+                        if(show_negedge_verify_row) $write("\tIdentified as MULHSU:");
 
                     end else if (func3_v == 3'b011) begin //----MULHU------------------------------
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as MULHU:");
+                        if(show_negedge_verify_row) $write("\tIdentified as MULHU:");
 
                     end
 
@@ -1021,7 +1047,7 @@ module top_riscv_cpu_v2_1();
                 if(row == 5) begin
 
                             assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                            else begin $display(" FAILURE"); return 1; end
 
                 end
 
@@ -1029,27 +1055,27 @@ module top_riscv_cpu_v2_1();
             end else if (opcode_v == 7'b0010011) begin //-----I-TYPE (ARITHMETIC) ---------------------------------
                 {imm_i_v[11:0], rs1_v, func3_v, rd_v} = INSTR[row][31:7];
                 imm_i_v[31:12] = {20{imm_i_v[11]}};
-                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+                if(show_negedge_verify_row) $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
 
                 if(func3_v == 3'b000) begin //-------ADDI-------------------------------
                     if(imm_i_v == 32'd0 & rs1_v == 5'd0 & rd_v == 5'd0) begin
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tIdentified as NOP.");
+                        if(show_negedge_verify_row) $display("\tIdentified as NOP.");
                         //TODO, do a reg by reg and data by data comparasion for validation here,
                         //once that task has been built as seen at ~line 1
 
                         //assert() $display(" Success");
-                        //else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                        //else begin $display(" FAILURE"); return 1; end
 
                     end else begin
                         //$display("rd_v: ", rd_v);
                         //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
-                        /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ADDI:");
+                        if(show_negedge_verify_row) $write("\tIdentified as ADDI:");
 
                         if(row == 5) begin                        
                             
                             //Output - compares the actual and predicted value of rd after the writeback stage
                             assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                            else begin $display(" FAILURE"); return 1; end
 
                         end
                     end
@@ -1057,12 +1083,12 @@ module top_riscv_cpu_v2_1();
                 end else if(func3_v == 3'b110) begin //-------ORI-------------------------------
                     //$display("rd_v: ", rd_v);
                     //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
-                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ORI:");
+                    if(show_negedge_verify_row) $write("\tIdentified as ORI:");
             
                 end else if(func3_v == 3'b111) begin //-------ANDI-------------------------------
                     //$display("rd_v: ", rd_v);
                     //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
-                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ANDI:");
+                    if(show_negedge_verify_row) $write("\tIdentified as ANDI:");
 
                 end
 
@@ -1071,14 +1097,14 @@ module top_riscv_cpu_v2_1();
             end else if (opcode_v == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
                 {imm_i_v[11:0], rs1_v, func3_v, rd_v} = INSTR[row][31:7];
                 imm_i_v[31:12] = {20{imm_i_v[11]}};
-                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+                if(show_negedge_verify_row) $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
 
                 if(func3_v == 3'b010) begin //----LW------------------------------------
-                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as LW:");
+                    if(show_negedge_verify_row) $write("\tIdentified as LW:");
                     if(row == 5) begin
 
                         assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                        else begin $display(" FAILURE"); return 1; end
 
                     end
                 end
@@ -1086,15 +1112,15 @@ module top_riscv_cpu_v2_1();
             end else if (opcode_v == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
                 {imm_i_v[11:0], rs1_v, func3_v, rd_v} = INSTR[row][31:7];
                 imm_i_v[31:12] = {20{imm_i_v[11]}};
-                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
+                if(show_negedge_verify_row) $display("\tI-Type: imm: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, rd_v: 0b%b, opcode_v: 0b%b", imm_i_v, rs1_v, func3_v, rd_v, opcode_v); //instruction info
 
                 if(func3_v == 3'b000) begin //-------JALR-------------------------------
-                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as JALR:");
+                    if(show_negedge_verify_row) $write("\tIdentified as JALR:");
                     // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                     if(row == 3) begin
 
                         assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
-                        else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                        else begin $display(" FAILURE"); return 1; end
 
                     end
                 end
@@ -1102,19 +1128,17 @@ module top_riscv_cpu_v2_1();
             end else if (opcode_v == 7'b0100011) begin //------S-TYPE----------------------------------
                 {imm_s_v[11:5], rs2_v, rs1_v, func3_v, imm_s_v[4:0]} = INSTR[row][31:7];
                 imm_s_v[31:12] = {20{imm_s_v[11]}};
-                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tS-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, opcode_v: 0b%b", imm_s_v, rs2_v, rs1_v, func3_v, opcode_v); //instruction info
+                if(show_negedge_verify_row) $display("\tS-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, opcode_v: 0b%b", imm_s_v, rs2_v, rs1_v, func3_v, opcode_v); //instruction info
 
                 if(func3_v == 3'b010) begin //----SW-------------------------------------
-                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as SW:");
+                    if(show_negedge_verify_row) $write("\tIdentified as SW:");
 
                     if(row == 4) begin
-                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success");
-                        else begin $display(" FAILURE"); local_instruction_failure = 1; end
-                    end
 
-                    $display("dut: %d, gold: %d, *rs1_v + imm_s: %d, *rs1_v: %d, imm_s: %d", cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2], DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2], REG_FILE[4][rs1_v] + imm_s_v, REG_FILE[4][rs1_v], imm_s_v);
-                    data_mem_dut_dump();
-                    data_mem_gold_ii_dump(row);
+                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end//$display("dut: %d, gold: %d, *rs1_v + imm_s: %d, *rs1_v: %d, imm_s: %d", cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2], DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2], REG_FILE[4][rs1_v] + imm_s_v, REG_FILE[4][rs1_v], imm_s_v);
 
                 end
 
@@ -1122,15 +1146,15 @@ module top_riscv_cpu_v2_1();
                 {imm_b_v[12], imm_b_v[10:5], rs2_v, rs1_v, func3_v, imm_b_v[4:1], imm_b_v[11]} = INSTR[row][31:7];
                 imm_b_v[31:13] = {19{imm_b_v[12]}};
                 imm_b_v[0] = 1'b0; //LSB is always zero for B-type
-                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tB-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, opcode_v: 0b%b", imm_b_v[12:1], rs2_v, rs1_v, func3_v, opcode_v); //instruction info
+                if(show_negedge_verify_row) $display("\tB-Type: imm: 0b%b, rs2_v: 0b%b, rs1_v: 0b%b, func3_v: 0b%b, opcode_v: 0b%b", imm_b_v[12:1], rs2_v, rs1_v, func3_v, opcode_v); //instruction info
 
                 if(func3_v == 3'b000) begin //----BEQ------------------------------------------------
-                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as BEQ:");
+                    if(show_negedge_verify_row) $write("\tIdentified as BEQ:");
                     // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                     if(row == 3) begin
                         
                         assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
-                        else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                        else begin $display(" FAILURE"); return 1; end
 
                     end
                     
@@ -1140,47 +1164,42 @@ module top_riscv_cpu_v2_1();
                 {imm_j_v[20], imm_j_v[10:1], imm_j_v[11], imm_j_v[19:12], rd_v} = INSTR[row][31:7];
                 imm_j_v[31:21] = {11{imm_j_v[20]}};
                 imm_j_v[0] = 1'b0;
-                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_j_v[20:1], rd_v, opcode_v); //instruction info
+                if(show_negedge_verify_row) $display("\tJ-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_j_v[20:1], rd_v, opcode_v); //instruction info
 
                 //----JAL------------
-                /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as JAL:");
+                if(show_negedge_verify_row) $write("\tIdentified as JAL:");
                 // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                 if(row == 3) begin
                     
-                    assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
-                    else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                    assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success"); //here
+                    else begin $display(" FAILURE"); return 1; end
 
                 end
 
             end else if (opcode_v == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
                 {imm_u_v[31:12], rd_v} = INSTR[row][31:7];
                 imm_u_v[11:0] = 12'b0;
-                /* DO NOT REMOVE : DEBUG VERIFY */ $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_u_v, rd_v, opcode_v); //instruction info
+                if(show_negedge_verify_row) $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_u_v, rd_v, opcode_v); //instruction info
 
                 //----LUI---------------
-                /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as LUI:");
+                if(show_negedge_verify_row) $write("\tIdentified as LUI:");
                 if(row == 5) begin
 
                     assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                    else begin $display(" FAILURE"); local_instruction_failure = 1; end
+                    else begin $display(" FAILURE"); return 1; end
 
                 end
-                // else local_instruction_failure = 1;
+                // else return 1;
 
             end else begin
                 //UNKNOWN ------------------------------
-                /* DO NOT REMOVE : DEBUG VERIFY */ $display("WARNING: Instruction type not currently recognized by TB.");
+                if(show_negedge_verify_row) $display("WARNING: Instruction type not currently recognized by TB.");
 
             end
 
-            if(local_instruction_failure == 1) begin 
+            return 0;
 
-                $display("\nError: Mismatch between model and CPU.");
-                reg_dut_dump();
-                //$stop();
-
-            end
         end
-    endtask
+    endfunction
 
 endmodule
