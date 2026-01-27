@@ -58,9 +58,6 @@ module riscv_cpu_v2
     logic [31:0] DATA_MEM_OUT_W;
 
     logic zero_flag;               //from alu, is the result zero?
-    logic negative_flag;           //from alu, is the result negative?
-    logic overflow_flag;           //from alu, did an overflow occur?
-    logic carryout_flag;           //from alu, was there a carryout?
 
     logic branch_taken;          //is a branch taken?
     logic jump_taken;            //is a jump taken?
@@ -393,9 +390,6 @@ module riscv_cpu_v2
         .alu_sel_slt(alu_sel_slt_E),
         .alu_sel_sltu(alu_sel_sltu_E),
         .zero_flag(zero_flag),
-        .negative_flag(negative_flag),
-        .overflow_flag(overflow_flag),
-        .carryout_flag(carryout_flag),
         .result(ALU)
     );
 

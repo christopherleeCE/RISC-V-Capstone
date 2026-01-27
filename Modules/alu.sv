@@ -14,9 +14,6 @@ module alu
     input logic alu_sel_slt,
     input logic alu_sel_sltu,
     output logic zero_flag,
-    output logic negative_flag,
-    output logic overflow_flag,
-    output logic carryout_flag,
     output logic [WIDTH-1:0] result
 );
 
@@ -70,11 +67,5 @@ end
 
 // Flag assignments
 assign zero_flag = ( result == '0 );
-assign negative_flag = result[WIDTH-1];
-assign overflow_flag = ( alu_sel_add && ( operand_a[WIDTH-1] == operand_b[WIDTH-1] ) && ( result[WIDTH-1] != operand_a[WIDTH-1] )  )  
-                        || 
-                        ( alu_sel_sub && ( operand_a[WIDTH-1] != operand_b[WIDTH-1] ) && ( result[WIDTH-1] != operand_a[WIDTH-1] )   );
-assign carryout_flag = ( alu_sel_add && ( add_result[WIDTH] ) ) ||
-                       ( alu_sel_sub && ( sub_result[WIDTH] ) );
 
 endmodule
