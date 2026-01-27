@@ -4,7 +4,7 @@ param(
 
 if ($Help) {
     # You can put your usage message here
-    Write-Output "Call from 'Modules' directory using ../simulate_sv.ps1"
+    Write-Output "Call from 'Modules' directory using ../Scripts/simulate_sv.ps1"
     exit 0
 }
 

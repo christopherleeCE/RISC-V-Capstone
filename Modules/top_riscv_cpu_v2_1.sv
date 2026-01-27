@@ -1043,6 +1043,13 @@ module top_riscv_cpu_v2_1();
                         //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                         /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ADDI:");
 
+                        if(row == 5) begin                        
+                            
+                            //Output - compares the actual and predicted value of rd after the writeback stage
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                        end
                     end
 
                 end else if(func3_v == 3'b110) begin //-------ORI-------------------------------
@@ -1057,12 +1064,6 @@ module top_riscv_cpu_v2_1();
 
                 end
 
-                //Output - compares the actual and predicted value of rd after the writeback stage
-                if(row == 5) begin
-                    assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                    else begin $display(" FAILURE"); local_instruction_failure = 1; end
-
-                end
 
 
             end else if (opcode_v == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------

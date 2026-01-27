@@ -4,7 +4,7 @@ set -e
 # Check for help flag
 if [[ "$1" == "-h" || "$1" == "-help" ]]; then
     echo "Usage: $0"
-    echo "Call from 'Modules' directory using ../assemble_gas.sh"
+    echo "Call from 'Modules' directory using ../Scripts/assemble_gas.sh"
     exit 0
 fi
 

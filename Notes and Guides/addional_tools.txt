@@ -14,23 +14,14 @@ Usage
 =====
 riscv64-unknown-elf-as -march=rv32im test.s -o test.o; riscv64-unknown-elf-objdump -d test.o
 
-//chris's person command string
-riscv64-unknown-elf-as -march=rv32im chris_prog.s -o chris_prog.o; riscv64-unknown-elf-objdump -d chris_prog.o | tee chris_prog.log; python3 ./load_instr_mem_file.py
-
-riscv64-unknown-elf-gcc -O0 -march=rv32i -mabi=ilp32 -c test.c -o test.o; riscv64-unknown-elf-objdump -d test.o | tee chris_prog.log; python3 ./load_instr_mem_file.py
+NOTICE: use bash script for updated command (dm chris for questions)
 
 Questia
 =======
 in gui, change directory to git directory
 in questia cmd, cd into modules
 
-run in questia
-transcript file -close; file delete -force sim.log; transcript file sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu; run 1us; transcript file -close
-
-OR
-
-run in powershell
-vsim -c -do "file delete -force sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1; run 5us; quit -f"
+NOTICE: use powershell script for updated command (dm chris for questions)
 
 Writing asm
 ===========
@@ -38,8 +29,6 @@ the .s file ONLY expects labels in the jal and jalr, so if i give it
 jal ra, 0x10, it thinks 0x10 is a lable, and not an offset or absolute address, it then sees that that label doesnt exist
 so it then interprets that label to point to the current instruction, that is the jal or jalr. when we objdump it will give 
 us the absolute address that the instruction will actually jump to, which is the location of the jal/jalr instruciton in memmory
-
-
 
 RUNNING OLD TESTBENCH (WARNING - MAY BE OUT OF DATE)
 This command will run the old test bench (from last semester) and output the results into the "sim.log" file. Please be aware the old testbench
