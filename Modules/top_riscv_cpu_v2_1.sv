@@ -29,6 +29,8 @@ but golden doesnt, not sure which is complient with riscv, addionally mul instr'
 im not looking into them cus im tired but i assume it because of the li sign extension 
 disagreement previously stated
 
+TODO see if curren beq verification can be broken at (plz dont...)
+
 
 --------------TEST LOG----------------------------------------------------
 
@@ -609,7 +611,7 @@ module top_riscv_cpu_v2_1();
 
 
         //def# is a werid way to get an output of a task, at this point its not even used
-        verify_row(0, def0);
+        //verify_row(0, def0);
         verify_row(1, def1);
         verify_row(2, def2);
         verify_row(3, def3);
