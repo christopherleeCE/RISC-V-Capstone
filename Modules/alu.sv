@@ -21,7 +21,7 @@ module alu
 // output logic overflow_flag, carryout_flag, negative_flag
 
 // Signed operands for signed operations
-logic signed [WIDTH-1:0] signed_a, signed_b;
+logic signed [WIDTH-1:0] signed_a, signed_b, fake_signed_b;
 assign signed_a = operand_a;
 assign signed_b = operand_b;
 
@@ -31,8 +31,16 @@ logic [2*WIDTH-1:0] product_su;   // signed * unsigned
 logic [2*WIDTH-1:0] product_uu;   // unsigned * unsigned
 
 assign product_ss = signed_a * signed_b;
-assign product_su = signed_a * operand_b;
 assign product_uu = operand_a * operand_b;
+
+// When you do 'su' multiply, the '*' operator treats both operands as unsigned instead.
+
+// To Fix, when the unsigned version of b is negative as a signed number, 
+// do 2's complement on unsigned b to change it to what it would be if positive, then store as signed value. 
+// If b is already positive as both signed or unsigned, just change it to signed immediately.
+
+assign fake_signed_b = (operand_b[WIDTH-1]) ? ( ~(operand_b) + 1'b1 ) :  signed_b; 
+assign product_su = signed_a * fake_signed_b;
 
 // Pre-compute common arithmetic results (In case of use of flags in future, result is stored as a 33-bit value first)
 logic [WIDTH:0] add_result, sub_result;
