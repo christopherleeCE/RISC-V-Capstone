@@ -9,6 +9,6 @@ if [[ "$1" == "-h" || "$1" == "-help" ]]; then
 fi
 
 # Chris's personal command string (assembly)
-riscv64-unknown-elf-as -march=rv32im chris_prog.s -o chris_prog.o
-riscv64-unknown-elf-objdump -d chris_prog.o | tee chris_prog.log
+riscv64-unknown-elf-as -march=rv32im program_asm.s -o program_asm.o
+riscv64-unknown-elf-objdump -d program_asm.o | tee program.log
 python3 ./load_instr_mem_file.py
