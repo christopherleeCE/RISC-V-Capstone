@@ -29,6 +29,8 @@ but golden doesnt, not sure which is complient with riscv, addionally mul instr'
 im not looking into them cus im tired but i assume it because of the li sign extension 
 disagreement previously stated
 
+TODO see if curren beq verification can be broken at (plz dont...)
+
 
 --------------TEST LOG----------------------------------------------------
 
@@ -43,7 +45,7 @@ I-TYPE: ADDI/NOP, LW, JALR
 S-TYPE: SW
 B-TYPE: BEQ
 J-TYPE: JAL
-U-TYPE: LUI
+U-TYPE:
 M-TYPE:
 
 UNSUCCESSFUL TESTS:
@@ -69,6 +71,12 @@ module top_riscv_cpu_v2_1();
     "s2",   "s3",   "s4",  "s5",  "s6",  "s7",  "s8",  "s9",  "s10", "s11",
     "t3",   "t4",   "t5",  "t6"
     };
+
+    typedef enum logic [2:0]{
+        FULL_WORD = 3'b100,
+        HALF_WORD = 3'b010,
+        BYTE      = 3'b001
+    }store_type_t;
 
     //dumb way to get around default output of verify_row task, TODO find better way to do this, maybe switch from task to func?
     static int def0 = 0;
@@ -379,7 +387,20 @@ module top_riscv_cpu_v2_1();
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end
+
+                end else if (func3 == 3'b110) begin //------ORI-------------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ORI.");
+                        //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] | imm_i, rd, rs1);
+                        write_reg(rd, REG_FILE[1][rs1] | imm_i);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                end else if (func3 == 3'b111) begin //-------ANDI---------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ANDI.");
+                        //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] & imm_i, rd, rs1);
+                        write_reg(rd, REG_FILE[1][rs1] & imm_i);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
                 end
+
 
 
             end else if (opcode == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
@@ -389,7 +410,8 @@ module top_riscv_cpu_v2_1();
 
                 if(func3 == 3'b010) begin //----LW------------------------------------
                     // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as LW.");
-                    write_reg(rd, DATA_MEM[1][(REG_FILE[1][rs1] + imm_i)>>2]);
+                    //write_reg(rd, DATA_MEM[1][(REG_FILE[1][rs1] + imm_i)>>2]); //old implementation
+                    write_reg(rd, read_data_mem(REG_FILE[1][rs1] + imm_i, FULL_WORD, .is_signed(0)));
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //first entry in the matrix
@@ -435,7 +457,8 @@ module top_riscv_cpu_v2_1();
 
                 if(func3 == 3'b010) begin //----SW-------------------------------------
                     // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as SW.");
-                    DATA_MEM[1][(REG_FILE[1][rs1] + imm_s)>>2] <= REG_FILE[1][rs2];
+                    //DATA_MEM[1][(REG_FILE[1][rs1] + imm_s)>>2] <= REG_FILE[1][rs2]; //old implementation
+                    write_data_mem(REG_FILE[1][rs2], (REG_FILE[1][rs1] + imm_s), FULL_WORD);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //first entry in the matrix
@@ -551,6 +574,27 @@ module top_riscv_cpu_v2_1();
             $display("FORWARDED");
         end
 
+        // $display("signed word: %h", read_data_mem(0, FULL_WORD, .is_signed(1)));
+        // $display("unsigned word: %h", read_data_mem(0, FULL_WORD, .is_signed(0)));
+        // $write("\n");
+        // $display("signed highhalfword: %h", read_data_mem(2, HALF_WORD, .is_signed(1)));
+        // $display("unsigned highhalfword: %h", read_data_mem(2, HALF_WORD, .is_signed(0)));
+        // $write("\n");
+        // $display("signed lowhalfword: %h", read_data_mem(0, HALF_WORD, .is_signed(1)));
+        // $display("unsigned lowhalfword: %h", read_data_mem(0, HALF_WORD, .is_signed(0)));
+        // $write("\n");
+        // $display("signed byte3: %h", read_data_mem(3, BYTE, .is_signed(1)));
+        // $display("unsigned byte3: %h", read_data_mem(3, BYTE, .is_signed(0)));
+        // $write("\n");
+        // $display("signed byte2: %h", read_data_mem(2, BYTE, .is_signed(1)));
+        // $display("unsigned byte2: %h", read_data_mem(2, BYTE, .is_signed(0)));
+        // $write("\n");
+        // $display("signed byte1: %h", read_data_mem(1, BYTE, .is_signed(1)));
+        // $display("unsigned byte1: %h", read_data_mem(1, BYTE, .is_signed(0)));
+        // $write("\n");
+        // $display("signed byte0: %h", read_data_mem(0, BYTE, .is_signed(1)));
+        // $display("unsigned byte0: %h", read_data_mem(0, BYTE, .is_signed(0)));
+
         $write("\n\n\n");
         $display("Negedge block output");
         $display("========================================================================================");
@@ -567,7 +611,7 @@ module top_riscv_cpu_v2_1();
 
 
         //def# is a werid way to get an output of a task, at this point its not even used
-        verify_row(0, def0);
+        //verify_row(0, def0);
         verify_row(1, def1);
         verify_row(2, def2);
         verify_row(3, def3);
@@ -605,6 +649,117 @@ module top_riscv_cpu_v2_1();
             REG_FILE[1][addr] <= word;
 
     endtask
+
+    localparam WORD_ADDR_BIT_WIDTH = 8;
+    task automatic write_data_mem(
+        input logic [31:0] data,
+        input logic [WORD_ADDR_BIT_WIDTH+1:0] byte_addr, //2 larger bw then the word address space
+        input store_type_t store_type
+    );
+
+        logic word_flag;
+        logic half_word_flag;
+        logic byte_flag;
+
+        logic [3:0] byte_en;
+        logic [31:0] aligned_data;
+        logic [WORD_ADDR_BIT_WIDTH-1:0] word_addr;
+
+        {word_flag, half_word_flag, byte_flag} = store_type;
+
+        if (word_flag && (byte_addr[1:0] != 2'b00)) 
+            $error("Misaligned SW at address %0d: This is an illegal instruction, not nessisarily a hardware issue.", byte_addr);
+        if (half_word_flag && byte_addr[0])
+            $error("Misaligned SH at address %0d: This is an illegal instruction, not nessisarily a hardware issue.", byte_addr);
+
+        word_addr = byte_addr >> 2;
+
+        unique case(1'b1)
+            word_flag:          byte_en = 4'b1111;
+
+            half_word_flag:     byte_en = byte_addr[1] ? 4'b1100 : //write to upper half of word
+                                                         4'b0011;  //write to lower half of word
+
+            byte_flag:          byte_en = byte_addr[1] ? (byte_addr[0] ? 4'b1000 : //write to uppermost byte
+                                                                        4'b0100) : //write to middle upper byte
+                                 /* byte_addr[1] = 0 */  (byte_addr[0] ? 4'b0010 : //write to middle lower byte
+                                                                        4'b0001);   //write to lowermost byte           
+        endcase
+
+        unique case(1'b1)
+            word_flag:          aligned_data = data;
+            half_word_flag:     aligned_data = data << (16 * byte_addr[1]); //shift lower 16 to upper 16 if writing to upper 16
+            byte_flag:          aligned_data = data << (8 * byte_addr[1:0]); //shiftt lower 8 bytes to corresponding byte_en
+        endcase
+
+        if (byte_en[0]) DATA_MEM[1][word_addr][7:0]   <= aligned_data[7:0];
+        if (byte_en[1]) DATA_MEM[1][word_addr][15:8]  <= aligned_data[15:8];
+        if (byte_en[2]) DATA_MEM[1][word_addr][23:16] <= aligned_data[23:16];
+        if (byte_en[3]) DATA_MEM[1][word_addr][31:24] <= aligned_data[31:24];    
+
+    endtask
+
+    function automatic logic[31:0] read_data_mem(
+        input logic [WORD_ADDR_BIT_WIDTH+1:0] byte_addr, //2 larger bw then the word address space
+        input store_type_t store_type,
+        input logic is_signed
+    );
+
+        logic word_flag;
+        logic half_word_flag;
+        logic byte_flag;
+
+        logic [3:0] byte_en;
+        logic [31:0] data;
+        logic [31:0] aligned_data;
+        logic [31:0] result;
+        logic [WORD_ADDR_BIT_WIDTH-1:0] word_addr;
+
+        {word_flag, half_word_flag, byte_flag} = store_type;
+
+        if (word_flag && (byte_addr[1:0] != 2'b00)) 
+            $error("Misaligned SW at address %0d: This is an illegal instruction, not nessisarily a hardware issue.", byte_addr);
+        if (half_word_flag && byte_addr[0])
+            $error("Misaligned SH at address %0d: This is an illegal instruction, not nessisarily a hardware issue.", byte_addr);
+
+        word_addr = byte_addr >> 2;
+
+        unique case(1'b1)
+            word_flag:          byte_en = 4'b1111;
+
+            half_word_flag:     byte_en = byte_addr[1] ? 4'b1100 : //read from upper half of word
+                                                         4'b0011;  //read from lower half of word
+
+            byte_flag:          byte_en = byte_addr[1] ? (byte_addr[0] ? 4'b1000 : //read from uppermost byte
+                                                                        4'b0100) : //read from middle upper byte
+                                 /* byte_addr[1] = 0 */  (byte_addr[0] ? 4'b0010 : //read from middle lower byte
+                                                                        4'b0001);   //read from lowermost byte           
+        endcase
+
+        data[7:0]   = byte_en[0] ? DATA_MEM[1][word_addr][7:0]   : 8'b0;
+        data[15:8]  = byte_en[1] ? DATA_MEM[1][word_addr][15:8]  : 8'b0;
+        data[23:16] = byte_en[2] ? DATA_MEM[1][word_addr][23:16] : 8'b0;
+        data[31:24] = byte_en[3] ? DATA_MEM[1][word_addr][31:24] : 8'b0;
+
+        unique case(1'b1)
+            word_flag:          aligned_data = data;
+            half_word_flag:     aligned_data = data >> (16 * byte_addr[1]); //shift upper 16 to lower 16 if we are reading from upper 16
+            byte_flag:          aligned_data = data >> (8 * byte_addr[1:0]); //shift byte we are reading from to lower byte
+        endcase
+
+        if(is_signed) begin
+            unique case(1'b1)
+                word_flag:          result = aligned_data;
+                half_word_flag:     result = {{16{aligned_data[15]}}, aligned_data[15:0]};
+                byte_flag:          result = {{24{aligned_data[7]}}, aligned_data[7:0]};
+            endcase
+        end else begin
+                result = aligned_data;
+        end
+
+        return result;
+
+    endfunction
 
     task dut_dump;
         begin
@@ -862,7 +1017,7 @@ module top_riscv_cpu_v2_1();
 
                 end
 
-                //Output - checks the output of rd after the writeback stage (row = 5)
+                //Output - compares the actual and expected value of rd after the writeback stage (row = 5)
                 if(row == 5) begin
 
                             assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
@@ -886,20 +1041,32 @@ module top_riscv_cpu_v2_1();
                         //else begin $display(" FAILURE"); local_instruction_failure = 1; end
 
                     end else begin
-                        
                         //$display("rd_v: ", rd_v);
                         //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                         /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ADDI:");
-                        if(row == 5) begin
 
+                        if(row == 5) begin                        
+                            
+                            //Output - compares the actual and predicted value of rd after the writeback stage
                             assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
                             else begin $display(" FAILURE"); local_instruction_failure = 1; end
 
                         end
                     end
 
-                    
+                end else if(func3_v == 3'b110) begin //-------ORI-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ORI:");
+            
+                end else if(func3_v == 3'b111) begin //-------ANDI-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ANDI:");
+
                 end
+
+
 
             end else if (opcode_v == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
                 {imm_i_v[11:0], rs1_v, func3_v, rd_v} = INSTR[row][31:7];

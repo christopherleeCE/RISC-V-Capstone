@@ -1,5 +1,5 @@
 
-chris_prog.o:     file format elf32-littleriscv
+program_asm.o:     file format elf32-littleriscv
 
 
 Disassembly of section .text:

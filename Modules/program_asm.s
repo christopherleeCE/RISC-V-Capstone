@@ -53,6 +53,16 @@
 # end:
 #         jal zero, end
 
+# start: #results in warning from vsim, not unique case statement
+
+#         li t0, 0xF3F2F1F0
+#         sw t0, 0(zero)
+#         li t0, 0x08070605
+#         sw t0, 0(zero)
+
+# end:
+#         jal zero, end
+
 start:
         addi a0, zero, 0x10
         addi a1, zero, 0x17

@@ -1,7 +1,7 @@
 import re
 
 # Input objdump file
-input_file = "chris_prog.log"
+input_file = "program.log"
 output_file = "instruction_memory.txt"
 
 # Regular expression to match the machine code hex
