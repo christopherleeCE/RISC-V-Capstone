@@ -18,21 +18,21 @@ module alu
 );
 
 // Consider adding these in the future
-// output logic overflow_flag, carryout_flag
+// output logic overflow_flag, carryout_flag, negative_flag
 
 // Signed operands for signed operations
 logic signed [WIDTH-1:0] signed_a, signed_b;
 assign signed_a = operand_a;
 assign signed_b = operand_b;
 
-// Define signed products
-logic signed [2*WIDTH-1:0] product_ss;   // signed * signed
-logic signed [2*WIDTH-1:0] product_su;   // signed * unsigned
-logic signed [2*WIDTH-1:0] product_uu;   // unsigned * unsigned
+// Define signed products (64 bit results)
+logic [2*WIDTH-1:0] product_ss;   // signed * signed
+logic [2*WIDTH-1:0] product_su;   // signed * unsigned
+logic [2*WIDTH-1:0] product_uu;   // unsigned * unsigned
 
-assign product_ss = {{32{operand_a[31]}}, operand_a} * {{32{operand_b[31]}}, operand_b};
-assign product_su = {{32{operand_a[31]}}, operand_a} * {{32{1'b0}}, operand_b};
-assign product_uu = {{32{1'b0}}, operand_a} * {{32{1'b0}}, operand_b};
+assign product_ss = signed_a * signed_b;
+assign product_su = signed_a * operand_b;
+assign product_uu = operand_a * operand_b;
 
 // Pre-compute common arithmetic results (In case of use of flags in future, result is stored as a 33-bit value first)
 logic [WIDTH:0] add_result, sub_result;
