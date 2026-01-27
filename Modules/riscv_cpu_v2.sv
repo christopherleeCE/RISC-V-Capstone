@@ -383,7 +383,7 @@ module riscv_cpu_v2
         .alu_sel_mul(alu_sel_mul_E),
         .alu_sel_mulh(alu_sel_mulh_E),
         .alu_sel_mulhsu(alu_sel_mulhsu_E),
-        .alu_sel_mulhu(alu_sel_mulh_E),
+        .alu_sel_mulhu(alu_sel_mulhu_E),
         .alu_sel_and(alu_sel_and_E),
         .alu_sel_or(alu_sel_or_E),
         .alu_sel_slt(alu_sel_slt_E),
