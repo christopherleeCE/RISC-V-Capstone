@@ -58,6 +58,10 @@ module riscv_cpu_v2
     logic [31:0] DATA_MEM_OUT_W;
 
     logic zero_flag;               //from alu, is the result zero?
+    logic negative_flag;           //from alu, is the result negative?
+    logic overflow_flag;           //from alu, did an overflow occur?
+    logic carryout_flag;           //from alu, was there a carryout?
+
     logic branch_taken;          //is a branch taken?
     logic jump_taken;            //is a jump taken?
     logic redirect_pc;           //should the PC be redirected?
@@ -346,7 +350,7 @@ module riscv_cpu_v2
 
     //Data Hazard Forwarding MUXes for RS1
     always_comb begin
-        unique case (1'b1)
+        priority case (1'b1)
 
         (R1_case_dm2alu && dbus_sel_alu_M) : RS1_DATA_E_FWD = ALU_M;         //Take from ALU_M if needed in EX stage and was gotten from ALU
         (R1_case_dm2alu && dbus_sel_data_mem_M)  : RS1_DATA_E_FWD = DATA_MEM_OUT;  //Take from DATA_MEM_OUT if needed in EX stage and was gotten from Data Memory
@@ -359,7 +363,7 @@ module riscv_cpu_v2
 
     //Data Hazard Forwarding MUXes for RS2
     always_comb begin
-        unique case (1'b1)
+        priority case (1'b1)
 
         (R2_case_dm2alu && dbus_sel_alu_M) : RS2_DATA_E_FWD = ALU_M;
         (R2_case_dm2alu && dbus_sel_data_mem_M)  : RS2_DATA_E_FWD = DATA_MEM_OUT; 
@@ -389,6 +393,9 @@ module riscv_cpu_v2
         .alu_sel_slt(alu_sel_slt_E),
         .alu_sel_sltu(alu_sel_sltu_E),
         .zero_flag(zero_flag),
+        .negative_flag(negative_flag),
+        .overflow_flag(overflow_flag),
+        .carryout_flag(carryout_flag),
         .result(ALU)
     );
 

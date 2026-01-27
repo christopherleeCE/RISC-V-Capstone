@@ -14,11 +14,11 @@ module alu
     input logic alu_sel_slt,
     input logic alu_sel_sltu,
     output logic zero_flag,
+    output logic negative_flag,
+    output logic overflow_flag,
+    output logic carryout_flag,
     output logic [WIDTH-1:0] result
 );
-
-// Consider adding these in the future
-// output logic overflow_flag, carryout_flag, negative_flag
 
 // Signed operands for signed operations
 logic signed [WIDTH-1:0] signed_a, signed_b, fake_signed_b;
@@ -42,7 +42,7 @@ assign product_uu = operand_a * operand_b;
 assign fake_signed_b = (operand_b[WIDTH-1]) ? ( ~(operand_b) + 1'b1 ) :  signed_b; 
 assign product_su = signed_a * fake_signed_b;
 
-// Pre-compute common arithmetic results (In case of use of flags in future, result is stored as a 33-bit value first)
+// Pre-compute common arithmetic results (Due to use of flags, result is stored as a 33-bit value first)
 logic [WIDTH:0] add_result, sub_result;
 assign add_result = operand_a + operand_b;
 assign sub_result = operand_a - operand_b;
@@ -70,5 +70,11 @@ end
 
 // Flag assignments
 assign zero_flag = ( result == '0 );
+assign negative_flag = result[WIDTH-1];
+assign overflow_flag = ( alu_sel_add && ( operand_a[WIDTH-1] == operand_b[WIDTH-1] ) && ( result[WIDTH-1] != operand_a[WIDTH-1] )  )  
+                        || 
+                        ( alu_sel_sub && ( operand_a[WIDTH-1] != operand_b[WIDTH-1] ) && ( result[WIDTH-1] != operand_a[WIDTH-1] )   );
+assign carryout_flag = ( alu_sel_add && ( add_result[WIDTH] ) ) ||
+                       ( alu_sel_sub && ( sub_result[WIDTH] ) );
 
 endmodule
