@@ -42,11 +42,12 @@ I-TYPE: ADDI/NOP, LW, JALR
 S-TYPE: SW
 B-TYPE: BEQ
 J-TYPE: JAL
-U-TYPE: LUI
+U-TYPE:
 M-TYPE:
 
 UNSUCCESSFUL TESTS:
 MUL, MULH, MULHSU, MULHU  (LOOK AT TB in chris_prog)
+LUI (I'm not 100% sure about this one)
 
 
 */
@@ -384,7 +385,20 @@ module top_riscv_cpu_v2_1();
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end
+
+                end else if (func3 == 3'b110) begin //------ORI-------------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ORI.");
+                        //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] | imm_i, rd, rs1);
+                        write_reg(rd, REG_FILE[1][rs1] | imm_i);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                end else if (func3 == 3'b111) begin //-------ANDI---------------------------------
+                        // /* DO NOT REMOVE : DEBUG GOLD */ $display("\tIdentified as ANDI.");
+                        //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] & imm_i, rd, rs1);
+                        write_reg(rd, REG_FILE[1][rs1] & imm_i);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
                 end
+
 
 
             end else if (opcode == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
@@ -1001,7 +1015,7 @@ module top_riscv_cpu_v2_1();
 
                 end
 
-                //Output - checks the output of rd after the writeback stage (row = 5)
+                //Output - compares the actual and expected value of rd after the writeback stage (row = 5)
                 if(row == 5) begin
 
                             assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
@@ -1025,20 +1039,31 @@ module top_riscv_cpu_v2_1();
                         //else begin $display(" FAILURE"); local_instruction_failure = 1; end
 
                     end else begin
-                        
                         //$display("rd_v: ", rd_v);
                         //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                         /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ADDI:");
-                        if(row == 5) begin
 
-                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); local_instruction_failure = 1; end
-
-                        end
                     end
 
-                    
+                end else if(func3_v == 3'b110) begin //-------ORI-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ORI:");
+            
+                end else if(func3_v == 3'b111) begin //-------ANDI-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    /* DO NOT REMOVE : DEBUG VERIFY */ $write("\tIdentified as ANDI:");
+
                 end
+
+                //Output - compares the actual and predicted value of rd after the writeback stage
+                if(row == 5) begin
+                    assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                    else begin $display(" FAILURE"); local_instruction_failure = 1; end
+
+                end
+
 
             end else if (opcode_v == 7'b0000011) begin //----I-TYPE (LOADS) ----------------------------------
                 {imm_i_v[11:0], rs1_v, func3_v, rd_v} = INSTR[row][31:7];
