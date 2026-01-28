@@ -39,21 +39,20 @@ TODO make sure datamem access is using the abstracted
 --------------TEST LOG----------------------------------------------------
 
 WAITING LIST: ...
-R-TYPE: AND, OR, SLT, SLTU
-I-TYPE: ANDI, ORI
+R-TYPE: SLT, SLTU
+I-TYPE:
 M-TYPE: MUL, MULH, MULHSU, MULHU
 
 SUCCESSFUL TESTS:
-R-TYPE: ADD, SUB
-I-TYPE: ADDI/NOP, LW, JALR
+R-TYPE: ADD, SUB, AND, OR
+I-TYPE: ADDI/NOP, ANDI, ORI, LW, JALR
 S-TYPE: SW
 B-TYPE: BEQ
 J-TYPE: JAL
-U-TYPE:
+U-TYPE: LUI
 M-TYPE:
 
 UNSUCCESSFUL TESTS:
-LUI
 
 
 */
@@ -1084,11 +1083,23 @@ module top_riscv_cpu_v2_1();
                     //$display("rd_v: ", rd_v);
                     //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                     if(show_negedge_verify_row) $write("\tIdentified as ORI:");
+                    if(row == 5) begin                          
+                        //Output - compares the actual and predicted value of rd after the writeback stage
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
             
                 end else if(func3_v == 3'b111) begin //-------ANDI-------------------------------
                     //$display("rd_v: ", rd_v);
                     //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                     if(show_negedge_verify_row) $write("\tIdentified as ANDI:");
+                    if(row == 5) begin                          
+                        //Output - compares the actual and predicted value of rd after the writeback stage
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
 
                 end
 
