@@ -30,8 +30,8 @@ TODO time arg in ps script
 --------------TEST LOG----------------------------------------------------
 
 WAITING LIST: ...
-R-TYPE: SLT, SLTU
-I-TYPE:
+R-TYPE: SLT, SLTU, XOR
+I-TYPE: XORI
 M-TYPE: MUL, MULH, MULHSU, MULHU
 
 SUCCESSFUL TESTS:
