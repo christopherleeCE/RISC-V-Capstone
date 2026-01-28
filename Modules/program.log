@@ -5,48 +5,89 @@ program_asm.o:     file format elf32-littleriscv
 Disassembly of section .text:
 
 00000000 <start>:
-   0:	01000513          	li	a0,16
-   4:	01700593          	li	a1,23
-   8:	00b50633          	add	a2,a0,a1
-   c:	0000f6b7          	lui	a3,0xf
-  10:	40a58733          	sub	a4,a1,a0
-  14:	004000ef          	jal	ra,18 <start+0x18>
-  18:	03028293          	addi	t0,t0,48
-  1c:	03430313          	addi	t1,t1,52
-  20:	03838393          	addi	t2,t2,56
-  24:	010000ef          	jal	ra,34 <label+0x4>
-  28:	03c00793          	li	a5,60
-  2c:	04000793          	li	a5,64
+   0:	00000293          	li	t0,0
+   4:	00f00313          	li	t1,15
+   8:	0100006f          	j	18 <label>
+   c:	00000013          	nop
+  10:	00000013          	nop
+  14:	00000013          	nop
 
-00000030 <label>:
-  30:	04400793          	li	a5,68
-  34:	00c02623          	sw	a2,12(zero) # c <start+0xc>
-  38:	00c02803          	lw	a6,12(zero) # c <start+0xc>
-  3c:	04000893          	li	a7,64
-  40:	00000013          	nop
-  44:	02028463          	beqz	t0,6c <beq_label>
-  48:	00a02023          	sw	a0,0(zero) # 0 <start>
-  4c:	00b02223          	sw	a1,4(zero) # 4 <start+0x4>
-  50:	00c02423          	sw	a2,8(zero) # 8 <start+0x8>
-  54:	00d02623          	sw	a3,12(zero) # c <start+0xc>
-  58:	00078a63          	beqz	a5,6c <beq_label>
-  5c:	00002c03          	lw	s8,0(zero) # 0 <start>
-  60:	00402c83          	lw	s9,4(zero) # 4 <start+0x4>
-  64:	00802d03          	lw	s10,8(zero) # 8 <start+0x8>
-  68:	01002d83          	lw	s11,16(zero) # 10 <start+0x10>
+00000018 <label>:
+  18:	00000013          	nop
+  1c:	00000013          	nop
+  20:	00000013          	nop
+  24:	06628263          	beq	t0,t1,88 <end>
 
-0000006c <beq_label>:
-  6c:	00002d83          	lw	s11,0(zero) # 0 <start>
-  70:	00402d03          	lw	s10,4(zero) # 4 <start+0x4>
-  74:	00802c83          	lw	s9,8(zero) # 8 <start+0x8>
-  78:	00c02c03          	lw	s8,12(zero) # c <start+0xc>
-  7c:	00e02823          	sw	a4,16(zero) # 10 <start+0x10>
-  80:	00f02a23          	sw	a5,20(zero) # 14 <start+0x14>
-  84:	01002c23          	sw	a6,24(zero) # 18 <start+0x18>
-  88:	01102e23          	sw	a7,28(zero) # 1c <start+0x1c>
+00000028 <label_0>:
+  28:	06628063          	beq	t0,t1,88 <end>
 
-0000008c <end>:
-  8c:	000000ef          	jal	ra,8c <end>
+0000002c <label_1>:
+  2c:	00630263          	beq	t1,t1,30 <label_2>
+
+00000030 <label_2>:
+  30:	04628c63          	beq	t0,t1,88 <end>
+
+00000034 <label_3>:
+  34:	04628a63          	beq	t0,t1,88 <end>
+
+00000038 <label_4>:
+  38:	04628863          	beq	t0,t1,88 <end>
+
+0000003c <label_5>:
+  3c:	04628663          	beq	t0,t1,88 <end>
+
+00000040 <label_6>:
+  40:	00628c63          	beq	t0,t1,58 <label_12>
+
+00000044 <label_7>:
+  44:	00628c63          	beq	t0,t1,5c <label_13>
+
+00000048 <label_8>:
+  48:	00628c63          	beq	t0,t1,60 <label_14>
+
+0000004c <label_9>:
+  4c:	00628c63          	beq	t0,t1,64 <label_15>
+
+00000050 <label_10>:
+  50:	00628c63          	beq	t0,t1,68 <label_16>
+
+00000054 <label_11>:
+  54:	00628c63          	beq	t0,t1,6c <label_17>
+
+00000058 <label_12>:
+  58:	00628c63          	beq	t0,t1,70 <label_18>
+
+0000005c <label_13>:
+  5c:	00628c63          	beq	t0,t1,74 <label_19>
+
+00000060 <label_14>:
+  60:	00628c63          	beq	t0,t1,78 <label_20>
+
+00000064 <label_15>:
+  64:	00628263          	beq	t0,t1,68 <label_16>
+
+00000068 <label_16>:
+  68:	00628263          	beq	t0,t1,6c <label_17>
+
+0000006c <label_17>:
+  6c:	00628263          	beq	t0,t1,70 <label_18>
+
+00000070 <label_18>:
+  70:	00628263          	beq	t0,t1,74 <label_19>
+
+00000074 <label_19>:
+  74:	00628263          	beq	t0,t1,78 <label_20>
+
+00000078 <label_20>:
+  78:	00628863          	beq	t0,t1,88 <end>
+  7c:	00000013          	nop
+  80:	00000013          	nop
+  84:	00000013          	nop
+
+00000088 <end>:
+  88:	00000013          	nop
+  8c:	00000013          	nop
   90:	00000013          	nop
-  94:	00000013          	nop
-  98:	00000013          	nop
+
+00000094 <loop>:
+  94:	0000006f          	j	94 <loop>

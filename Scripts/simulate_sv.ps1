@@ -7,7 +7,8 @@ param(
     [switch]$golden_history,
     [switch]$verify_output,
     [switch]$no_verify,
-    [switch]$continue
+    [switch]$continue,
+    [switch]$verbose
 )
 
 $vsimArgs = ""
@@ -22,15 +23,17 @@ if ($Help) {
     -verify_output:     shows debug info of verify_row()'s
     -no_verify:         disable verification, script will verify if this argument is NOT given
     -continue:          continue simulation even on instruction failure
+    -verbose:           enables -golden_calc -dut_dump -golden_history -verify_output -continue
     "
     exit 0
 }
 
-if ($golden_calc)      { $vsimArgs += " +GOLDEN_CALC" }
-if ($dut_dump)         { $vsimArgs += " +DUT_DUMP" }
-if ($golden_history)   { $vsimArgs += " +GOLDEN_HISTORY" }
-if ($verify_output)    { $vsimArgs += " +VERIFY_OUTPUT"}
-if ($no_verify)        { $vsimArgs += " +NO_VERIFY" }
-if ($continue)         { $vsimArgs += " +CONTINUE" }
+if ($golden_calc)       { $vsimArgs += " +GOLDEN_CALC" }
+if ($dut_dump)          { $vsimArgs += " +DUT_DUMP" }
+if ($golden_history)    { $vsimArgs += " +GOLDEN_HISTORY" }
+if ($verify_output)     { $vsimArgs += " +VERIFY_OUTPUT"}
+if ($no_verify)         { $vsimArgs += " +NO_VERIFY" }
+if ($continue)          { $vsimArgs += " +CONTINUE" }
+if ($verbose)           { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 
-vsim -c -do "file delete -force sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs; run 5us; quit -f"
+vsim -c -do "file delete -force sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs; run 2us; quit -f"

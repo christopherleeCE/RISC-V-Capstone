@@ -19,22 +19,13 @@ cause according to chat, if there is an x in the structure, even in
 reggold[1] for example the assertion fails, so you need to do a for loop,
 and doing that is prob easier to do in a task/func but ill do that l8r
 
-TODO build proper halding of local_instruction_failure,
-where it gets passed into the instruction failure.
-as of right now they more or less get ignored,
-the error reporting rn is done by the else of the assert
-
-TODO PRIORITY: mul_test isn chris_prog.s is a failure,dut preforms sign extension,
-but golden doesnt, not sure which is complient with riscv, addionally mul instr's also fail,
-im not looking into them cus im tired but i assume it because of the li sign extension 
-disagreement previously stated
-
 TODO see if curren beq verification can be broken at (plz dont...)
 
 TODO check if fowrding and flush debug @ posedge are still correct
 
-TODO make sure datamem access is using the abstracted
+TODO mul failure
 
+TODO time arg in ps script
 
 --------------TEST LOG----------------------------------------------------
 
@@ -1058,10 +1049,11 @@ module top_riscv_cpu_v2_1();
 
                 if(func3_v == 3'b000) begin //-------ADDI-------------------------------
                     if(imm_i_v == 32'd0 & rs1_v == 5'd0 & rd_v == 5'd0) begin
-                        if(show_negedge_verify_row) $display("\tIdentified as NOP.");
+                        if(show_negedge_verify_row) $write("\tIdentified as NOP:");
                         //TODO, do a reg by reg and data by data comparasion for validation here,
                         //once that task has been built as seen at ~line 1
 
+                        if(row == 5) $display(" Success");
                         //assert() $display(" Success");
                         //else begin $display(" FAILURE"); return 1; end
 

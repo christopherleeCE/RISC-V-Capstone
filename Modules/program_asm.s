@@ -1,57 +1,81 @@
 # chris's test program ##
 
-        # li t0, 0xFF
-        # sw t0, 0(zero)
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
-        # nop
+##breaks top file
 
-        # addi a0, zero, 0x1
-        # addi a0, zero, 0x2
-        # addi a0, zero, 0x3
-        # addi a0, zero, 0x4
-        # addi a0, zero, 0x5
-        # addi a0, zero, 0x6
-        # addi a0, zero, 0x7
-        # addi a0, zero, 0x8
-        # addi a0, zero, 0x9
-        # addi a0, zero, 0xA
-        # #nop
+# if there is 1 or 2 nobranches b4 a branch (or jump i belive) those no branches fail the verification
+# one more thing to investigate is if there a difference between the branch/jump scenario, appears as both do the same
+# if jmp is changed to start instead of end, same errors, just repeat cus its an inf loop
 
 
-# start:
-#         addi a0, zero, 0
-#         addi a1, zero, 4
-#         addi a2, zero, 8
-#         addi a3, zero, 12
-#         jal zero, label
-#         sub a0, a0, zero
-#         sub a1, a1, zero
-#         sub a2, a2, zero
-#         sub a3, a3, zero
-# label:
-#         addi a4, a4, 16
-#         nop
-#         nop
-#         nop
-#         nop
-#         nop
-# end:
-#         jal zero, end
+start:
+        li t0, 0x0
+        li t1, 0xF
+        jal zero, label
+        nop
+        nop
+        nop
+        label:
+        nop
+        nop
+        nop
+
+
+        beq t0, t1, end
+label_0:        
+        beq t0, t1, end
+label_1:        
+        beq t1, t1, start
+        #jal zero, end
+label_2:        
+        beq t0, t1, end
+label_3:        
+        beq t0, t1, end
+label_4:        
+        beq t0, t1, end
+label_5:        
+        beq t0, t1, end
+label_6:        
+        beq t0, t1, label_12
+label_7:        
+        beq t0, t1, label_13
+label_8:        
+        beq t0, t1, label_14
+label_9:        
+        beq t0, t1, label_15
+label_10:        
+        beq t0, t1, label_16
+label_11:        
+        beq t0, t1, label_17
+label_12:        
+        beq t0, t1, label_18
+label_13:        
+        beq t0, t1, label_19
+label_14:        
+        beq t0, t1, label_20
+label_15:        
+        beq t0, t1, label_16
+label_16:        
+        beq t0, t1, label_17
+label_17:        
+        beq t0, t1, label_18
+label_18:        
+        beq t0, t1, label_19
+label_19:        
+        beq t0, t1, label_20
+label_20:        
+        #jal zero, end_after_end
+        beq t0, t1, end
+        nop
+        nop
+        nop
+end:
+        nop
+        nop
+        nop
+loop:
+        jal zero, loop
+
+
 
 # start: #results in warning from vsim, not unique case statement
 
@@ -63,55 +87,55 @@
 # end:
 #         jal zero, end
 
-start:
-        addi a0, zero, 0x10
-        addi a1, zero, 0x17
-        add a2, a0, a1
-        lui a3, 0xF
-        sub a4, a1, a0
-        jal ra, . + 4
-        addi t0, t0, 0x30
-        addi t1, t1, 0x34
-        addi t2, t2, 0x38
-        jal ra, label + 4
-        addi a5, zero, 0x3C
-        addi a5, zero, 0x40
-label:
-        addi a5, zero, 0x44
-        sw a2, 0xC(zero)
-        lw a6, 0xC(zero)
-        addi a7, zero, 0x40
-        #jalr ra, a7, 0x8
-        # nop
-        # beq a5, zero, beq_label
-        # nop
-        # beq a5, a6, beq_label
-        # nop
-        nop
-        beq t0, zero, beq_label #desync here
-        sw a0, 0(zero)
-        sw a1, 4(zero)
-        sw a2, 8(zero)
-        sw a3, 12(zero)
-        beq a5, zero, beq_label
-        lw s8, 0(zero)
-        lw s9, 4(zero)
-        lw s10, 8(zero)
-        lw s11, 16(zero)
-beq_label:
-        lw s11, 0(zero)
-        lw s10, 4(zero)
-        lw s9, 8(zero)
-        lw s8, 12(zero)
-        sw a4, 16(zero)
-        sw a5, 20(zero)
-        sw a6, 24(zero)
-        sw a7, 28(zero)
-end:
-        jal ra, end
-        nop
-        nop
-        nop
+# start:
+#         addi a0, zero, 0x10
+#         addi a1, zero, 0x17
+#         add a2, a0, a1
+#         lui a3, 0xF
+#         sub a4, a1, a0
+#         jal ra, . + 4
+#         addi t0, t0, 0x30
+#         addi t1, t1, 0x34
+#         addi t2, t2, 0x38
+#         jal ra, label + 4
+#         addi a5, zero, 0x3C
+#         addi a5, zero, 0x40
+# label:
+#         addi a5, zero, 0x44
+#         sw a2, 0xC(zero)
+#         lw a6, 0xC(zero)
+#         addi a7, zero, 0x40
+#         #jalr ra, a7, 0x8
+#         # nop
+#         # beq a5, zero, beq_label
+#         # nop
+#         # beq a5, a6, beq_label
+#         # nop
+#         nop
+#         beq t0, zero, beq_label #desync here
+#         sw a0, 0(zero)
+#         sw a1, 4(zero)
+#         sw a2, 8(zero)
+#         sw a3, 12(zero)
+#         beq a5, zero, beq_label
+#         lw s8, 0(zero)
+#         lw s9, 4(zero)
+#         lw s10, 8(zero)
+#         lw s11, 16(zero)
+# beq_label:
+#         lw s11, 0(zero)
+#         lw s10, 4(zero)
+#         lw s9, 8(zero)
+#         lw s8, 12(zero)
+#         sw a4, 16(zero)
+#         sw a5, 20(zero)
+#         sw a6, 24(zero)
+#         sw a7, 28(zero)
+# end:
+#         jal ra, end
+#         nop
+#         nop
+#         nop
 
 
         # nop #DNR
@@ -120,7 +144,7 @@ end:
         # nop #DNR0
 
 
-##mul test from chat ##
+# #mul test from chat ##
 #         .section .text
 #         .globl _start
 # _start:
@@ -154,35 +178,6 @@ end:
 # end:
         # jal     zero, end
 
-
-# start:
-#         addi a0, zero, 16
-#         addi a1, zero, 32
-        
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         jal ra, label0
-# label0:
-#         addi a2, zero, 72
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
-#         addi a0, zero, 100
 
 
 
