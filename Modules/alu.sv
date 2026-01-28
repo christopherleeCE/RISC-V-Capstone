@@ -11,6 +11,7 @@ module alu
     input logic alu_sel_mulhu,
     input logic alu_sel_and,
     input logic alu_sel_or,
+    input logic alu_sel_xor,
     input logic alu_sel_slt,
     input logic alu_sel_sltu,
     output logic zero_flag,
@@ -59,6 +60,7 @@ always_comb begin
     alu_sel_mulhu : result = product_uu[2*WIDTH-1:WIDTH];  // MULHU
     alu_sel_and : result = operand_a & operand_b; // AND
     alu_sel_or : result = operand_a | operand_b; // OR
+    alu_sel_xor : result = operand_a ^ operand_b; // XOR
     alu_sel_slt : result = {31'b0,slt_result}; // SLT
     alu_sel_sltu : result = {31'b0,sltu_result}; // SLTU
     default : result = '0;

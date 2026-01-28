@@ -67,9 +67,9 @@ module riscv_cpu_v2
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
 
     logic [142:0] d2e_data_D;          //decode to execute data signals
-    logic [18:0] d2e_control_D;       //decode to execute control signals
+    logic [19:0] d2e_control_D;       //decode to execute control signals
     logic [142:0] d2e_data_E;       //decode to execute post pipeline
-    logic [18:0] d2e_control_E;    //decode to execute control signals post pipeline
+    logic [19:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [100:0] e2m_data_E;          //execute to memory data signals
     logic [5:0] e2m_control_E;       //execute to memory control signals
@@ -93,6 +93,7 @@ module riscv_cpu_v2
     logic alu_sel_mulhu_E;
     logic alu_sel_and_E;
     logic alu_sel_or_E;
+    logic alu_sel_xor_E;
     logic alu_sel_slt_E;
     logic alu_sel_sltu_E;
     logic branch_en_E;
@@ -284,6 +285,7 @@ module riscv_cpu_v2
         alu_sel_mulhu,
         alu_sel_and,
         alu_sel_or,
+        alu_sel_xor,
         alu_sel_slt,
         alu_sel_sltu,
         branch_en,
@@ -309,7 +311,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(19)
+        .WIDTH(20)
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
@@ -333,6 +335,7 @@ module riscv_cpu_v2
         alu_sel_mulhu_E,
         alu_sel_and_E,
         alu_sel_or_E,
+        alu_sel_xor_E,
         alu_sel_slt_E,
         alu_sel_sltu_E,
         branch_en_E,
@@ -387,6 +390,7 @@ module riscv_cpu_v2
         .alu_sel_mulhu(alu_sel_mulhu_E),
         .alu_sel_and(alu_sel_and_E),
         .alu_sel_or(alu_sel_or_E),
+        .alu_sel_xor(alu_sel_xor_E),
         .alu_sel_slt(alu_sel_slt_E),
         .alu_sel_sltu(alu_sel_sltu_E),
         .zero_flag(zero_flag),
