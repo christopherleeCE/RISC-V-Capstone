@@ -8,10 +8,12 @@ param(
     [switch]$verify_output,
     [switch]$no_verify,
     [switch]$continue,
-    [switch]$verbose
+    [switch]$verbose,
+    [int]$time = 2
 )
 
 $vsimArgs = ""
+$runTime = $time
 
 if ($Help) {
     # You can put your usage message here
@@ -24,6 +26,7 @@ if ($Help) {
     -no_verify:         disable verification, script will verify if this argument is NOT given
     -continue:          continue simulation even on instruction failure
     -verbose:           enables -golden_calc -dut_dump -golden_history -verify_output -continue
+    -time <INTEGER>     sets the runtime of the questia simulation to be <INTEGER> micro seconds, default is 2us
     "
     exit 0
 }
@@ -36,4 +39,4 @@ if ($no_verify)         { $vsimArgs += " +NO_VERIFY" }
 if ($continue)          { $vsimArgs += " +CONTINUE" }
 if ($verbose)           { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 
-vsim -c -do "file delete -force sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs; run 2us; quit -f"
+vsim -c -do "file delete -force sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs; run ${time}us; quit -f"
