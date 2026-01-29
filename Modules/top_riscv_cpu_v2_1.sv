@@ -371,25 +371,29 @@ module top_riscv_cpu_v2_1();
                 end else if (func7 == 7'b0000001) begin
                     if (func3 == 3'b000) begin //----MUL------------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as MUL.");
-                        product = $signed(REG_FILE[1][rs1]) * $signed(REG_FILE[1][rs2]);
+                        product = $signed({ {32{REG_FILE[1][rs1][31]}}, REG_FILE[1][rs1] }) *
+                                $signed({ {32{REG_FILE[1][rs2][31]}}, REG_FILE[1][rs2] });
                         write_reg(rd, product[31:0]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b001) begin //----MULH------------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as MULH.");
-                        product = $signed(REG_FILE[1][rs1]) * $signed(REG_FILE[1][rs2]);
+                        product = $signed({ {32{REG_FILE[1][rs1][31]}}, REG_FILE[1][rs1] }) *
+                                $signed({ {32{REG_FILE[1][rs2][31]}}, REG_FILE[1][rs2] });
                         write_reg(rd, product[63:32]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b010) begin //----MULHSU------------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as MULHSU.");
-                        product = $signed(REG_FILE[1][rs1]) * $unsigned(REG_FILE[1][rs2]);
+                        product = $signed({ {32{REG_FILE[1][rs1][31]}}, REG_FILE[1][rs1] }) *
+                                $unsigned(  REG_FILE[1][rs2]  ); //HERE
                         write_reg(rd, product[63:32]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b011) begin //----MULHU------------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as MULHU.");
-                        product = $unsigned(REG_FILE[1][rs1]) * $unsigned(REG_FILE[1][rs2]);
+                        product = $unsigned({ 32'b0, REG_FILE[1][rs1] }) *
+                                $unsigned({ 32'b0, REG_FILE[1][rs2] });
                         write_reg(rd, product[63:32]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 

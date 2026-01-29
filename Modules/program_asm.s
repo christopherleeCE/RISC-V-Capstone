@@ -7,73 +7,73 @@
 # if jmp is changed to start instead of end, same errors, just repeat cus its an inf loop
 
 
-start:
-        li t0, 0x0
-        li t1, 0xF
-        jal zero, label
-        nop
-        nop
-        nop
-        label:
-        nop
-        nop
-        nop
+# start:
+#         li t0, 0x0
+#         li t1, 0xF
+#         jal zero, label
+#         nop
+#         nop
+#         nop
+#         label:
+#         nop
+#         nop
+#         nop
 
 
-        beq t0, t1, end
-label_0:        
-        beq t0, t1, end
-label_1:        
-        beq t1, t1, start
-        #jal zero, end
-label_2:        
-        beq t0, t1, end
-label_3:        
-        beq t0, t1, end
-label_4:        
-        beq t0, t1, end
-label_5:        
-        beq t0, t1, end
-label_6:        
-        beq t0, t1, label_12
-label_7:        
-        beq t0, t1, label_13
-label_8:        
-        beq t0, t1, label_14
-label_9:        
-        beq t0, t1, label_15
-label_10:        
-        beq t0, t1, label_16
-label_11:        
-        beq t0, t1, label_17
-label_12:        
-        beq t0, t1, label_18
-label_13:        
-        beq t0, t1, label_19
-label_14:        
-        beq t0, t1, label_20
-label_15:        
-        beq t0, t1, label_16
-label_16:        
-        beq t0, t1, label_17
-label_17:        
-        beq t0, t1, label_18
-label_18:        
-        beq t0, t1, label_19
-label_19:        
-        beq t0, t1, label_20
-label_20:        
-        #jal zero, end_after_end
-        beq t0, t1, end
-        nop
-        nop
-        nop
-end:
-        nop
-        nop
-        nop
-loop:
-        jal zero, loop
+#         beq t0, t1, end
+# label_0:        
+#         beq t0, t1, end
+# label_1:        
+#         beq t1, t1, start
+#         #jal zero, end
+# label_2:        
+#         beq t0, t1, end
+# label_3:        
+#         beq t0, t1, end
+# label_4:        
+#         beq t0, t1, end
+# label_5:        
+#         beq t0, t1, end
+# label_6:        
+#         beq t0, t1, label_12
+# label_7:        
+#         beq t0, t1, label_13
+# label_8:        
+#         beq t0, t1, label_14
+# label_9:        
+#         beq t0, t1, label_15
+# label_10:        
+#         beq t0, t1, label_16
+# label_11:        
+#         beq t0, t1, label_17
+# label_12:        
+#         beq t0, t1, label_18
+# label_13:        
+#         beq t0, t1, label_19
+# label_14:        
+#         beq t0, t1, label_20
+# label_15:        
+#         beq t0, t1, label_16
+# label_16:        
+#         beq t0, t1, label_17
+# label_17:        
+#         beq t0, t1, label_18
+# label_18:        
+#         beq t0, t1, label_19
+# label_19:        
+#         beq t0, t1, label_20
+# label_20:        
+#         #jal zero, end_after_end
+#         beq t0, t1, end
+#         nop
+#         nop
+#         nop
+# end:
+#         nop
+#         nop
+#         nop
+# loop:
+#         jal zero, loop
 
 
 
@@ -144,12 +144,8 @@ loop:
         # nop #DNR0
 
 
-# #mul test from chat ##
-#         .section .text
-#         .globl _start
-# _start:
+# start:
 
-#         # Test values
 #         li      t0, 0x010      # 16 decimal
 #         li      t1, 0x003      # 3 decimal
 #         li      t2, -4               # signed negative
@@ -158,27 +154,42 @@ loop:
 #         lui     t3, 0xFFFFF
 
 #         # -----------------------
-#         # MUL: signed * signed -> lower 32 bits
-#         mul     a0, t0, t1          # 16 * 3 = 48
-#         # Expected a0 = 48
+#         mul     a0, t0, t1          #0x30
+#         mulh    a1, t2, t1          #0xFFFFFFFF
+#         mulhsu  a2, t2, t3          #0xFFFFF000
+#         mulhu   a3, t0, t3          #0xF
 
-#         # MULH: signed * signed -> upper 32 bits
-#         mulh    a1, t2, t1          # -4 * 3 = -12 -> upper 32 bits
-#         # Expected a1 = 0xFFFFFFFF (high 32 of -12)
-
-#         # MULHSU: signed * unsigned -> upper 32 bits
-#         mulhsu  a2, t2, t3          # -4 * 0xFFFFFFFE
-#         # Expected a2 = 0xFFFFFFFF (high 32)
-
-#         # MULHU: unsigned * unsigned -> upper 32 bits
-#         mulhu   a3, t0, t3          # 16 * 0xFFFFFFFE
-#         # Expected a3 = 0x0000000F (high 32)
-
-#         # End (infinite loop)
 # end:
-        # jal     zero, end
+#         jal     zero, end
 
+_start:
 
+        # Test values
+        li      t0, 0x010      # 16 decimal
+        li      t1, 0x003      # 3 decimal
+        li      t2, -4               # signed negative
+        li      t3, -2         # unsigned 0xFFFFFFFE
+
+        # -----------------------
+        # MUL: signed * signed -> lower 32 bits
+        mul     a0, t0, t1          # 16 * 3 = 48
+        # Expected a0 = 48
+
+        # MULH: signed * signed -> upper 32 bits
+        mulh    a1, t2, t1          # -4 * 3 = -12 -> upper 32 bits
+        # Expected a1 = 0xFFFFFFFF (high 32 of -12)
+
+        # MULHSU: signed * unsigned -> upper 32 bits
+        mulhsu  a2, t2, t3          # -4 * 0xFFFFFFFE
+        # Expected a2 = 0xFFFFFFFF (high 32)
+
+        # MULHU: unsigned * unsigned -> upper 32 bits
+        mulhu   a3, t0, t3          # 16 * 0xFFFFFFFE
+        # Expected a3 = 0x0000000F (high 32)
+
+        # End (infinite loop)
+end:
+        jal     zero, end
 
 
 # #Test for AND, OR, ANDI, and ORI - Edgar G.
