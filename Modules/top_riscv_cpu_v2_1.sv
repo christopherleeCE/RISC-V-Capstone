@@ -218,8 +218,22 @@ module top_riscv_cpu_v2_1();
         assign INSTR_FLUSH = INSTR_ASYNC;
         assign opcode = INSTR_FLUSH[6:0];
 
-        if(cpu_dut.R1_case_rf2rf || cpu_dut.R2_case_rf2rf) begin
-            if(show_posedge_golden_calc) $display("FORWARDED");
+        if(
+        cpu_dut.R1_case_dm2alu ||
+        cpu_dut.R1_case_rf2alu ||
+        cpu_dut.R2_case_dm2alu ||
+        cpu_dut.R2_case_rf2alu
+        ) begin
+            if(show_posedge_golden_calc) begin
+                $display("\nFORWARDED");
+                $display(
+                "\tR1_case_dm2alu: %1b\n\tR1_case_rf2alu: %1b\n\tR2_case_dm2alu: %1b\n\tR2_case_rf2alu: %1b",
+                cpu_dut.R1_case_dm2alu,
+                cpu_dut.R1_case_rf2alu,
+                cpu_dut.R2_case_dm2alu,
+                cpu_dut.R2_case_rf2alu
+                );
+            end
         end
 
         if (!rst) begin

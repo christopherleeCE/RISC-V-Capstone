@@ -13,7 +13,6 @@ param(
 )
 
 $vsimArgs = ""
-$runTime = $time
 
 if ($Help) {
     # You can put your usage message here
