@@ -227,11 +227,13 @@ module top_riscv_cpu_v2_1();
             if(show_posedge_golden_calc) begin
                 $display("\nFORWARDED");
                 $display(
-                "\tR1_case_dm2alu: %1b\n\tR1_case_rf2alu: %1b\n\tR2_case_dm2alu: %1b\n\tR2_case_rf2alu: %1b",
+                "\tR1_case_dm2alu: %1b\n\tR1_case_rf2alu: %1b\n\tR1_case_rf2rf: %1b\n\tR2_case_dm2alu: %1b\n\tR2_case_rf2alu: %1b\n\tR2_case_rf2rf: %1b",
                 cpu_dut.R1_case_dm2alu,
                 cpu_dut.R1_case_rf2alu,
+                cpu_dut.R1_case_rf2rf,
                 cpu_dut.R2_case_dm2alu,
-                cpu_dut.R2_case_rf2alu
+                cpu_dut.R2_case_rf2alu,
+                cpu_dut.R2_case_rf2rf
                 );
             end
         end
