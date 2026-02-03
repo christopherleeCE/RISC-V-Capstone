@@ -24,13 +24,13 @@ TODO see if curren beq verification can be broken at (plz dont...) : it can :(, 
 --------------TEST LOG----------------------------------------------------
 
 WAITING LIST: ...
-R-TYPE: SLT, SLTU, XOR
-I-TYPE: XORI
+R-TYPE: SLT, SLTU
+I-TYPE: 
 M-TYPE: 
 
 SUCCESSFUL TESTS:
-R-TYPE: ADD, SUB, AND, OR
-I-TYPE: ADDI/NOP, ANDI, ORI, LW, JALR
+R-TYPE: ADD, SUB, XOR, AND, OR
+I-TYPE: ADDI/NOP, XORI, ANDI, ORI, LW, JALR
 S-TYPE: SW
 B-TYPE: BEQ
 J-TYPE: JAL
@@ -438,6 +438,12 @@ module top_riscv_cpu_v2_1();
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end
+
+                end else if (func3 == 3'b100) begin //------XORI-------------------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as XORI.");
+                        //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] ^ imm_i, rd, rs1);
+                        write_reg(rd, REG_FILE[1][rs1] ^ imm_i);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b110) begin //------ORI-------------------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as ORI.");
@@ -1083,6 +1089,17 @@ module top_riscv_cpu_v2_1();
                             else begin $display(" FAILURE"); return 1; end
 
                         end
+                    end
+
+                end else if(func3_v == 3'b100) begin //-------XORI-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    if(show_negedge_verify_row) $write("\tIdentified as XORI:");
+                    if(row == 5) begin                          
+                        //Output - compares the actual and predicted value of rd after the writeback stage
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
                     end
 
                 end else if(func3_v == 3'b110) begin //-------ORI-------------------------------
