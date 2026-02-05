@@ -15,6 +15,7 @@ module alu
     input logic alu_sel_slt,
     input logic alu_sel_sltu,
     output logic zero_flag,
+    output logic less_than,
     output logic [WIDTH-1:0] result
 );
 
@@ -45,11 +46,6 @@ assign su_fix = pre_product_su[2*WIDTH-1:WIDTH] + ( ~(operand_b) + 1'b1 );
 // Only apply the fix if operand_a is negative as a signed number
 assign product_su = (operand_a[WIDTH-1]) ? { su_fix, pre_product_su[WIDTH-1:0] } : pre_product_su;
 
-// Pre-compute common arithmetic results (Due to use of flags, result is stored as a 33-bit value first)
-logic [WIDTH:0] add_result, sub_result;
-assign add_result = operand_a + operand_b;
-assign sub_result = operand_a - operand_b;
-
 // Pre-compute comparisons (These are initially 1 bit values)
 logic slt_result, sltu_result;
 assign slt_result = signed_a < signed_b;
@@ -57,8 +53,8 @@ assign sltu_result = operand_a < operand_b;
 
 always_comb begin
     unique case(1'b1)
-    alu_sel_add : result = add_result[WIDTH-1:0]; // ADD
-    alu_sel_sub : result = sub_result[WIDTH-1:0]; // SUB
+    alu_sel_add : result = operand_a + operand_b; // ADD
+    alu_sel_sub : result = operand_a - operand_b; // SUB
     alu_sel_mul : result = product_ss[WIDTH-1:0];         // MUL
     alu_sel_mulh : result = product_ss[2*WIDTH-1:WIDTH];  // MULH
     alu_sel_mulhsu : result = product_su[2*WIDTH-1:WIDTH]; // MULHSU
@@ -73,6 +69,7 @@ always_comb begin
 end
 
 // Flag assignments
-assign zero_flag = ( result == '0 );
+assign zero_flag = ( result == '0 ); 
+assign less_than = ( ( result == '1 ) && alu_sel_slt );
 
 endmodule
