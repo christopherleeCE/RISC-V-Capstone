@@ -96,7 +96,7 @@ module riscv_cpu_v2
     logic alu_sel_xor_E;
     logic alu_sel_slt_E;
     logic alu_sel_sltu_E;
-    logic branch_en_E;
+    logic branch_eq_E;
     logic data_mem_wr_en_E;
     logic dbus_sel_alu_E;
     logic dbus_sel_data_mem_E;
@@ -156,7 +156,7 @@ module riscv_cpu_v2
     assign ohalt = halt_W;
 
     //branch logic
-    assign branch_taken = branch_en_E && zero_flag; //is the branch taken?
+    assign branch_taken = branch_eq_E && zero_flag; //is the branch taken?
     assign jump_taken = jump_en_E;                  //are we taking an unconditional jump?
     assign redirect_pc = branch_taken || jump_taken; //should the PC be redirected?
 
@@ -288,7 +288,7 @@ module riscv_cpu_v2
         alu_sel_xor,
         alu_sel_slt,
         alu_sel_sltu,
-        branch_en,
+        branch_eq,
         jump_en,
         data_mem_wr_en,
         dbus_sel_alu,
@@ -338,7 +338,7 @@ module riscv_cpu_v2
         alu_sel_xor_E,
         alu_sel_slt_E,
         alu_sel_sltu_E,
-        branch_en_E,
+        branch_eq_E,
         jump_en_E,
         data_mem_wr_en_E,
         dbus_sel_alu_E,
