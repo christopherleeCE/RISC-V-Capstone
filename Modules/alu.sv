@@ -70,6 +70,6 @@ end
 
 // Flag assignments
 assign zero_flag = ( result == '0 ); 
-assign less_than = ( ( result == '1 ) && alu_sel_slt );
+assign less_than = ( ( result == 32'b1 ) && alu_sel_slt );
 
 endmodule
