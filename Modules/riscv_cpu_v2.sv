@@ -61,16 +61,15 @@ module riscv_cpu_v2
     logic less_than;              //from alu, is op1 < op2? (for signed comparisons)
 
     logic branch_taken;          //is a branch taken?
-    logic jump_taken;            //is a jump taken?
     logic redirect_pc;           //should the PC be redirected?
 
     logic [63:0] f2d_data_F;          //fetch to decode data signals
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
 
     logic [142:0] d2e_data_D;          //decode to execute data signals
-    logic [22:0] d2e_control_D;       //decode to execute control signals
+    logic [21:0] d2e_control_D;       //decode to execute control signals
     logic [142:0] d2e_data_E;       //decode to execute post pipeline
-    logic [22:0] d2e_control_E;    //decode to execute control signals post pipeline
+    logic [21:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [100:0] e2m_data_E;          //execute to memory data signals
     logic [5:0] e2m_control_E;       //execute to memory control signals
@@ -84,7 +83,6 @@ module riscv_cpu_v2
 
     //control signals after 1 pipeline reg
     logic reg_file_wr_en_E;
-    logic jump_en_E;
     logic alu_use_im_E;
     logic alu_sel_add_E;
     logic alu_sel_sub_E;
@@ -164,12 +162,11 @@ module riscv_cpu_v2
                              ( branch_neq_E && !zero_flag ) ||
                              ( branch_lt_E && less_than ) ||
                              ( branch_gte_E && !less_than )    ); //is the branch taken?
-    assign jump_taken = jump_en_E;                  //are we taking an unconditional jump?
-    assign redirect_pc = branch_taken || jump_taken; //should the PC be redirected?
+    assign redirect_pc = branch_taken || jump_en; //should the PC be redirected?
 
     //Control Hazard Handling
-    assign flush_FD = redirect_pc; //flush IF/ID pipeline reg if branch taken by inserting NOP
-    assign flush_DE = redirect_pc; //flush ID/EX pipeline reg if branch taken by inserting NOP
+    assign flush_FD = redirect_pc; //flush IF/ID pipeline reg if branch or jump taken by inserting NOP
+    assign flush_DE = branch_taken; //flush ID/EX pipeline reg if branch taken by inserting NOP
 
     //Data Hazard Handling (might put in another module)
     //detecting data hazards for RS1
@@ -299,7 +296,6 @@ module riscv_cpu_v2
         branch_neq,
         branch_lt,
         branch_gte,
-        jump_en,
         data_mem_wr_en,
         dbus_sel_alu,
         dbus_sel_data_mem,
@@ -321,7 +317,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(23)
+        .WIDTH(22)
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
@@ -352,7 +348,6 @@ module riscv_cpu_v2
         branch_neq_E,
         branch_lt_E,
         branch_gte_E,
-        jump_en_E,
         data_mem_wr_en_E,
         dbus_sel_alu_E,
         dbus_sel_data_mem_E,
