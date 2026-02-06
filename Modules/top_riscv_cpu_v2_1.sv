@@ -26,6 +26,7 @@ TODO see if curren beq verification can be broken at (plz dont...) : it can :(, 
 WAITING LIST: ...
 R-TYPE: SLT, SLTU
 I-TYPE: 
+B-TYPE: BNE, BLT, BGE
 M-TYPE: 
 
 SUCCESSFUL TESTS:
