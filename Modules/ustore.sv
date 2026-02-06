@@ -39,9 +39,9 @@ always_comb begin
 // ==== INSTRUCTION: BNE ====
     5'd14: sig = 23'b00100000000001000000000; // alu_sel_sub branch_neq
 // ==== INSTRUCTION: BLT ====
-    5'd15: sig = 23'b00010000000000000000010; // alu_sel_slt branch_lt
+    5'd15: sig = 23'b00010000000000000000000; // branch_lt
 // ==== INSTRUCTION: BGE ====
-    5'd16: sig = 23'b00001000000000000000010; // alu_sel_slt branch_gte
+    5'd16: sig = 23'b00001000000000000000000; // branch_gte
 // ==== INSTRUCTION: ADDI ====
     5'd17: sig = 23'b00000011000110000000000; // alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: ORI ====
