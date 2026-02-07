@@ -28,7 +28,7 @@ def main():
                 "nop\n"
             )
 
-        f.write("end:\njal zero end")
+        f.write("end:\njal zero, end\n")
         f.write("nop\nnop\nnop\n")
 
     return 0
