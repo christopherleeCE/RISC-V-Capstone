@@ -23,17 +23,25 @@ TODO see if curren beq verification can be broken at (plz dont...) : it can :(, 
 
 --------------TEST LOG----------------------------------------------------
 
+*NOTE: I now strongly agree with whoever said the verification for BEQ is prone to breaking.
+Unfortunately, this applies for other B-type instructions, so it seems. HOWEVER, I am confident 
+the branch hardware has been working okay so far, including for BNE, BLT, and BGE. If you run 
+the assembly program I wrote for BNE/BLT/BGE, and look at the register dump, the values in s0 
+and s1 match the target value. Within the context of the program, I believe it shows that the
+these three instructions are functioning properly. I will put these as successful for now, if
+anyone disagrees or has questions, please reach out - Edgar G.
+
 WAITING LIST: ...
 R-TYPE: SLT, SLTU
 I-TYPE: 
-B-TYPE: BNE, BLT, BGE
+B-TYPE:
 M-TYPE: 
 
 SUCCESSFUL TESTS:
 R-TYPE: ADD, SUB, XOR, AND, OR
 I-TYPE: ADDI/NOP, XORI, ANDI, ORI, LW, JALR
 S-TYPE: SW
-B-TYPE: BEQ
+B-TYPE: BEQ, BNE, BLT, BGE
 J-TYPE: JAL
 U-TYPE: LUI
 M-TYPE: MUL, MULH, MULHSU, MULHU
@@ -560,7 +568,73 @@ module top_riscv_cpu_v2_1();
                     RD[1] <= 'x;
                     IM[1] <= imm_b;
                     
-                end 
+                end else if(func3 == 3'b001) begin //----BNE------------------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as BNE.");
+                    if(REG_FILE[1][rs1] != REG_FILE[1][rs2]) begin
+                        if(show_posedge_golden_calc) $display("Branch Taken");
+                        PC_ASYNC <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+                        
+                        PC_TARGET[1] <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+                    end else begin
+                        if(show_posedge_golden_calc) $display("Branch not Taken");
+                        PC_ASYNC <= PC_ASYNC + 4;
+
+                        PC_TARGET[1] <= PC_ASYNC + 4;
+                    end
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    INSTR[1] <= INSTR_FLUSH;
+                    RS1[1] <= rs1;
+                    RS2[1] <= rs2;
+                    RD[1] <= 'x;
+                    IM[1] <= imm_b;
+                    
+                end else if(func3 == 3'b100) begin //----BLT------------------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as BLT.");
+                    if(REG_FILE[1][rs1] < REG_FILE[1][rs2]) begin
+                        if(show_posedge_golden_calc) $display("Branch Taken");
+                        PC_ASYNC <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+                        
+                        PC_TARGET[1] <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+                    end else begin
+                        if(show_posedge_golden_calc) $display("Branch not Taken");
+                        PC_ASYNC <= PC_ASYNC + 4;
+
+                        PC_TARGET[1] <= PC_ASYNC + 4;
+                    end
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    INSTR[1] <= INSTR_FLUSH;
+                    RS1[1] <= rs1;
+                    RS2[1] <= rs2;
+                    RD[1] <= 'x;
+                    IM[1] <= imm_b;
+                    
+                end else if(func3 == 3'b101) begin //----BGE------------------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as BGE.");
+                    if(REG_FILE[1][rs1] >= REG_FILE[1][rs2]) begin
+                        if(show_posedge_golden_calc) $display("Branch Taken");
+                        PC_ASYNC <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+                        
+                        PC_TARGET[1] <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+                    end else begin
+                        if(show_posedge_golden_calc) $display("Branch not Taken");
+                        PC_ASYNC <= PC_ASYNC + 4;
+
+                        PC_TARGET[1] <= PC_ASYNC + 4;
+                    end
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    INSTR[1] <= INSTR_FLUSH;
+                    RS1[1] <= rs1;
+                    RS2[1] <= rs2;
+                    RD[1] <= 'x;
+                    IM[1] <= imm_b;
+                    
+                end
             
             end else if (opcode == 7'b1101111) begin //---J-TYPE (JAL) ------------------------------------------
                 {imm_j[20], imm_j[10:1], imm_j[11], imm_j[19:12], rd} = INSTR_FLUSH[31:7];
@@ -1185,6 +1259,36 @@ module top_riscv_cpu_v2_1();
 
                 if(func3_v == 3'b000) begin //----BEQ------------------------------------------------
                     if(show_negedge_verify_row) $write("\tIdentified as BEQ:");
+                    // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
+                    if(row == 3) begin
+                        
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
+                    
+                end else if(func3_v == 3'b001) begin //----BNE------------------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as BNE:");
+                    // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
+                    if(row == 3) begin
+                        
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
+                    
+                end else if(func3_v == 3'b100) begin //----BLT------------------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as BLT:");
+                    // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
+                    if(row == 3) begin
+                        
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
+                    
+                end else if(func3_v == 3'b101) begin //----BGE------------------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as BGE:");
                     // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                     if(row == 3) begin
                         

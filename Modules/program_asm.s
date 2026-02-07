@@ -240,18 +240,18 @@ end:
 
 # #TEST FOR BNE, BLT, BGE - Edgar G.
 # #This program takes a value and adjusts it to a target
-# .eqv TARGET_VALUE, 10 # decimal value
+# .eqv TARGET_VALUE, 0xaa # hex value
 
 # .globl _start
 
 # _start: 
 #     # Smaller numbers
-#     addi a0, zero, 8 # loading the first value as an argument (decimal value)
+#     addi a0, zero, 0x91 # loading the first value as an argument (hex value)
 #     addi a1, zero, TARGET_VALUE #loading the target value as argument
 #     jal adjust_num # call function
 #     mv s0, a0 # save return value
     
-#     addi a0, zero, 12 # loading the second value as an argument (decimal value)
+#     addi a0, zero, 0xc7 # loading the second value as an argument (hex value)
 #     addi a1, zero, TARGET_VALUE #loading the target value as argument
 #     jal adjust_num # call function
 #     mv s1, a0 # save return value
