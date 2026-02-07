@@ -5,38 +5,38 @@ program_asm.o:     file format elf32-littleriscv
 Disassembly of section .text:
 
 00000000 <end-0x9c>:
-   0:	684b6537          	lui	a0,0x684b6
-   4:	36450513          	addi	a0,a0,868 # 684b6364 <end+0x684b62c8>
-   8:	d91525b7          	lui	a1,0xd9152
-   c:	14a58593          	addi	a1,a1,330 # d915214a <end+0xd91520ae>
-  10:	38435637          	lui	a2,0x38435
-  14:	e8f60613          	addi	a2,a2,-369 # 38434e8f <end+0x38434df3>
-  18:	eee166b7          	lui	a3,0xeee16
-  1c:	90f68693          	addi	a3,a3,-1777 # eee1590f <end+0xeee15873>
-  20:	a34a7737          	lui	a4,0xa34a7
-  24:	42b70713          	addi	a4,a4,1067 # a34a742b <end+0xa34a738f>
-  28:	0f5f27b7          	lui	a5,0xf5f2
-  2c:	75778793          	addi	a5,a5,1879 # f5f2757 <end+0xf5f26bb>
-  30:	4485d837          	lui	a6,0x4485d
-  34:	93780813          	addi	a6,a6,-1737 # 4485c937 <end+0x4485c89b>
-  38:	53fc08b7          	lui	a7,0x53fc0
-  3c:	91f88893          	addi	a7,a7,-1761 # 53fbf91f <end+0x53fbf883>
-  40:	00f60b33          	add	s6,a2,a5
-  44:	02f58bb3          	mul	s7,a1,a5
-  48:	41060ab3          	sub	s5,a2,a6
-  4c:	00c70b33          	add	s6,a4,a2
-  50:	00a809b3          	add	s3,a6,a0
-  54:	00f78cb3          	add	s9,a5,a5
-  58:	00e67c33          	and	s8,a2,a4
-  5c:	0117cd33          	xor	s10,a5,a7
-  60:	0115c9b3          	xor	s3,a1,a7
-  64:	02d50ab3          	mul	s5,a0,a3
-  68:	00b70b33          	add	s6,a4,a1
-  6c:	02a58433          	mul	s0,a1,a0
-  70:	40a50933          	sub	s2,a0,a0
-  74:	0118f9b3          	and	s3,a7,a7
-  78:	41180433          	sub	s0,a6,a7
-  7c:	0105cbb3          	xor	s7,a1,a6
+   0:	00333537          	lui	a0,0x333
+   4:	ee350513          	addi	a0,a0,-285 # 332ee3 <end+0x332e47>
+   8:	7f2b05b7          	lui	a1,0x7f2b0
+   c:	a4c58593          	addi	a1,a1,-1460 # 7f2afa4c <end+0x7f2af9b0>
+  10:	24aab637          	lui	a2,0x24aab
+  14:	af060613          	addi	a2,a2,-1296 # 24aaaaf0 <end+0x24aaaa54>
+  18:	0ba9d6b7          	lui	a3,0xba9d
+  1c:	2cb68693          	addi	a3,a3,715 # ba9d2cb <end+0xba9d22f>
+  20:	a65de737          	lui	a4,0xa65de
+  24:	acd70713          	addi	a4,a4,-1331 # a65ddacd <end+0xa65dda31>
+  28:	a62127b7          	lui	a5,0xa6212
+  2c:	59878793          	addi	a5,a5,1432 # a6212598 <end+0xa62124fc>
+  30:	abab3837          	lui	a6,0xabab3
+  34:	f7080813          	addi	a6,a6,-144 # abab2f70 <end+0xabab2ed4>
+  38:	cbb3d8b7          	lui	a7,0xcbb3d
+  3c:	e8988893          	addi	a7,a7,-375 # cbb3ce89 <end+0xcbb3cded>
+  40:	00b86ab3          	or	s5,a6,a1
+  44:	00a7c4b3          	xor	s1,a5,a0
+  48:	00b7e4b3          	or	s1,a5,a1
+  4c:	03160cb3          	mul	s9,a2,a7
+  50:	40b78d33          	sub	s10,a5,a1
+  54:	00f60ab3          	add	s5,a2,a5
+  58:	00d57933          	and	s2,a0,a3
+  5c:	00e87ab3          	and	s5,a6,a4
+  60:	00a7f4b3          	and	s1,a5,a0
+  64:	00c57d33          	and	s10,a0,a2
+  68:	00b88b33          	add	s6,a7,a1
+  6c:	00b6ebb3          	or	s7,a3,a1
+  70:	00e70933          	add	s2,a4,a4
+  74:	01184db3          	xor	s11,a6,a7
+  78:	0106e9b3          	or	s3,a3,a6
+  7c:	02c58a33          	mul	s4,a1,a2
   80:	00000013          	nop
   84:	00000013          	nop
   88:	00000013          	nop

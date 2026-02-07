@@ -1,27 +1,27 @@
-li a0, 1749771108
-li a1, -652926646
-li a2, 943935119
-li a3, -287221489
-li a4, -1555401685
-li a5, 257894231
-li a6, 1149618487
-li a7, 1409022239
-add s6, a2, a5
-mul s7, a1, a5
-sub s5, a2, a6
-add s6, a4, a2
-add s3, a6, a0
-add s9, a5, a5
-and s8, a2, a4
-xor s10, a5, a7
-xor s3, a1, a7
-mul s5, a0, a3
-add s6, a4, a1
-mul s0, a1, a0
-sub s2, a0, a0
-and s3, a7, a7
-sub s0, a6, a7
-xor s7, a1, a6
+li a0, 3354339
+li a1, 2133523020
+li a2, 615164656
+li a3, 195678923
+li a4, -1503798579
+li a5, -1507777128
+li a6, -1414844560
+li a7, -877408631
+or s5, a6, a1
+xor s1, a5, a0
+or s1, a5, a1
+mul s9, a2, a7
+sub s10, a5, a1
+add s5, a2, a5
+and s2, a0, a3
+and s5, a6, a4
+and s1, a5, a0
+and s10, a0, a2
+add s6, a7, a1
+or s7, a3, a1
+add s2, a4, a4
+xor s11, a6, a7
+or s3, a3, a6
+mul s4, a1, a2
 nop
 nop
 nop

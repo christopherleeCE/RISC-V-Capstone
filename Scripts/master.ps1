@@ -1,6 +1,31 @@
+param(
+    [int]$runs = 1
+)
+
 $ErrorActionPreference = "Stop"
 
-for($ii = 0; $ii -lt 2; $ii++){
+# Get the current directory name
+$currentDirName = Split-Path -Leaf (Get-Location)
+
+if ($currentDirName -ne "Modules") {
+    Write-Host "Error: Script must be run from the Modules folder. Current folder is $currentDirName"
+    exit 1
+}
+
+$logFolder = "..\Logs\raw"
+$masterLog = Join-Path $logFolder "master.log"
+
+# Create the folder if it doesn't exist
+if (-not (Test-Path $logFolder)) {
+    New-Item -ItemType Directory -Path $logFolder | Out-Null
+} else {
+    # Remove all files in the folder
+    Get-ChildItem $logFolder -File | Remove-Item -Force
+}
+
+Write-Host "Running from Modules folder, continuing..."
+
+for($ii = 0; $ii -lt $runs; $ii++){
 
     Write-Host "Generating random assembly..."
     python3 ..\Scripts\gen_random_prog.py
@@ -15,7 +40,7 @@ for($ii = 0; $ii -lt 2; $ii++){
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Running simulation..."
-    & ..\Scripts\simulate_sv.ps1
+    & ..\Scripts\simulate_sv.ps1 -continue
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Flow complete."
@@ -24,49 +49,64 @@ for($ii = 0; $ii -lt 2; $ii++){
     $tempSName = "temp_$ii.s"
     $simLogName = "sim_$ii.log"
 
-    Copy-Item ".\temp.s" -Destination (Join-Path "..\Logs\" $tempSName) -Force
-    Copy-Item ".\sim.log" -Destination (Join-Path "..\Logs\" $simLogName) -Force
+    Copy-Item ".\temp.s" -Destination (Join-Path $logFolder $tempSName) -Force
+    Copy-Item ".\sim.log" -Destination (Join-Path $logFolder $simLogName) -Force
 
     Write-Host "Saved logs for iteration $ii"
 
 }
 
-$logFolder = "..\Logs"
-$masterLog = Join-Path $logFolder "master.log"
-
-# Make sure log folder exists
-if (-not (Test-Path $logFolder)) { New-Item -ItemType Directory -Path $logFolder | Out-Null }
-
 # Clear master log if it exists
-if (Test-Path $masterLog) { Remove-Item $masterLog }
+if (Test-Path $masterLog) {
+    Remove-Item $masterLog
 
-# Loop over all .log files
-Get-ChildItem "$logFolder\*.log" | ForEach-Object {
-    $file = $_.FullName
-    $fileName = $_.Name
-    $found = $false
+}Add-Content -Path $masterLog "Begining of Master Log..."
 
-    # Read lines and look for "Errors: X, Warnings: Y"
-    Get-Content $file | ForEach-Object {
-        if ($_ -match "Errors:\s*(\d+),\s*Warnings:\s*(\d+)") {
-            $errors = [int]$matches[1]
-            $warnings = [int]$matches[2]
+# Initialize global trackers for the final verdict
+$globalAnyErrors = $false
+$globalAnyWarnings = $false
 
-            if ($errors -ne 0 -or $warnings -ne 0) {
-                $line = "[$fileName] Errors: $errors, Warnings: $warnings"
-                Add-Content -Path $masterLog -Value $line
+# Scan every sim_*.log file
+$logFiles = Get-ChildItem -Path $logFolder -Filter "sim_*.log" | Sort-Object Name
+
+foreach ($file in $logFiles) {
+    $content = Get-Content $file.FullName
+    $summaryLines = $content | Where-Object { $_ -match "Errors:\s*(?<err>\d+),\s*Warnings:\s*(?<warn>\d+)" }
+
+    if ($summaryLines) {
+        $fileErrors = 0
+        $fileWarnings = 0
+
+        foreach ($line in $summaryLines) {
+            if ($line -match "Errors:\s*(?<err>\d+),\s*Warnings:\s*(?<warn>\d+)") {
+                $fileErrors += [int]$Matches['err']
+                $fileWarnings += [int]$Matches['warn']
             }
-            $found = $true
         }
-    }
 
-    # Optional: If no Errors/Warnings line found, you can note it
-    if (-not $found) {
-        Add-Content -Path $masterLog -Value "$fileName : No error/warning summary found."
+        # Update global flags if any issues are found in this file
+        if ($fileErrors -gt 0) { $globalAnyErrors = $true }
+        if ($fileWarnings -gt 0) { $globalAnyWarnings = $true }
+
+        # Write the individual file line to the master log
+        Add-Content -Path $masterLog "$($file.Name): PASS ($fileErrors Errors, $fileWarnings Warnings)"
+    } else {
+        $globalAnyErrors = $true
+        Add-Content -Path $masterLog "$($file.Name): No error/warning summary found, NOT A PASS"
     }
 }
 
-Write-Host "Master log written to $masterLog"
+# Final Verdict Logic at the end of the file
+Add-Content -Path $masterLog "" # Add a blank line for readability
 
+if ($globalAnyErrors) {
+    Add-Content -Path $masterLog "FAIL: Errors detected in one or more logs"
+} elseif ($globalAnyWarnings) {
+    Add-Content -Path $masterLog "PASS: Warnings present"
+} else {
+    Add-Content -Path $masterLog "CLEAN PASS: No warnings or errors"
+}
+
+Write-Host "Master log updated at $masterLog"
 
 
