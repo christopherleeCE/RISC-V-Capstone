@@ -19,7 +19,9 @@ cause according to chat, if there is an x in the structure, even in
 reggold[1] for example the assertion fails, so you need to do a for loop,
 and doing that is prob easier to do in a task/func but ill do that l8r
 
-TODO see if curren beq verification can be broken at (plz dont...) : it can :(, fix plz
+TODO see if curren beq verification can be broken at (plz dont...) : it can :( fix plz
+
+TODO expand gen_random_prog.py with branching
 
 --------------TEST LOG----------------------------------------------------
 
