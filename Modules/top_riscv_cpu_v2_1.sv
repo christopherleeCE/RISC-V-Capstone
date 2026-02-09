@@ -25,8 +25,6 @@ TODO expand gen_random_prog.py with branching
 
 TODO make sure run time for master.ps1 is enuf
 
-TODO master.log says pass on the individual results
-
 TODO make sure that in rand testing the run time is enuf
 
 --------------TEST LOG----------------------------------------------------

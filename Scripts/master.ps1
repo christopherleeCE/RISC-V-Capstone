@@ -87,11 +87,21 @@ foreach ($file in $logFiles) {
         }
 
         # Update global flags if any issues are found in this file
-        if ($fileErrors -gt 0) { $globalAnyErrors = $true }
+        if ($fileErrors -gt 0) {
+            $globalAnyErrors = $true
+            Add-Content -Path $masterLog "$($file.Name): FAIL (Errors: $fileErrors, Warnings: $fileWarnings)"
+        }else{
+            if($fileWarnings -gt 0){
+                Add-Content -Path $masterLog "$($file.Name): PASS (Errors: $fileErrors, Warnings: $fileWarnings)"
+            }else{
+                Add-Content -Path $masterLog "$($file.Name): CLEAN PASS (Errors: $fileErrors, Warnings: $fileWarnings)"
+            }
+        }
         if ($fileWarnings -gt 0) { $globalAnyWarnings = $true }
 
+
         # Write the individual file line to the master log
-        Add-Content -Path $masterLog "$($file.Name): PASS ($fileErrors Errors, $fileWarnings Warnings)"
+        #Add-Content -Path $masterLog "$($file.Name): PASS (Errors: $fileErrors, Warnings: $fileWarnings)"
     } else {
         $globalAnyErrors = $true
         Add-Content -Path $masterLog "$($file.Name): No error/warning summary found, NOT A PASS"

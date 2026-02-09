@@ -5,123 +5,123 @@ program_asm.o:     file format elf32-littleriscv
 Disassembly of section .text:
 
 00000000 <.text>:
-   0:	58f44537          	lui	a0,0x58f44
-   4:	03c50513          	addi	a0,a0,60 # 58f4403c <.text+0x58f4403c>
-   8:	1fbab5b7          	lui	a1,0x1fbab
-   c:	cba58593          	addi	a1,a1,-838 # 1fbaacba <.text+0x1fbaacba>
-  10:	19fa2637          	lui	a2,0x19fa2
-  14:	6f560613          	addi	a2,a2,1781 # 19fa26f5 <.text+0x19fa26f5>
-  18:	8fbe76b7          	lui	a3,0x8fbe7
-  1c:	e2b68693          	addi	a3,a3,-469 # 8fbe6e2b <.text+0x8fbe6e2b>
-  20:	cc9d7737          	lui	a4,0xcc9d7
-  24:	38570713          	addi	a4,a4,901 # cc9d7385 <.text+0xcc9d7385>
-  28:	0420f7b7          	lui	a5,0x420f
-  2c:	11978793          	addi	a5,a5,281 # 420f119 <.text+0x420f119>
-  30:	dd51a837          	lui	a6,0xdd51a
-  34:	c4180813          	addi	a6,a6,-959 # dd519c41 <.text+0xdd519c41>
-  38:	3b0698b7          	lui	a7,0x3b069
-  3c:	99088893          	addi	a7,a7,-1648 # 3b068990 <.text+0x3b068990>
+   0:	a6ad3537          	lui	a0,0xa6ad3
+   4:	15150513          	addi	a0,a0,337 # a6ad3151 <.text+0xa6ad3151>
+   8:	1e6215b7          	lui	a1,0x1e621
+   c:	06358593          	addi	a1,a1,99 # 1e621063 <.text+0x1e621063>
+  10:	028fe637          	lui	a2,0x28fe
+  14:	f7060613          	addi	a2,a2,-144 # 28fdf70 <.text+0x28fdf70>
+  18:	7f43f6b7          	lui	a3,0x7f43f
+  1c:	e3368693          	addi	a3,a3,-461 # 7f43ee33 <.text+0x7f43ee33>
+  20:	f0f0c737          	lui	a4,0xf0f0c
+  24:	43670713          	addi	a4,a4,1078 # f0f0c436 <.text+0xf0f0c436>
+  28:	288277b7          	lui	a5,0x28827
+  2c:	37778793          	addi	a5,a5,887 # 28827377 <.text+0x28827377>
+  30:	89692837          	lui	a6,0x89692
+  34:	aec80813          	addi	a6,a6,-1300 # 89691aec <.text+0x89691aec>
+  38:	bf1808b7          	lui	a7,0xbf180
+  3c:	9cd88893          	addi	a7,a7,-1587 # bf17f9cd <.text+0xbf17f9cd>
   40:	0040016f          	jal	sp,44 <.text+0x44>
-  44:	010749b3          	xor	s3,a4,a6
-  48:	00c874b3          	and	s1,a6,a2
-  4c:	00a50263          	beq	a0,a0,50 <.text+0x50>
-  50:	02b884b3          	mul	s1,a7,a1
-  54:	00f6e4b3          	or	s1,a3,a5
-  58:	00d78ab3          	add	s5,a5,a3
-  5c:	00f7f4b3          	and	s1,a5,a5
-  60:	41078cb3          	sub	s9,a5,a6
-  64:	00f54cb3          	xor	s9,a0,a5
-  68:	02c70933          	mul	s2,a4,a2
-  6c:	00a50263          	beq	a0,a0,70 <.text+0x70>
-  70:	00b5eb33          	or	s6,a1,a1
-  74:	01086b33          	or	s6,a6,a6
-  78:	00a00663          	beq	zero,a0,84 <.text+0x84>
-  7c:	00e87ab3          	and	s5,a6,a4
-  80:	40e88a33          	sub	s4,a7,a4
-  84:	00c7f933          	and	s2,a5,a2
-  88:	40c70cb3          	sub	s9,a4,a2
-  8c:	00a00463          	beq	zero,a0,94 <.text+0x94>
-  90:	01177cb3          	and	s9,a4,a7
-  94:	00a00863          	beq	zero,a0,a4 <.text+0xa4>
-  98:	00c58c33          	add	s8,a1,a2
-  9c:	00d86cb3          	or	s9,a6,a3
-  a0:	00b5c433          	xor	s0,a1,a1
-  a4:	00f544b3          	xor	s1,a0,a5
-  a8:	00a00263          	beq	zero,a0,ac <.text+0xac>
-  ac:	070100e7          	jalr	112(sp)
-  b0:	0107e4b3          	or	s1,a5,a6
-  b4:	00a87433          	and	s0,a6,a0
-  b8:	00b58433          	add	s0,a1,a1
-  bc:	41080cb3          	sub	s9,a6,a6
-  c0:	010669b3          	or	s3,a2,a6
-  c4:	41050a33          	sub	s4,a0,a6
-  c8:	00a5cb33          	xor	s6,a1,a0
-  cc:	40a50bb3          	sub	s7,a0,a0
-  d0:	41070db3          	sub	s11,a4,a6
-  d4:	40e784b3          	sub	s1,a5,a4
-  d8:	41168c33          	sub	s8,a3,a7
-  dc:	00c5cab3          	xor	s5,a1,a2
-  e0:	00d74c33          	xor	s8,a4,a3
-  e4:	00d8ecb3          	or	s9,a7,a3
-  e8:	00f87a33          	and	s4,a6,a5
-  ec:	00d77cb3          	and	s9,a4,a3
-  f0:	01178db3          	add	s11,a5,a7
-  f4:	00a00463          	beq	zero,a0,fc <.text+0xfc>
-  f8:	01068433          	add	s0,a3,a6
-  fc:	00a50a63          	beq	a0,a0,110 <.text+0x110>
- 100:	01168db3          	add	s11,a3,a7
- 104:	40b60933          	sub	s2,a2,a1
- 108:	02e809b3          	mul	s3,a6,a4
- 10c:	00a5fb33          	and	s6,a1,a0
- 110:	01067db3          	and	s11,a2,a6
- 114:	03178cb3          	mul	s9,a5,a7
- 118:	01066db3          	or	s11,a2,a6
- 11c:	40f58933          	sub	s2,a1,a5
- 120:	00a50663          	beq	a0,a0,12c <.text+0x12c>
- 124:	00e77433          	and	s0,a4,a4
- 128:	410509b3          	sub	s3,a0,a6
- 12c:	00d78db3          	add	s11,a5,a3
- 130:	0107e933          	or	s2,a5,a6
- 134:	40b80433          	sub	s0,a6,a1
- 138:	00f6ea33          	or	s4,a3,a5
- 13c:	00a00c63          	beq	zero,a0,154 <.text+0x154>
- 140:	00e74bb3          	xor	s7,a4,a4
- 144:	40e789b3          	sub	s3,a5,a4
- 148:	41050d33          	sub	s10,a0,a6
- 14c:	008000ef          	jal	ra,154 <.text+0x154>
- 150:	031709b3          	mul	s3,a4,a7
- 154:	41050cb3          	sub	s9,a0,a6
- 158:	0106edb3          	or	s11,a3,a6
- 15c:	03068433          	mul	s0,a3,a6
- 160:	00a00663          	beq	zero,a0,16c <.text+0x16c>
- 164:	00b64933          	xor	s2,a2,a1
- 168:	02d50db3          	mul	s11,a0,a3
- 16c:	40f60ab3          	sub	s5,a2,a5
- 170:	00b8ebb3          	or	s7,a7,a1
- 174:	0115c933          	xor	s2,a1,a7
- 178:	00b88b33          	add	s6,a7,a1
- 17c:	01084a33          	xor	s4,a6,a6
- 180:	01158db3          	add	s11,a1,a7
- 184:	02a80d33          	mul	s10,a6,a0
- 188:	00d7ccb3          	xor	s9,a5,a3
- 18c:	00a00c63          	beq	zero,a0,1a4 <.text+0x1a4>
- 190:	40e884b3          	sub	s1,a7,a4
- 194:	030889b3          	mul	s3,a7,a6
- 198:	0115ccb3          	xor	s9,a1,a7
- 19c:	00d579b3          	and	s3,a0,a3
- 1a0:	00e8eb33          	or	s6,a7,a4
- 1a4:	00a8c433          	xor	s0,a7,a0
- 1a8:	02e78b33          	mul	s6,a5,a4
- 1ac:	00a50463          	beq	a0,a0,1b4 <.text+0x1b4>
- 1b0:	410509b3          	sub	s3,a0,a6
- 1b4:	03180ab3          	mul	s5,a6,a7
- 1b8:	00a50c63          	beq	a0,a0,1d0 <.text+0x1d0>
- 1bc:	02c58db3          	mul	s11,a1,a2
- 1c0:	02c78933          	mul	s2,a5,a2
- 1c4:	00c8fcb3          	and	s9,a7,a2
- 1c8:	03088933          	mul	s2,a7,a6
- 1cc:	01080cb3          	add	s9,a6,a6
- 1d0:	02f50d33          	mul	s10,a0,a5
+  44:	00e5ed33          	or	s10,a1,a4
+  48:	00d58a33          	add	s4,a1,a3
+  4c:	0115fdb3          	and	s11,a1,a7
+  50:	00f67a33          	and	s4,a2,a5
+  54:	01060933          	add	s2,a2,a6
+  58:	0115ca33          	xor	s4,a1,a7
+  5c:	00a00263          	beq	zero,a0,60 <.text+0x60>
+  60:	02e60cb3          	mul	s9,a2,a4
+  64:	00a50863          	beq	a0,a0,74 <.text+0x74>
+  68:	01160bb3          	add	s7,a2,a7
+  6c:	40d78d33          	sub	s10,a5,a3
+  70:	00b80c33          	add	s8,a6,a1
+  74:	018000ef          	jal	ra,8c <.text+0x8c>
+  78:	01068d33          	add	s10,a3,a6
+  7c:	01177ab3          	and	s5,a4,a7
+  80:	02d88433          	mul	s0,a7,a3
+  84:	410704b3          	sub	s1,a4,a6
+  88:	00a574b3          	and	s1,a0,a0
+  8c:	00a679b3          	and	s3,a2,a0
+  90:	008000ef          	jal	ra,98 <.text+0x98>
+  94:	00a869b3          	or	s3,a6,a0
+  98:	00a88bb3          	add	s7,a7,a0
+  9c:	00c8edb3          	or	s11,a7,a2
+  a0:	00b80933          	add	s2,a6,a1
+  a4:	02a88a33          	mul	s4,a7,a0
+  a8:	011549b3          	xor	s3,a0,a7
+  ac:	00e8fa33          	and	s4,a7,a4
+  b0:	02e70c33          	mul	s8,a4,a4
+  b4:	031704b3          	mul	s1,a4,a7
+  b8:	008000ef          	jal	ra,c0 <.text+0xc0>
+  bc:	00a00463          	beq	zero,a0,c4 <.text+0xc4>
+  c0:	094100e7          	jalr	148(sp)
+  c4:	00b58933          	add	s2,a1,a1
+  c8:	090100e7          	jalr	144(sp)
+  cc:	00c70c33          	add	s8,a4,a2
+  d0:	00a00c63          	beq	zero,a0,e8 <.text+0xe8>
+  d4:	02e78433          	mul	s0,a5,a4
+  d8:	00b86a33          	or	s4,a6,a1
+  dc:	00f50cb3          	add	s9,a0,a5
+  e0:	02b70d33          	mul	s10,a4,a1
+  e4:	0118f433          	and	s0,a7,a7
+  e8:	00e78b33          	add	s6,a5,a4
+  ec:	00a54db3          	xor	s11,a0,a0
+  f0:	00b8c9b3          	xor	s3,a7,a1
+  f4:	00c504b3          	add	s1,a0,a2
+  f8:	018000ef          	jal	ra,110 <.text+0x110>
+  fc:	00a50663          	beq	a0,a0,108 <.text+0x108>
+ 100:	40d78c33          	sub	s8,a5,a3
+ 104:	00d84cb3          	xor	s9,a6,a3
+ 108:	02f709b3          	mul	s3,a4,a5
+ 10c:	0118f9b3          	and	s3,a7,a7
+ 110:	00c84c33          	xor	s8,a6,a2
+ 114:	00a00263          	beq	zero,a0,118 <.text+0x118>
+ 118:	00e889b3          	add	s3,a7,a4
+ 11c:	01070db3          	add	s11,a4,a6
+ 120:	02e50d33          	mul	s10,a0,a4
+ 124:	00b5f9b3          	and	s3,a1,a1
+ 128:	00f5ebb3          	or	s7,a1,a5
+ 12c:	02a68db3          	mul	s11,a3,a0
+ 130:	40c58b33          	sub	s6,a1,a2
+ 134:	00f88db3          	add	s11,a7,a5
+ 138:	00c8ecb3          	or	s9,a7,a2
+ 13c:	108100e7          	jalr	264(sp)
+ 140:	0117e933          	or	s2,a5,a7
+ 144:	40d88a33          	sub	s4,a7,a3
+ 148:	00a5cb33          	xor	s6,a1,a0
+ 14c:	00a00663          	beq	zero,a0,158 <.text+0x158>
+ 150:	40e589b3          	sub	s3,a1,a4
+ 154:	00e58b33          	add	s6,a1,a4
+ 158:	02d60c33          	mul	s8,a2,a3
+ 15c:	00c6c9b3          	xor	s3,a3,a2
+ 160:	00f68bb3          	add	s7,a3,a5
+ 164:	00f604b3          	add	s1,a2,a5
+ 168:	00d77433          	and	s0,a4,a3
+ 16c:	00c7cdb3          	xor	s11,a5,a2
+ 170:	03080cb3          	mul	s9,a6,a6
+ 174:	148100e7          	jalr	328(sp)
+ 178:	41060c33          	sub	s8,a2,a6
+ 17c:	00a00463          	beq	zero,a0,184 <.text+0x184>
+ 180:	03070d33          	mul	s10,a4,a6
+ 184:	02a60d33          	mul	s10,a2,a0
+ 188:	40f70933          	sub	s2,a4,a5
+ 18c:	02d78db3          	mul	s11,a5,a3
+ 190:	010584b3          	add	s1,a1,a6
+ 194:	168100e7          	jalr	360(sp)
+ 198:	00a8fab3          	and	s5,a7,a0
+ 19c:	00d56db3          	or	s11,a0,a3
+ 1a0:	010749b3          	xor	s3,a4,a6
+ 1a4:	00f64b33          	xor	s6,a2,a5
+ 1a8:	00a00863          	beq	zero,a0,1b8 <.text+0x1b8>
+ 1ac:	00e77933          	and	s2,a4,a4
+ 1b0:	00f5e4b3          	or	s1,a1,a5
+ 1b4:	0118e4b3          	or	s1,a7,a7
+ 1b8:	02f78c33          	mul	s8,a5,a5
+ 1bc:	02c70433          	mul	s0,a4,a2
+ 1c0:	004000ef          	jal	ra,1c4 <.text+0x1c4>
+ 1c4:	00a00a63          	beq	zero,a0,1d8 <.text+0x1d8>
+ 1c8:	00e70bb3          	add	s7,a4,a4
+ 1cc:	40f504b3          	sub	s1,a0,a5
+ 1d0:	41088c33          	sub	s8,a7,a6
  1d4:	00000013          	nop
  1d8:	00000013          	nop
  1dc:	00000013          	nop
