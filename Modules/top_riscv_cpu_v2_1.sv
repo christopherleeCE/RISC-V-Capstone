@@ -23,6 +23,10 @@ TODO see if curren beq verification can be broken at (plz dont...) : it can :( f
 
 TODO expand gen_random_prog.py with branching
 
+TODO make sure run time for master.ps1 is enuf
+
+TODO master.log says pass on the individual results
+
 --------------TEST LOG----------------------------------------------------
 
 *NOTE: I now strongly agree with whoever said the verification for BEQ is prone to breaking.
