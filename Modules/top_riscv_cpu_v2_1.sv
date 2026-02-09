@@ -27,6 +27,8 @@ TODO make sure run time for master.ps1 is enuf
 
 TODO master.log says pass on the individual results
 
+TODO make sure that in rand testing the run time is enuf
+
 --------------TEST LOG----------------------------------------------------
 
 *NOTE: I now strongly agree with whoever said the verification for BEQ is prone to breaking.
