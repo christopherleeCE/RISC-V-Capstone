@@ -16,7 +16,8 @@ module data_memory
     output logic [BIT_WIDTH-1:0] readData,
     input  logic          clk,
     input  logic          addr_byte,          //are we reading/writing a byte, half-word, or word?
-    input  logic          addr_half
+    input  logic          addr_half,
+    input  logic          zero_extend           //should we zero-extend the data read from memory
     );
 
    logic [BIT_WIDTH-1:0] data_mem [ENTRY_COUNT-1:0];
@@ -57,11 +58,10 @@ module data_memory
    assign data_half_r = byte_select[1] ? readWord[31:16] : readWord[15:0];
 
    // are we reading a byte, half-word, or word?
-   // will choose whether to sign extend or zero extend outside memory
    always_comb begin
       unique case ({addr_byte, addr_half})
-         2'b10	:	readData = {24'h000000, data_byte_r}; 
-         2'b01	:	readData = {16'h0000, data_half_r};
+         2'b10	:	readData = zero_extend ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
+         2'b01	:	readData = zero_extend ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
          default	:	readData = readWord;
       endcase
    end

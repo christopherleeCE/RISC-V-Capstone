@@ -68,14 +68,14 @@ module riscv_cpu_v2
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
 
     logic [142:0] d2e_data_D;          //decode to execute data signals
-    logic [25:0] d2e_control_D;       //decode to execute control signals
+    logic [28:0] d2e_control_D;       //decode to execute control signals
     logic [142:0] d2e_data_E;       //decode to execute post pipeline
-    logic [25:0] d2e_control_E;    //decode to execute control signals post pipeline
+    logic [28:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [100:0] e2m_data_E;          //execute to memory data signals
-    logic [5:0] e2m_control_E;       //execute to memory control signals
+    logic [8:0] e2m_control_E;       //execute to memory control signals
     logic [100:0] e2m_data_M;       //execute to memory post pipeline
-    logic [5:0] e2m_control_M;    //execute to memory control signals post pipeline  
+    logic [8:0] e2m_control_M;    //execute to memory control signals post pipeline  
 
     logic [100:0] m2w_data_M;          //memory to writeback data signals
     logic [4:0] m2w_control_M;       //memory to writeback control signals
@@ -105,12 +105,18 @@ module riscv_cpu_v2
     logic branch_lt_E;
     logic branch_gte_E;
     logic data_mem_wr_en_E;
+    logic addr_byte_E;
+    logic addr_half_E;
+    logic zero_extend_mem_E;
     logic dbus_sel_alu_E;
     logic dbus_sel_data_mem_E;
     logic dbus_sel_pc_plus_4_E;
 
     //control signals after 2 pipeline regs
     logic data_mem_wr_en_M;
+    logic addr_byte_M;
+    logic addr_half_M;
+    logic zero_extend_mem_M;
     logic dbus_sel_alu_M;
     logic dbus_sel_data_mem_M;
     logic dbus_sel_pc_plus_4_M;
@@ -304,6 +310,9 @@ module riscv_cpu_v2
         branch_gte,
         jump_en,
         data_mem_wr_en,
+        addr_byte,
+        addr_half,
+        zero_extend_mem,
         dbus_sel_alu,
         dbus_sel_data_mem,
         dbus_sel_pc_plus_4,
@@ -324,7 +333,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(26)
+        .WIDTH(29)
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
@@ -360,6 +369,9 @@ module riscv_cpu_v2
         branch_gte_E,
         jump_en_E,
         data_mem_wr_en_E,
+        addr_byte_E,
+        addr_half_E,
+        zero_extend_mem_E,    
         dbus_sel_alu_E,
         dbus_sel_data_mem_E,
         dbus_sel_pc_plus_4_E,
@@ -427,6 +439,9 @@ module riscv_cpu_v2
     assign e2m_data_E = {ALU, RS2_DATA_E_FWD, RD_E, PC_plus_4_E};
     assign e2m_control_E = {
         data_mem_wr_en_E,
+        addr_byte_E,
+        addr_half_E,
+        zero_extend_mem_E,
         dbus_sel_alu_E,
         dbus_sel_data_mem_E,
         dbus_sel_pc_plus_4_E,
@@ -448,7 +463,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(6)
+        .WIDTH(9)
     ) ex_mem_control_reg (
         .d(e2m_control_E),      // Include control signals in pipeline
         .clk(clk),
@@ -463,6 +478,9 @@ module riscv_cpu_v2
     assign {ALU_M, RS2_DATA_M, RD_M, PC_plus_4_M} = e2m_data_M;
     assign {
         data_mem_wr_en_M,
+        addr_byte_M,
+        addr_half_M,
+        zero_extend_mem_M,
         dbus_sel_alu_M,
         dbus_sel_data_mem_M,
         dbus_sel_pc_plus_4_M,
@@ -481,7 +499,10 @@ module riscv_cpu_v2
         .writeData(RS2_DATA_M),
         .writeEn(data_mem_wr_en_M),
         .readData(DATA_MEM_OUT),
-        .clk(clk)
+        .clk(clk),
+        .addr_byte(addr_byte_M),
+        .addr_half(addr_half_M),
+        .zero_extend(zero_extend_mem_M)
     );
 
     //preparing data and control signals for pipeline reg
