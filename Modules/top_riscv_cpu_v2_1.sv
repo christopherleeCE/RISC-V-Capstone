@@ -39,7 +39,7 @@ anyone disagrees or has questions, please reach out - Edgar G.
 
 WAITING LIST: ...
 R-TYPE: SLT, SLTU, SLL, SRL, SRA
-I-TYPE: 
+I-TYPE: LB, LH, LBU, LHU
 B-TYPE:
 M-TYPE: 
 
