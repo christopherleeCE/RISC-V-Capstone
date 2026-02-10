@@ -2,14 +2,13 @@ module instruction_memory
 #(
     parameter int BIT_WIDTH,
     parameter int ENTRY_COUNT,
-    parameter int ADDR_WIDTH=32 // byte-addressable memory 
+    parameter int ADDR_WIDTH=32
 ) 
 (
     input logic [ADDR_WIDTH-1:0] read_address,
     output logic [BIT_WIDTH-1:0] read_data
 );
 
-// Note: Entry count is in bytes currently
 logic [BIT_WIDTH-1:0] instr_mem [0:ENTRY_COUNT-1]; //instantiate the instruction memory
 
 initial begin

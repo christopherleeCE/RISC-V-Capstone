@@ -211,9 +211,6 @@ module riscv_cpu_v2
         .q(PC)
     );
 
-    //should be converted to proper ROM at some point
-    //as of rn idk if its async or not
-    // response - This should now function as a ROM, and I believe it's async (no clk needed)
     instruction_memory #(
         .BIT_WIDTH(32),
         .ENTRY_COUNT(512)
@@ -473,7 +470,6 @@ module riscv_cpu_v2
         halt_M
     } = e2m_control_M;     
 
-    //TODO i think EC = 32 might mean we only have words 32 of datamem, mabye increase at some point
     //TODO implement rst, in current state data mem entries are initialized to 0xXXXXXXXX
     //-chris
     data_memory #(
