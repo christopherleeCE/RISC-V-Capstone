@@ -327,7 +327,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(23)
+        .WIDTH(26)
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
