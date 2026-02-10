@@ -38,7 +38,7 @@ these three instructions are functioning properly. I will put these as successfu
 anyone disagrees or has questions, please reach out - Edgar G.
 
 WAITING LIST: ...
-R-TYPE: SLT, SLTU
+R-TYPE: SLT, SLTU, SLL, SRL, SRA
 I-TYPE: 
 B-TYPE:
 M-TYPE: 
