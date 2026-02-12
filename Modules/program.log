@@ -5,25 +5,29 @@ program_asm.o:     file format elf32-littleriscv
 Disassembly of section .text:
 
 00000000 <_start>:
-   0:	00100513          	li	a0,1
-   4:	f00005b7          	lui	a1,0xf0000
-   8:	010000ef          	jal	18 <hamming_dist>
+   0:	02400513          	li	a0,36
+   4:	fec00593          	li	a1,-20
+   8:	010000ef          	jal	18 <shift_add_mult>
    c:	00000013          	nop
   10:	00000013          	nop
   14:	00100073          	ebreak
 
-00000018 <hamming_dist>:
-  18:	000282b3          	add	t0,t0,zero
-  1c:	02030313          	addi	t1,t1,32
-  20:	00100393          	li	t2,1
-  24:	00b54e33          	xor	t3,a0,a1
-  28:	00a54533          	xor	a0,a0,a0
-  2c:	0040006f          	j	30 <shift_add>
+00000018 <shift_add_mult>:
+  18:	00000293          	li	t0,0
+  1c:	00100313          	li	t1,1
+  20:	01f00393          	li	t2,31
+  24:	0040006f          	j	28 <condition>
 
-00000030 <shift_add>:
-  30:	005e5eb3          	srl	t4,t3,t0
-  34:	01d3feb3          	and	t4,t2,t4
-  38:	01d50533          	add	a0,a0,t4
-  3c:	00128293          	addi	t0,t0,1
-  40:	fe6298e3          	bne	t0,t1,30 <shift_add>
-  44:	00008067          	ret
+00000028 <condition>:
+  28:	0065fe33          	and	t3,a1,t1
+  2c:	006e1663          	bne	t3,t1,38 <advance>
+  30:	00a282b3          	add	t0,t0,a0
+  34:	0040006f          	j	38 <advance>
+
+00000038 <advance>:
+  38:	00651533          	sll	a0,a0,t1
+  3c:	0065d5b3          	srl	a1,a1,t1
+  40:	406383b3          	sub	t2,t2,t1
+  44:	fe7012e3          	bne	zero,t2,28 <condition>
+  48:	00500533          	add	a0,zero,t0
+  4c:	00008067          	ret

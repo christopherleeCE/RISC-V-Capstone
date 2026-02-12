@@ -303,39 +303,82 @@
 #     ebreak
     
 
-# Hamming Distance Calculator - Edgar G.
-# Learned about Hamming Distance when I was searching the web for applications
-# of XOR. This will take two strings/vectors and tell you how many bits are 
-# different between the two.
+# # Hamming Distance Calculator - Edgar G.
+# # Learned about Hamming Distance when I was searching the web for applications
+# # of XOR. This will take two strings/vectors and tell you how many bits are 
+# # different between the two.
 
-# DECLARE CONSTANTS
-.equ V_1, 0x00000001 #first vector
-.equ V_2, 0xf0000000 #second vector
-.equ MASK, 0x00000001 #this will isolate the rightmost bit
+# # DECLARE CONSTANTS
+# .equ V_1, 0x00000001 #first vector
+# .equ V_2, 0x8000000f #second vector
 
-.global _start
+# .global _start
+# .text
+# _start:
+# 	li a0, V_1 #load first vector
+# 	li a1, V_2 #second vector
+# 	jal hamming_dist #jump to function
+# 	nop # Hamming distance is returned in a0
+# 	nop
+# 	ebreak #pause the program
+	
+# hamming_dist:
+# 	add t0, t0, zero #this register tracks shifts needed
+# 	addi t1, t1, 32 #limit of shifts (32 bits)
+	
+# 	xor t2, a0, a1 # xor the two values - will find differences
+# 	xor a0, a0, a0 # clear a0 for next step
+# 	j shift_add #perform operation
+	
+# shift_add:
+# 	srl t3, t2, t0 #shift the bits to the right (no sign extension)
+# 	andi t3, t3, 1 #isolate the rightmost bit
+# 	add a0, a0, t3 #keep a running sum of bits that are different
+# 	addi t0, t0, 1 #increment the value to sweep through each bit of the XOR result
+# 	bne t0, t1, shift_add #repeat until all 32 bits have been scanned
+# 	jr ra # end function, return to main program
+
+
+# SLL, SRA Test - Edgar A. Gastelum Martinez
+# Simple shift-add multiplier - does not handle overflow
+# Choose two numbers to multiply by modifying the constants
+# Programs works with negative numbers
+# The result is returned in the a0 register
+
+# declare some constants
+.equ MULTIPLICAND, 36
+.equ MULTIPLIER, -20
+
+.globl _start
+
 .text
 _start:
-	li a0, V_1 #load first vector
-	li a1, V_2 #second vector
-	jal hamming_dist #jump to function
-	nop # Hamming distance is returned in a0
-	nop
-	ebreak #pause the program
-	
-hamming_dist:
-	add t0, t0, zero #this register tracks shifts needed
-	addi t1, t1, 32 #limit of shifts (32 bits)
-	li t2, MASK #load the mask
-	
-	xor t3, a0, a1 # xor the two values - will find differences
-	xor a0, a0, a0 # clear a0 for next step
-	j shift_add #perform operation
-	
-shift_add:
-	srl t4, t3, t0 #shift the bits to the right (no sign extension)
-	and t4, t2, t4 #isolate the rightmost bit
-	add a0, a0, t4 #keep a running sum of bits that are different
-	addi t0, t0, 1 #increment the value to sweep through each bit of the XOR result
-	bne t0, t1, shift_add #repeat until all 32 bits have been scanned
-	jr ra # end function, return to main program
+    li a0, MULTIPLICAND # prepare arguments
+    li a1, MULTIPLIER
+    
+    jal shift_add_mult # call the function
+    
+    nop
+    nop
+    ebreak # pause the program
+    
+
+shift_add_mult: # prepares registers for operation
+    addi t0, zero, 0 # will hold the running sum
+    addi t1, zero, 1 # will need a one for several things
+    addi t2, zero, 31 # a limit to not exceed 32 bits
+    j condition
+
+condition: # will evaluate whether to add partial product
+    and t3, a1, t1 #isolate rightmost digit of multiplier
+    bne t3, t1, advance # only add partial product if bit is one
+    add t0, t0, a0
+    j advance
+
+advance: # will either advance through multiplier or jump to main func.
+    sll a0, a0, t1 # shift the multiplicand left
+    srl a1, a1, t1 # shift the multiplier right (no sign extension)
+    sub t2, t2, t1 # decrement the number of shifts left
+    bne zero, t2, condition # loop until no shifts are left
+    add a0, zero, t0 # load the product for return in a0
+    jr ra # return back from function
