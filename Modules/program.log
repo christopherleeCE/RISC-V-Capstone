@@ -4,137 +4,14 @@ program_asm.o:     file format elf32-littleriscv
 
 Disassembly of section .text:
 
-00000000 <.text>:
-   0:	a6ad3537          	lui	a0,0xa6ad3
-   4:	15150513          	addi	a0,a0,337 # a6ad3151 <.text+0xa6ad3151>
-   8:	1e6215b7          	lui	a1,0x1e621
-   c:	06358593          	addi	a1,a1,99 # 1e621063 <.text+0x1e621063>
-  10:	028fe637          	lui	a2,0x28fe
-  14:	f7060613          	addi	a2,a2,-144 # 28fdf70 <.text+0x28fdf70>
-  18:	7f43f6b7          	lui	a3,0x7f43f
-  1c:	e3368693          	addi	a3,a3,-461 # 7f43ee33 <.text+0x7f43ee33>
-  20:	f0f0c737          	lui	a4,0xf0f0c
-  24:	43670713          	addi	a4,a4,1078 # f0f0c436 <.text+0xf0f0c436>
-  28:	288277b7          	lui	a5,0x28827
-  2c:	37778793          	addi	a5,a5,887 # 28827377 <.text+0x28827377>
-  30:	89692837          	lui	a6,0x89692
-  34:	aec80813          	addi	a6,a6,-1300 # 89691aec <.text+0x89691aec>
-  38:	bf1808b7          	lui	a7,0xbf180
-  3c:	9cd88893          	addi	a7,a7,-1587 # bf17f9cd <.text+0xbf17f9cd>
-  40:	0040016f          	jal	sp,44 <.text+0x44>
-  44:	00e5ed33          	or	s10,a1,a4
-  48:	00d58a33          	add	s4,a1,a3
-  4c:	0115fdb3          	and	s11,a1,a7
-  50:	00f67a33          	and	s4,a2,a5
-  54:	01060933          	add	s2,a2,a6
-  58:	0115ca33          	xor	s4,a1,a7
-  5c:	00a00263          	beq	zero,a0,60 <.text+0x60>
-  60:	02e60cb3          	mul	s9,a2,a4
-  64:	00a50863          	beq	a0,a0,74 <.text+0x74>
-  68:	01160bb3          	add	s7,a2,a7
-  6c:	40d78d33          	sub	s10,a5,a3
-  70:	00b80c33          	add	s8,a6,a1
-  74:	018000ef          	jal	ra,8c <.text+0x8c>
-  78:	01068d33          	add	s10,a3,a6
-  7c:	01177ab3          	and	s5,a4,a7
-  80:	02d88433          	mul	s0,a7,a3
-  84:	410704b3          	sub	s1,a4,a6
-  88:	00a574b3          	and	s1,a0,a0
-  8c:	00a679b3          	and	s3,a2,a0
-  90:	008000ef          	jal	ra,98 <.text+0x98>
-  94:	00a869b3          	or	s3,a6,a0
-  98:	00a88bb3          	add	s7,a7,a0
-  9c:	00c8edb3          	or	s11,a7,a2
-  a0:	00b80933          	add	s2,a6,a1
-  a4:	02a88a33          	mul	s4,a7,a0
-  a8:	011549b3          	xor	s3,a0,a7
-  ac:	00e8fa33          	and	s4,a7,a4
-  b0:	02e70c33          	mul	s8,a4,a4
-  b4:	031704b3          	mul	s1,a4,a7
-  b8:	008000ef          	jal	ra,c0 <.text+0xc0>
-  bc:	00a00463          	beq	zero,a0,c4 <.text+0xc4>
-  c0:	094100e7          	jalr	148(sp)
-  c4:	00b58933          	add	s2,a1,a1
-  c8:	090100e7          	jalr	144(sp)
-  cc:	00c70c33          	add	s8,a4,a2
-  d0:	00a00c63          	beq	zero,a0,e8 <.text+0xe8>
-  d4:	02e78433          	mul	s0,a5,a4
-  d8:	00b86a33          	or	s4,a6,a1
-  dc:	00f50cb3          	add	s9,a0,a5
-  e0:	02b70d33          	mul	s10,a4,a1
-  e4:	0118f433          	and	s0,a7,a7
-  e8:	00e78b33          	add	s6,a5,a4
-  ec:	00a54db3          	xor	s11,a0,a0
-  f0:	00b8c9b3          	xor	s3,a7,a1
-  f4:	00c504b3          	add	s1,a0,a2
-  f8:	018000ef          	jal	ra,110 <.text+0x110>
-  fc:	00a50663          	beq	a0,a0,108 <.text+0x108>
- 100:	40d78c33          	sub	s8,a5,a3
- 104:	00d84cb3          	xor	s9,a6,a3
- 108:	02f709b3          	mul	s3,a4,a5
- 10c:	0118f9b3          	and	s3,a7,a7
- 110:	00c84c33          	xor	s8,a6,a2
- 114:	00a00263          	beq	zero,a0,118 <.text+0x118>
- 118:	00e889b3          	add	s3,a7,a4
- 11c:	01070db3          	add	s11,a4,a6
- 120:	02e50d33          	mul	s10,a0,a4
- 124:	00b5f9b3          	and	s3,a1,a1
- 128:	00f5ebb3          	or	s7,a1,a5
- 12c:	02a68db3          	mul	s11,a3,a0
- 130:	40c58b33          	sub	s6,a1,a2
- 134:	00f88db3          	add	s11,a7,a5
- 138:	00c8ecb3          	or	s9,a7,a2
- 13c:	108100e7          	jalr	264(sp)
- 140:	0117e933          	or	s2,a5,a7
- 144:	40d88a33          	sub	s4,a7,a3
- 148:	00a5cb33          	xor	s6,a1,a0
- 14c:	00a00663          	beq	zero,a0,158 <.text+0x158>
- 150:	40e589b3          	sub	s3,a1,a4
- 154:	00e58b33          	add	s6,a1,a4
- 158:	02d60c33          	mul	s8,a2,a3
- 15c:	00c6c9b3          	xor	s3,a3,a2
- 160:	00f68bb3          	add	s7,a3,a5
- 164:	00f604b3          	add	s1,a2,a5
- 168:	00d77433          	and	s0,a4,a3
- 16c:	00c7cdb3          	xor	s11,a5,a2
- 170:	03080cb3          	mul	s9,a6,a6
- 174:	148100e7          	jalr	328(sp)
- 178:	41060c33          	sub	s8,a2,a6
- 17c:	00a00463          	beq	zero,a0,184 <.text+0x184>
- 180:	03070d33          	mul	s10,a4,a6
- 184:	02a60d33          	mul	s10,a2,a0
- 188:	40f70933          	sub	s2,a4,a5
- 18c:	02d78db3          	mul	s11,a5,a3
- 190:	010584b3          	add	s1,a1,a6
- 194:	168100e7          	jalr	360(sp)
- 198:	00a8fab3          	and	s5,a7,a0
- 19c:	00d56db3          	or	s11,a0,a3
- 1a0:	010749b3          	xor	s3,a4,a6
- 1a4:	00f64b33          	xor	s6,a2,a5
- 1a8:	00a00863          	beq	zero,a0,1b8 <.text+0x1b8>
- 1ac:	00e77933          	and	s2,a4,a4
- 1b0:	00f5e4b3          	or	s1,a1,a5
- 1b4:	0118e4b3          	or	s1,a7,a7
- 1b8:	02f78c33          	mul	s8,a5,a5
- 1bc:	02c70433          	mul	s0,a4,a2
- 1c0:	004000ef          	jal	ra,1c4 <.text+0x1c4>
- 1c4:	00a00a63          	beq	zero,a0,1d8 <.text+0x1d8>
- 1c8:	00e70bb3          	add	s7,a4,a4
- 1cc:	40f504b3          	sub	s1,a0,a5
- 1d0:	41088c33          	sub	s8,a7,a6
- 1d4:	00000013          	nop
- 1d8:	00000013          	nop
- 1dc:	00000013          	nop
- 1e0:	00000013          	nop
- 1e4:	00000013          	nop
- 1e8:	00000013          	nop
- 1ec:	00000013          	nop
- 1f0:	00000013          	nop
- 1f4:	00000013          	nop
- 1f8:	00000013          	nop
- 1fc:	0000006f          	j	1fc <.text+0x1fc>
- 200:	00000013          	nop
- 204:	00000013          	nop
- 208:	00000013          	nop
- 20c:	00000013          	nop
- 210:	00000013          	nop
+00000000 <_start>:
+   0:	00300513          	li	a0,3
+   4:	00200593          	li	a1,2
+   8:	fff00613          	li	a2,-1
+   c:	00a5b2b3          	sltu	t0,a1,a0
+  10:	00b63333          	sltu	t1,a2,a1
+  14:	00a5a3b3          	slt	t2,a1,a0
+  18:	00b62e33          	slt	t3,a2,a1
+  1c:	00000013          	nop
+  20:	00000013          	nop
+  24:	00100073          	ebreak

@@ -38,13 +38,13 @@ these three instructions are functioning properly. I will put these as successfu
 anyone disagrees or has questions, please reach out - Edgar G.
 
 WAITING LIST: ...
-R-TYPE: SLT, SLTU, SLL, SRL, SRA
+R-TYPE: SLL, SRL, SRA
 I-TYPE: LB, LH, LBU, LHU
 B-TYPE:
 M-TYPE: 
 
 SUCCESSFUL TESTS:
-R-TYPE: ADD, SUB, XOR, AND, OR
+R-TYPE: ADD, SUB, XOR, AND, OR, SLT, SLTU
 I-TYPE: ADDI/NOP, XORI, ANDI, ORI, LW, JALR
 S-TYPE: SW
 B-TYPE: BEQ, BNE, BLT, BGE
