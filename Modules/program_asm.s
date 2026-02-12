@@ -339,7 +339,7 @@
 # 	jr ra # end function, return to main program
 
 
-# SLL, SRA Test - Edgar A. Gastelum Martinez
+# SLL Test - Edgar A. Gastelum Martinez
 # Simple shift-add multiplier - does not handle overflow
 # Choose two numbers to multiply by modifying the constants
 # Programs works with negative numbers
