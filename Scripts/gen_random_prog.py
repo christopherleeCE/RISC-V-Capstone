@@ -3,11 +3,23 @@ from random import randint, choice
 
 INT32_MIN = -2**31
 INT32_MAX = 2**31 - 1
+INT12_MIN = -2**11
+INT12_MAX = 2**11 - 1
 RAND_SECTION_LENGTH = 100
 CHANCE_OF_NON_BRANCH_INSTR = 80
 CHANCE_OF_COND_JMP = 80 #verses non conditional branch
 CHANCE_OF_BRANCH_TAKEN = 50
 CHANCE_OF_JAL_VS_JALR = 50
+
+
+#string constant/literal of all the instructions in the RV32I
+R_TYPE = ["add", "sub", "xor", "and", "sll", "srl", "sra", "slt", "or",
+                "sltu", "mul", "mulh", "mulhsu", "mulhu" ]
+I_TYPE_ARITH = ["addi", "xori", "ori", "andi", "slli", "srli","srai",
+                 "slti", "sltiu"]
+I_TYPE_LOAD = ["lb", "lh", "lw", "lbu", "lhu"]
+# will probably want to add B-type, etc.
+
 
 # !CHANCE_OF_NON_BRANCH_INSTR
 #     CHANCE_OF_COND_JMP
@@ -30,12 +42,30 @@ def gen_branch_section(instr:str, taken:bool, pc_offset:int) -> str:
     if(instr == "jalr"):
         return f"jalr ra, sp, {4*(pc_offset + randint(1, 6))}\n"
 
+def gen_non_branch_section(instr:str, dest_reg:int, src_reg1:int, src_reg2:int) -> str:
+
+    #R-type instructions
+    if instr in R_TYPE:
+        return f"{instr} {dest_reg}, {src_reg1}, {src_reg2}\n"
+
+    #I-type (arithmetic)
+    elif instr in I_TYPE_ARITH:
+        return f"{instr} {dest_reg}, {src_reg1}, {randint(INT12_MIN, INT12_MAX)}\n"
+    
+    #I-type (load) - to be added
+
+    else: # no match, for whatever reason
+         return f"{instr}\n"
+    
+
+
 def main():
 
     #pc_offset, excludes labels
     pc_offset = 0
 
-    non_branch_instr = ["add", "sub", "mul", "and", "or", "xor"]
+    #instructions implemented so far
+    non_branch_instr = ["add", "mul", "and", "or", "xor", "srl", "sra", "sll", "addi", "xori", "ori", "andi"]
     branch_instr = ["beq"]
     a_regs = ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"]
     t_regs = ["t0", "t1", "t2", "t3", "t4", "t5", "t6"]
@@ -58,7 +88,8 @@ def main():
             #non branch instructions
             if(randint(0, 99) < CHANCE_OF_NON_BRANCH_INSTR):
 
-                f.write(f"{choice(non_branch_instr)} {choice(s_regs)}, {choice(a_regs)}, {choice(a_regs)}\n")
+                f.write(gen_non_branch_section(choice(non_branch_instr), choice(s_regs),
+                                                choice(a_regs), choice(a_regs)))
                 pc_offset = pc_offset + 1
 
             else: #branch instructions
