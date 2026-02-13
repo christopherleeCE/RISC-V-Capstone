@@ -5,29 +5,14 @@ program_asm.o:     file format elf32-littleriscv
 Disassembly of section .text:
 
 00000000 <_start>:
-   0:	02400513          	li	a0,36
-   4:	fec00593          	li	a1,-20
-   8:	010000ef          	jal	18 <shift_add_mult>
-   c:	00000013          	nop
-  10:	00000013          	nop
-  14:	00100073          	ebreak
-
-00000018 <shift_add_mult>:
-  18:	00000293          	li	t0,0
-  1c:	00100313          	li	t1,1
-  20:	01f00393          	li	t2,31
-  24:	0040006f          	j	28 <condition>
-
-00000028 <condition>:
-  28:	0065fe33          	and	t3,a1,t1
-  2c:	006e1663          	bne	t3,t1,38 <advance>
-  30:	00a282b3          	add	t0,t0,a0
-  34:	0040006f          	j	38 <advance>
-
-00000038 <advance>:
-  38:	00651533          	sll	a0,a0,t1
-  3c:	0065d5b3          	srl	a1,a1,t1
-  40:	406383b3          	sub	t2,t2,t1
-  44:	fe7012e3          	bne	zero,t2,28 <condition>
-  48:	00500533          	add	a0,zero,t0
-  4c:	00008067          	ret
+   0:	02000513          	li	a0,32
+   4:	fe000593          	li	a1,-32
+   8:	80000637          	lui	a2,0x80000
+   c:	00300693          	li	a3,3
+  10:	40d55533          	sra	a0,a0,a3
+  14:	40d5d5b3          	sra	a1,a1,a3
+  18:	01f00693          	li	a3,31
+  1c:	40d65633          	sra	a2,a2,a3
+  20:	00000013          	nop
+  24:	00000013          	nop
+  28:	00100073          	ebreak

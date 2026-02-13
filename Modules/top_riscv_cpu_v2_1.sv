@@ -38,13 +38,13 @@ these three instructions are functioning properly. I will put these as successfu
 anyone disagrees or has questions, please reach out - Edgar G.
 
 WAITING LIST: ...
-R-TYPE: SRA
+R-TYPE:
 I-TYPE: LB, LH, LBU, LHU
 B-TYPE: 
 M-TYPE: 
 
 SUCCESSFUL TESTS:
-R-TYPE: ADD, SUB, XOR, AND, OR, SLL, SRL, SLT, SLTU
+R-TYPE: ADD, SUB, XOR, AND, OR, SLL, SRL, SRA, SLT, SLTU
 I-TYPE: ADDI/NOP, XORI, ANDI, ORI, LW, JALR
 S-TYPE: SW
 B-TYPE: BEQ, BNE, BLT, BGE
@@ -387,7 +387,7 @@ module top_riscv_cpu_v2_1();
                         
                     end else if (func3 == 3'b101) begin //----SRA---------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as SRA.");
-                        write_reg(rd, REG_FILE[1][rs1] >>> REG_FILE[1][rs2]);
+                        write_reg(rd, $signed(REG_FILE[1][rs1]) >>> REG_FILE[1][rs2]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
                         
                     end

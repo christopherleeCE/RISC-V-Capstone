@@ -67,7 +67,7 @@ always_comb begin
     alu_sel_xor : result = operand_a ^ operand_b; // XOR
     alu_sel_sll : result = operand_a << operand_b; // SLL
     alu_sel_srl : result = operand_a >> operand_b; // SRL (zero-extension)
-    alu_sel_sra : result = operand_a >>> operand_b; // SRA (msb-extension)
+    alu_sel_sra : result = signed_a >>> operand_b; // SRA (msb-extension)
     alu_sel_slt : result = {31'b0,slt_result}; // SLT
     alu_sel_sltu : result = {31'b0,sltu_result}; // SLTU
     default : result = '0;

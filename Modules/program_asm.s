@@ -339,46 +339,70 @@
 # 	jr ra # end function, return to main program
 
 
-# SLL Test - Edgar A. Gastelum Martinez
-# Simple shift-add multiplier - does not handle overflow
-# Choose two numbers to multiply by modifying the constants
-# Programs works with negative numbers
-# The result is returned in the a0 register
+# # Very Simple SRA Test - Edgar G.
+# # check for sign preservation with division
+# .globl _start
 
-# declare some constants
-.equ MULTIPLICAND, 36
-.equ MULTIPLIER, -20
+# .text
 
-.globl _start
+# _start:
+#     li a0, 32 # positive dividend 
+#     li a1, -32 # negative dividend
+#     li a2, -2147483648 # lowest possible signed number
 
-.text
-_start:
-    li a0, MULTIPLICAND # prepare arguments
-    li a1, MULTIPLIER
+#     li a3, 3 # shift amount (divide by 8)
+#     sra a0, a0, a3 # 32/8 = 4
+#     sra a1, a1, a3 # -32/8 = -4
     
-    jal shift_add_mult # call the function
     
-    nop
-    nop
-    ebreak # pause the program
+#     li a3, 31 # shift amount (divide by 2^31 = 2,147,483,648)
+#     sra a2, a2, a3 # -2,147,483,648/2,147,483,648 = -1 
+    
+#     nop # pause the program
+#     nop
+#     ebreak
+
+
+# # SLL Test - Edgar A. Gastelum Martinez
+# # Simple shift-add multiplier - does not handle overflow
+# # Choose two numbers to multiply by modifying the constants
+# # Programs works with negative numbers
+# # The result is returned in the a0 register
+
+# # declare some constants
+# .equ MULTIPLICAND, 36
+# .equ MULTIPLIER, -20
+
+# .globl _start
+
+# .text
+# _start:
+#     li a0, MULTIPLICAND # prepare arguments
+#     li a1, MULTIPLIER
+    
+#     jal shift_add_mult # call the function
+    
+#     nop
+#     nop
+#     ebreak # pause the program
     
 
-shift_add_mult: # prepares registers for operation
-    addi t0, zero, 0 # will hold the running sum
-    addi t1, zero, 1 # will need a one for several things
-    addi t2, zero, 31 # a limit to not exceed 32 bits
-    j condition
+# shift_add_mult: # prepares registers for operation
+#     addi t0, zero, 0 # will hold the running sum
+#     addi t1, zero, 1 # will need a one for several things
+#     addi t2, zero, 31 # a limit to not exceed 32 bits
+#     j condition
 
-condition: # will evaluate whether to add partial product
-    and t3, a1, t1 #isolate rightmost digit of multiplier
-    bne t3, t1, advance # only add partial product if bit is one
-    add t0, t0, a0
-    j advance
+# condition: # will evaluate whether to add partial product
+#     and t3, a1, t1 #isolate rightmost digit of multiplier
+#     bne t3, t1, advance # only add partial product if bit is one
+#     add t0, t0, a0
+#     j advance
 
-advance: # will either advance through multiplier or jump to main func.
-    sll a0, a0, t1 # shift the multiplicand left
-    srl a1, a1, t1 # shift the multiplier right (no sign extension)
-    sub t2, t2, t1 # decrement the number of shifts left
-    bne zero, t2, condition # loop until no shifts are left
-    add a0, zero, t0 # load the product for return in a0
-    jr ra # return back from function
+# advance: # will either advance through multiplier or jump to main func.
+#     sll a0, a0, t1 # shift the multiplicand left
+#     srl a1, a1, t1 # shift the multiplier right (no sign extension)
+#     sub t2, t2, t1 # decrement the number of shifts left
+#     bne zero, t2, condition # loop until no shifts are left
+#     add a0, zero, t0 # load the product for return in a0
+#     jr ra # return back from function
