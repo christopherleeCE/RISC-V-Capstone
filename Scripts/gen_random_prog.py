@@ -32,10 +32,38 @@ I_TYPE_LOAD = ["lb", "lh", "lw", "lbu", "lhu"]
 def gen_branch_section(instr:str, taken:bool, pc_offset:int) -> str:
     if(instr == "beq"):
         if(taken):
-            return f"beq a0, a0, . + {4*randint(1, 6)}\n"
+            return choice((f"beq t1, t2, . + {4*randint(1, 6)}\n",
+                           f"beq t4, t5, . + {4*randint(1, 6)}\n"))
         else: #not taken
-            return f"beq zero, a0, . + {4*randint(1, 6)}\n"
-    
+            return choice((f"beq zero, t1, . + {4*randint(1, 6)}\n",
+                           f"beq zero, t4, . + {4*randint(1, 6)}\n"))
+        
+    if(instr == "bne"):
+        if(taken):
+            return choice((f"bne zero, t1, . + {4*randint(1, 6)}\n",
+                           f"bne zero, t4, . + {4*randint(1, 6)}\n"))
+        else: #not taken
+            return choice((f"bne t1, t2, . + {4*randint(1, 6)}\n",
+                           f"bne t4, t5, . + {4*randint(1, 6)}\n"))
+
+    if(instr == "blt"):
+        if(taken):
+            return choice((f"blt t0, t1, . + {4*randint(1, 6)}\n",
+                           f"blt t6, t5, . + {4*randint(1, 6)}\n"))
+        else: #not taken
+            return choice((f"blt t1, t0, . + {4*randint(1, 6)}\n",
+                           f"blt t5, t6, . + {4*randint(1, 6)}\n"))
+        
+    if(instr == "bge"):
+        if(taken):
+            return choice((f"bge t1, t0, . + {4*randint(1, 6)}\n", #greater then
+                           f"bge t5, t6, . + {4*randint(1, 6)}\n", #greater then
+                           f"bge t1, t2, . + {4*randint(1, 6)}\n", #equal to
+                           f"bge t4, t5, . + {4*randint(1, 6)}\n",))#equal to
+        else: #not taken
+            return choice((f"bge t0, t1, . + {4*randint(1, 6)}\n", #less then
+                           f"bge t6, t5, . + {4*randint(1, 6)}\n")) #less then
+            
     if(instr == "jal"):
         return f"jal ra, . + {4*randint(1, 6)}\n"
 
@@ -66,12 +94,20 @@ def main():
 
     #instructions implemented so far
     non_branch_instr = ["add", "mul", "and", "or", "xor", "srl", "sra", "sll", "addi", "xori", "ori", "andi"]
-    branch_instr = ["beq"]
+    cond_branch_instr = ["beq", "bne", "blt", "bge"]
     a_regs = ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"]
     t_regs = ["t0", "t1", "t2", "t3", "t4", "t5", "t6"]
     s_regs = ["s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11"]
 
     with open("temp.s", "w") as f:
+
+        f.write(f"li t0, 17\n")
+        f.write(f"li t1, 32\n")
+        f.write(f"li t2, 32\n")
+        f.write(f"li t3, 0\n") #not used
+        f.write(f"li t4, -13\n")
+        f.write(f"li t5, -13\n")
+        f.write(f"li t6, -37\n")
 
         for reg in a_regs:
             f.write(f"li {reg}, {randint(INT32_MIN, INT32_MAX)}\n")
@@ -96,12 +132,12 @@ def main():
                 if(randint(0, 99) < CHANCE_OF_COND_JMP):
                     if(randint(0, 99) < CHANCE_OF_BRANCH_TAKEN):
 
-                        f.write(gen_branch_section(choice(branch_instr), True, pc_offset))
+                        f.write(gen_branch_section(choice(cond_branch_instr), True, pc_offset))
                         pc_offset = pc_offset + 1
 
                     else:
 
-                        f.write(gen_branch_section(choice(branch_instr), False, pc_offset))
+                        f.write(gen_branch_section(choice(cond_branch_instr), False, pc_offset))
                         pc_offset = pc_offset + 1
 
                 else:
