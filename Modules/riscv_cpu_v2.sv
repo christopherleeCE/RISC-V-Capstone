@@ -492,7 +492,7 @@ module riscv_cpu_v2
     //-chris
     data_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(255)
+        .ENTRY_COUNT(256)
     ) my_data_mem (
         .readAddr(ALU_M),
         .writeAddr(ALU_M),
