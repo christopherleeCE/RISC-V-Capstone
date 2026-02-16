@@ -6,249 +6,249 @@ li t4, -13
 li t5, -13
 li t6, -37
 
-li s0, 56
+li s0, 0
 sw s0, 0(zero)
-li s0, -42
+li s0, 91
 sw s0, 4(zero)
-li s0, -89
+li s0, 82
 sw s0, 8(zero)
-li s0, -26
+li s0, -22
 sw s0, 12(zero)
-li s0, -54
+li s0, -43
 sw s0, 16(zero)
-li s0, 72
+li s0, 92
 sw s0, 20(zero)
-li s0, 1
+li s0, -78
 sw s0, 24(zero)
-li s0, 19
+li s0, -49
 sw s0, 28(zero)
-li s0, -88
+li s0, -26
 sw s0, 32(zero)
-li s0, 38
+li s0, 46
 sw s0, 36(zero)
-li s0, 40
+li s0, -2
 sw s0, 40(zero)
-li s0, 29
+li s0, -43
 sw s0, 44(zero)
-li s0, -36
+li s0, 25
 sw s0, 48(zero)
-li s0, 55
+li s0, 35
 sw s0, 52(zero)
-li s0, 76
+li s0, 8
 sw s0, 56(zero)
-li s0, -56
+li s0, 6
 sw s0, 60(zero)
-li s0, -75
+li s0, 6
 sw s0, 64(zero)
 li s0, -51
 sw s0, 68(zero)
-li s0, -13
+li s0, -82
 sw s0, 72(zero)
-li s0, -57
-sw s0, 76(zero)
 li s0, 94
+sw s0, 76(zero)
+li s0, -56
 sw s0, 80(zero)
-li s0, 11
-sw s0, 84(zero)
-li s0, 75
-sw s0, 88(zero)
-li s0, 30
-sw s0, 92(zero)
-li s0, 25
-sw s0, 96(zero)
-li s0, 62
-sw s0, 100(zero)
-li s0, 100
-sw s0, 104(zero)
-li s0, -97
-sw s0, 108(zero)
-li s0, -24
-sw s0, 112(zero)
-li s0, -53
-sw s0, 116(zero)
-li s0, 65
-sw s0, 120(zero)
-li s0, -34
-sw s0, 124(zero)
-li s0, -87
-sw s0, 128(zero)
-li s0, -35
-sw s0, 132(zero)
-li s0, 31
-sw s0, 136(zero)
-li s0, 45
-sw s0, 140(zero)
-li s0, 45
-sw s0, 144(zero)
-li s0, -11
-sw s0, 148(zero)
-li s0, -39
-sw s0, 152(zero)
-li s0, 50
-sw s0, 156(zero)
-li s0, 98
-sw s0, 160(zero)
-li s0, -92
-sw s0, 164(zero)
-li s0, 61
-sw s0, 168(zero)
-li s0, -46
-sw s0, 172(zero)
-li s0, 78
-sw s0, 176(zero)
-li s0, 92
-sw s0, 180(zero)
-li s0, -73
-sw s0, 184(zero)
-li s0, -18
-sw s0, 188(zero)
-li s0, 37
-sw s0, 192(zero)
-li s0, 28
-sw s0, 196(zero)
-li s0, 57
-sw s0, 200(zero)
-li s0, -90
-sw s0, 204(zero)
-li s0, 8
-sw s0, 208(zero)
-li s0, 90
-sw s0, 212(zero)
-li s0, 17
-sw s0, 216(zero)
-li s0, -71
-sw s0, 220(zero)
-li s0, -70
-sw s0, 224(zero)
-li s0, -18
-sw s0, 228(zero)
-li s0, -44
-sw s0, 232(zero)
-li s0, -11
-sw s0, 236(zero)
 li s0, -20
+sw s0, 84(zero)
+li s0, -97
+sw s0, 88(zero)
+li s0, -91
+sw s0, 92(zero)
+li s0, 98
+sw s0, 96(zero)
+li s0, 63
+sw s0, 100(zero)
+li s0, 20
+sw s0, 104(zero)
+li s0, -98
+sw s0, 108(zero)
+li s0, 67
+sw s0, 112(zero)
+li s0, 26
+sw s0, 116(zero)
+li s0, -71
+sw s0, 120(zero)
+li s0, 53
+sw s0, 124(zero)
+li s0, 60
+sw s0, 128(zero)
+li s0, 16
+sw s0, 132(zero)
+li s0, 82
+sw s0, 136(zero)
+li s0, -7
+sw s0, 140(zero)
+li s0, -95
+sw s0, 144(zero)
+li s0, -94
+sw s0, 148(zero)
+li s0, -52
+sw s0, 152(zero)
+li s0, -12
+sw s0, 156(zero)
+li s0, -22
+sw s0, 160(zero)
+li s0, -28
+sw s0, 164(zero)
+li s0, 22
+sw s0, 168(zero)
+li s0, -9
+sw s0, 172(zero)
+li s0, 59
+sw s0, 176(zero)
+li s0, 74
+sw s0, 180(zero)
+li s0, -12
+sw s0, 184(zero)
+li s0, 85
+sw s0, 188(zero)
+li s0, 6
+sw s0, 192(zero)
+li s0, 34
+sw s0, 196(zero)
+li s0, 83
+sw s0, 200(zero)
+li s0, 78
+sw s0, 204(zero)
+li s0, -65
+sw s0, 208(zero)
+li s0, -34
+sw s0, 212(zero)
+li s0, 94
+sw s0, 216(zero)
+li s0, -13
+sw s0, 220(zero)
+li s0, -2
+sw s0, 224(zero)
+li s0, -34
+sw s0, 228(zero)
+li s0, 99
+sw s0, 232(zero)
+li s0, 41
+sw s0, 236(zero)
+li s0, -38
 sw s0, 240(zero)
-li s0, 81
+li s0, 59
 sw s0, 244(zero)
-li s0, 93
+li s0, -55
 sw s0, 248(zero)
-li s0, 56
+li s0, 39
 sw s0, 252(zero)
 
-li s0, -1691669496
-li s1, -729414597
-li s2, 1841797039
-li s3, 1428630282
-li s4, -1860185013
-li s5, -802854376
-li s6, 150503001
-li s7, 1692375684
-li s8, -681451311
-li s9, 1205891413
-li s10, 1500864234
-li s11, -794132129
+li s0, -2017003367
+li s1, 888768672
+li s2, 1674756338
+li s3, 1085877378
+li s4, -1105780678
+li s5, 26906844
+li s6, -274315777
+li s7, 896071358
+li s8, -799403101
+li s9, 965280519
+li s10, 1984375333
+li s11, -1896690759
 
 jal sp, . + 4
-beq t1, t2, . + 24
-xor a1, s1, s0
-xori a5, s3, -183
-mul a7, s2, s1
-addi a1, s5, -401
-lbu s0, 188(zero)
-add a7, s10, s9
-andi a0, s1, -478
-bne t1, t2, . + 24
-add a1, s2, s6
-sb s1, 112(zero)
-and a4, s9, s6
-mul a6, s2, s8
-mul a3, s10, s4
-lh s1, 72(zero)
-sb s6, 116(zero)
-lbu s0, 16(zero)
-xori a0, s10, 28
-xori a2, s4, 779
-add a0, s4, s2
-blt t1, t0, . + 8
-bge t6, t5, . + 12
-srl a2, s5, s0
-lhu s1, 148(zero)
-xori a6, s4, -438
-mul a3, s0, s1
-sw s3, 144(zero)
-sb s2, 176(zero)
-bne zero, t1, . + 8
-lbu s2, 140(zero)
-andi a0, s7, 1453
-beq zero, t1, . + 4
-or a3, s0, s5
-beq zero, t4, . + 24
-beq t1, t2, . + 24
-xor a6, s1, s11
-or a1, s3, s5
-xori a4, s1, 265
-srl a3, s11, s9
-bge t0, t1, . + 12
-bne zero, t1, . + 12
-and a1, s0, s7
-xor a2, s0, s7
-beq zero, t1, . + 24
-sw s2, 232(zero)
-bne zero, t4, . + 24
-xor a7, s9, s0
-lh s8, 116(zero)
-bne zero, t4, . + 8
-or a4, s8, s3
-lh s4, 16(zero)
-lw s5, 48(zero)
-and a3, s5, s7
-beq zero, t1, . + 8
-sll a3, s2, s11
-add a0, s8, s10
-blt t1, t0, . + 24
+bne zero, t4, . + 20
+or a2, s3, s5
+jalr ra, sp, 32
+ori a4, s11, -1210
 jal ra, . + 12
-bge t0, t1, . + 16
-jalr ra, sp, 204
-andi a0, s1, 530
-addi a3, s0, -185
-srl a6, s9, s0
-xor a3, s3, s2
-xor a2, s9, s10
-lw s8, 160(zero)
-add a1, s1, s5
-xor a6, s6, s11
-blt t0, t1, . + 4
-lb s2, 184(zero)
-blt t0, t1, . + 4
-and a0, s3, s0
-or a7, s4, s8
-sra a6, s5, s11
-srl a0, s3, s3
-add a7, s6, s8
-andi a3, s1, -217
-ori a7, s2, -208
-blt t6, t5, . + 24
-bge t6, t5, . + 4
-add a1, s1, s2
-or a7, s0, s8
-xor a6, s9, s3
-xor a0, s8, s4
-and a2, s11, s9
-lhu s0, 192(zero)
-xor a3, s1, s4
-add a0, s6, s0
-bge t1, t2, . + 12
-mul a4, s4, s4
-sh s3, 184(zero)
-srl a4, s5, s5
-andi a3, s2, -1580
-and a0, s7, s6
-and a6, s2, s0
-sh s4, 216(zero)
-blt t5, t6, . + 20
-andi a6, s11, -1974
-or a7, s2, s0
-andi a6, s1, 219
+sll a6, s9, s5
+addi a7, s6, -1086
+xori a5, s3, -1973
+blt t1, t0, . + 16
+and a1, s9, s2
+xor a7, s10, s0
+blt t5, t6, . + 4
+andi a5, s11, 1299
+sll a5, s6, s3
+beq t4, t5, . + 12
+andi a5, s0, 479
+andi a2, s4, 1127
+blt t6, t5, . + 16
+bge t0, t1, . + 20
+bge t6, t5, . + 16
+bge t1, t0, . + 16
+mul a6, s5, s11
+mul a5, s0, s8
+addi a6, s1, 1292
+ori a3, s0, 1575
+addi a0, s11, -1840
+srl a3, s6, s4
+addi a0, s0, 436
+add a6, s2, s10
+andi a1, s2, 1118
+and a0, s0, s1
+andi a1, s10, -1637
+mul a0, s3, s0
+or a7, s7, s0
+or a2, s4, s3
+ori a1, s11, -1554
+sra a5, s3, s7
+addi a4, s9, -67
+srl a7, s3, s10
+or a4, s4, s2
+ori a5, s9, 351
+xor a5, s11, s6
+bge t4, t5, . + 20
+and a1, s0, s4
+sra a3, s7, s8
+sra a3, s5, s1
+srl a2, s4, s11
+ori a7, s5, 154
+mul a1, s1, s1
+add a1, s11, s4
+xor a4, s11, s11
+xor a5, s2, s5
+beq t1, t2, . + 24
+sra a4, s1, s3
+mul a1, s0, s8
+add a2, s8, s8
+beq t4, t5, . + 24
+xori a4, s2, -941
+xori a6, s10, 1097
+and a7, s2, s6
+xor a0, s8, s11
+and a3, s2, s3
+ori a5, s10, -140
+addi a7, s10, 1568
+add a0, s5, s9
+srl a3, s3, s6
+xori a0, s8, -235
+jal ra, . + 24
+addi a1, s1, 1131
+add a0, s8, s1
+srl a6, s6, s3
+sll a3, s6, s1
+bge t1, t0, . + 16
+srl a7, s9, s6
+or a5, s6, s0
+ori a7, s3, 220
+or a6, s4, s4
+andi a7, s3, 2005
+sll a2, s9, s0
+xori a2, s11, -488
+and a1, s9, s4
+sll a6, s2, s6
+ori a4, s4, -399
+sra a1, s2, s3
+srl a3, s3, s3
+xor a3, s2, s2
+xori a2, s1, -1682
+andi a3, s10, -488
+ori a0, s10, 110
+xor a4, s8, s10
+andi a6, s1, 1098
+sll a6, s3, s5
+sll a3, s9, s11
+beq t4, t5, . + 12
+andi a1, s9, -1162
+addi a0, s3, -1569
+beq t1, t2, . + 24
+mul a2, s7, s1
+andi a4, s4, 1753
+beq zero, t4, . + 16
 
 nop
 nop

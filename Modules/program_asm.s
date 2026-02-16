@@ -146,18 +146,22 @@
 
 # start:
 
-#         li      t0, 0x010      # 16 decimal
-#         li      t1, 0x003      # 3 decimal
-#         li      t2, -4               # signed negative
-#         lui     t2, 0xFFFFF
-#         li      t3, 0xFFE       # unsigned large (4294967294)
-#         lui     t3, 0xFFFFF
+        li      t0, 0x010      # 16 decimal
+        li      t1, 0x003      # 3 decimal
+        li      t2, -4               # signed negative
+        lui     t2, 0xFFFFF
+        li      t3, 0xFFE       # unsigned large (4294967294)
+        lui     t3, 0xFFFFF
 
-#         # -----------------------
-#         mul     a0, t0, t1          #0x30
-#         mulh    a1, t2, t1          #0xFFFFFFFF
-#         mulhsu  a2, t2, t3          #0xFFFFF000
-#         mulhu   a3, t0, t3          #0xF
+        # -----------------------
+        mul     a0, t0, t1          #0x30
+        mulh    a1, t2, t1          #0xFFFFFFFF
+        mulhsu  a2, t2, t3          #0xFFFFF000
+        mulhu   a3, t0, t3          #0xF
+
+        end:
+        jal ra, end
+
 
 # end:
 #         jal     zero, end

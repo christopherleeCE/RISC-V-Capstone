@@ -27,6 +27,8 @@ TODO make sure run time for master.ps1 is enuf
 
 TODO make sure that in rand testing the run time is enuf
 
+TODO find a way for the top file to terminate on its own, and not have to if a prog finished
+
 --------------TEST LOG----------------------------------------------------
 
 *NOTE: I now strongly agree with whoever said the verification for BEQ is prone to breaking.
@@ -208,7 +210,7 @@ module top_riscv_cpu_v2_1();
     );
 
     //golden results calculated on posedge
-    always_ff @(posedge clk) begin
+    always @(posedge clk) begin
 
         logic [63:0] product;   //used in mul's calculations
         logic dut_pc_redirected;
@@ -252,50 +254,6 @@ module top_riscv_cpu_v2_1();
             if(show_posedge_golden_calc) $display("\n\n\n<* rst = 0, intializing *>");
             PC_ASYNC <= '0;
 
-
-        /* when dut.pc gets redirected, it will flush the if and id stage with nop, we mirror
-        this in the golden[] by flushing golden[1] & golden[2], more needs to be done on the
-        gold tho, for example the pc in the gold jumps immediately after a jump/branch instruction
-        however in the dut it takes 3ish clks, because of this for the gold to line up with the
-        dut after those 3ish clks, we need to revert the PC_ASYNC, REG_FILE[1] & DATA_MEM[1] as 
-        shown below the remaining gold[]'s get iterated through the 5x1 matrix as seen in the for loop */
-        end else if(dut_pc_redirected) begin
-
-                if(show_posedge_golden_calc) $write("\n\n\t@POSEDGE: FLUSHED G[1] & G[2], rolled back PC_ASYNC, REG_FILE[1] & DATA_MEM[1]");
-
-                PC_ASYNC <=  PC[1];
-
-                PC[1]          <= 'x;
-                PC_TARGET[1]   <= 'x;
-                INSTR[1]       <= 32'h00000013;
-                RS1[1]         <= 'x;
-                RS2[1]         <= 'x;
-                RD[1]          <= 'x;
-                IM[1]          <= 'x;
-                REG_FILE[1]    <= REG_FILE[2];
-                DATA_MEM[1]    <= DATA_MEM[2];
-
-                PC[2]          <= 'x;
-                PC_TARGET[2]   <= 'x;
-                INSTR[2]       <= 32'h00000013;
-                RS1[2]         <= 'x;
-                RS2[2]         <= 'x;
-                RD[2]          <= 'x;
-                IM[2]          <= 'x;
-                REG_FILE[2]    <= '{default: 'x};
-                DATA_MEM[2]    <= '{default: 'x};
-
-                for (int ii = 9; ii > 2; ii--) begin
-                    PC[ii]            <= PC[ii-1];
-                    PC_TARGET[ii]     <= PC_TARGET[ii-1];
-                    INSTR[ii]         <= INSTR[ii-1];
-                    RS1[ii]           <= RS1[ii-1];
-                    RS2[ii]           <= RS2[ii-1];
-                    RD[ii]            <= RD[ii-1];
-                    IM[ii]            <= IM[ii-1];
-                    REG_FILE[ii]      <= REG_FILE[ii-1];
-                    DATA_MEM[ii]      <= DATA_MEM[ii-1];
-                end
 
         //if the pc is not being redirected in the dut, and rst is not low, gold calculations are made
         //pc_async, isntr_async, and instr_flush (at this point they are always the same) are looked at
@@ -506,10 +464,16 @@ module top_riscv_cpu_v2_1();
 
                 if(func3 == 3'b000) begin //-------JALR-------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as JALR.");
-                    write_reg(rd, PC_ASYNC + 4);
-                    PC_ASYNC <= REG_FILE[1][rs1] + {{20{imm_i[11]}}, imm_i[11:0]};
 
-                    //first entry in the matrix
+                    //because we are delaying to pc jmp, we need to delay the rd write,
+                    //as if we dont then the instr jalr, ra, ra, IM will write the to ra
+                    //efore it jumps, this is not desired, we need to jump either before
+                    //or at the same time we write to ra, so this write_reg() is moved below
+                    //the repeat() blocks
+                    //write_reg(rd, PC_ASYNC + 4);
+
+                    //take_branch({{20{imm_i[11]}}, imm_i[11:0]}, rs1, 'x, rd);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
                     PC[1] <= PC_ASYNC;
                     PC_TARGET[1] <= REG_FILE[1][rs1] + {{20{imm_i[11]}}, imm_i[11:0]};
                     INSTR[1] <= INSTR_FLUSH;
@@ -517,6 +481,32 @@ module top_riscv_cpu_v2_1();
                     RS2[1] <= 'x;
                     RD[1] <= rd;
                     IM[1] <= imm_i;
+
+                        repeat(1) @(posedge clk);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+                    PC[1]          <= PC_ASYNC;
+                    PC_TARGET[1]   <= 'x;
+                    INSTR[1]       <= 32'h00000013;
+                    RS1[1]         <= 'x;
+                    RS2[1]         <= 'x;
+                    RD[1]          <= 'x;
+                    IM[1]          <= 'x;
+
+                        repeat(1) @(posedge clk);
+                    PC_ASYNC <= REG_FILE[2][rs1] + {{20{imm_i[11]}}, imm_i[11:0]};
+                    PC[1]          <= PC_ASYNC;
+                    PC_TARGET[1]   <= 'x;
+                    INSTR[1]       <= 32'h00000013;
+                    RS1[1]         <= 'x;
+                    RS2[1]         <= 'x;
+                    RD[1]          <= 'x;
+                    IM[1]          <= 'x;
+
+                    //ideally we would write this to reg_file[0], but that doesnt exist, and the "infastructor" for it would be a major overhall
+                    //that being said i dont think the it writing to regfile[1] is an issue, or will cause any sort of "data hazard" in the top file
+                    //because its essentially being added  at an early extra spot in the golden[], but that extra spot will always be populated with
+                    //a 0x00000013 opcode (nop) so it should never cause any verification issues (hopefully :)
+                    write_reg(rd, PC[1]);
 
                 end
 
@@ -556,89 +546,85 @@ module top_riscv_cpu_v2_1();
                     if(show_posedge_golden_calc) $display("\tIdentified as BEQ.");
                     if(REG_FILE[1][rs1] == REG_FILE[1][rs2]) begin
                         if(show_posedge_golden_calc) $display("Branch Taken");
-                        PC_ASYNC <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
-                        
-                        PC_TARGET[1] <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+
+                        take_branch({{19{imm_b[12]}}, imm_b[12:0]}, rs1, rs2, 'x);
+
                     end else begin
                         if(show_posedge_golden_calc) $display("Branch not Taken");
+
                         PC_ASYNC <= PC_ASYNC + 4;
 
+                        PC[1] <= PC_ASYNC;
                         PC_TARGET[1] <= PC_ASYNC + 4;
+                        INSTR[1] <= INSTR_FLUSH;
+                        RS1[1] <= rs1;
+                        RS2[1] <= rs2;
+                        RD[1] <= 'x;
+                        IM[1] <= imm_b;
                     end
-
-                    //first entry in the matrix
-                    PC[1] <= PC_ASYNC;
-                    INSTR[1] <= INSTR_FLUSH;
-                    RS1[1] <= rs1;
-                    RS2[1] <= rs2;
-                    RD[1] <= 'x;
-                    IM[1] <= imm_b;
                     
                 end else if(func3 == 3'b001) begin //----BNE------------------------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as BNE.");
                     if(REG_FILE[1][rs1] != REG_FILE[1][rs2]) begin
                         if(show_posedge_golden_calc) $display("Branch Taken");
-                        PC_ASYNC <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
-                        
-                        PC_TARGET[1] <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+
+                        take_branch({{19{imm_b[12]}}, imm_b[12:0]}, rs1, rs2, 'x);
+
                     end else begin
                         if(show_posedge_golden_calc) $display("Branch not Taken");
+
                         PC_ASYNC <= PC_ASYNC + 4;
 
+                        PC[1] <= PC_ASYNC;
                         PC_TARGET[1] <= PC_ASYNC + 4;
+                        INSTR[1] <= INSTR_FLUSH;
+                        RS1[1] <= rs1;
+                        RS2[1] <= rs2;
+                        RD[1] <= 'x;
+                        IM[1] <= imm_b;
                     end
-
-                    //first entry in the matrix
-                    PC[1] <= PC_ASYNC;
-                    INSTR[1] <= INSTR_FLUSH;
-                    RS1[1] <= rs1;
-                    RS2[1] <= rs2;
-                    RD[1] <= 'x;
-                    IM[1] <= imm_b;
                     
                 end else if(func3 == 3'b100) begin //----BLT------------------------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as BLT.");
                     if(REG_FILE[1][rs1] < REG_FILE[1][rs2]) begin
                         if(show_posedge_golden_calc) $display("Branch Taken");
-                        PC_ASYNC <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
-                        
-                        PC_TARGET[1] <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+
+                        take_branch({{19{imm_b[12]}}, imm_b[12:0]}, rs1, rs2, 'x);
+
                     end else begin
                         if(show_posedge_golden_calc) $display("Branch not Taken");
+
                         PC_ASYNC <= PC_ASYNC + 4;
 
+                        PC[1] <= PC_ASYNC;
                         PC_TARGET[1] <= PC_ASYNC + 4;
+                        INSTR[1] <= INSTR_FLUSH;
+                        RS1[1] <= rs1;
+                        RS2[1] <= rs2;
+                        RD[1] <= 'x;
+                        IM[1] <= imm_b;
                     end
-
-                    //first entry in the matrix
-                    PC[1] <= PC_ASYNC;
-                    INSTR[1] <= INSTR_FLUSH;
-                    RS1[1] <= rs1;
-                    RS2[1] <= rs2;
-                    RD[1] <= 'x;
-                    IM[1] <= imm_b;
                     
                 end else if(func3 == 3'b101) begin //----BGE------------------------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as BGE.");
                     if(REG_FILE[1][rs1] >= REG_FILE[1][rs2]) begin
                         if(show_posedge_golden_calc) $display("Branch Taken");
-                        PC_ASYNC <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
-                        
-                        PC_TARGET[1] <= PC_ASYNC + {{19{imm_b[12]}}, imm_b[12:0]};
+
+                        take_branch({{19{imm_b[12]}}, imm_b[12:0]}, rs1, rs2, 'x);
+
                     end else begin
                         if(show_posedge_golden_calc) $display("Branch not Taken");
+
                         PC_ASYNC <= PC_ASYNC + 4;
 
+                        PC[1] <= PC_ASYNC;
                         PC_TARGET[1] <= PC_ASYNC + 4;
+                        INSTR[1] <= INSTR_FLUSH;
+                        RS1[1] <= rs1;
+                        RS2[1] <= rs2;
+                        RD[1] <= 'x;
+                        IM[1] <= imm_b;
                     end
-
-                    //first entry in the matrix
-                    PC[1] <= PC_ASYNC;
-                    INSTR[1] <= INSTR_FLUSH;
-                    RS1[1] <= rs1;
-                    RS2[1] <= rs2;
-                    RD[1] <= 'x;
-                    IM[1] <= imm_b;
                     
                 end
             
@@ -650,17 +636,10 @@ module top_riscv_cpu_v2_1();
 
                 //----JAL------------
                 if(show_posedge_golden_calc) $display("\tIdentified as JAL.");
-                write_reg(rd, PC_ASYNC + 4);
-                PC_ASYNC <= PC_ASYNC + {{11{imm_j[20]}}, imm_j[20:0]};
 
-                //first entry in the matrix
-                PC[1] <= PC_ASYNC;
-                PC_TARGET[1] <= PC_ASYNC + imm_j;
-                INSTR[1] <= INSTR_FLUSH;
-                RS1[1] <= 'x;
-                RS2[1] <= 'x;
-                RD[1] <= rd;
-                IM[1] <= imm_j;
+                write_reg(rd, PC_ASYNC + 4);
+
+                take_branch({{11{imm_j[20]}}, imm_j[20:0]}, 'x, 'x, rd);
 
             end else if (opcode == 7'b0110111) begin  //------U-TYPE-(LUI)-------------------------------
                 {imm_u[31:12], rd} = INSTR_FLUSH[31:7];
@@ -686,19 +665,21 @@ module top_riscv_cpu_v2_1();
                 if(show_posedge_golden_calc) $display("\t<### WARNING: Instruction type not currently recognized by TB ###>");
 
             end
+        end
+    end
 
-            //advance golden[] history
-            for (int ii = 9; ii > 1; ii--) begin
-                PC[ii]            <= PC[ii-1];
-                PC_TARGET[ii]     <= PC_TARGET[ii-1];
-                INSTR[ii]         <= INSTR[ii-1];
-                RS1[ii]           <= RS1[ii-1];
-                RS2[ii]           <= RS2[ii-1];
-                RD[ii]            <= RD[ii-1];
-                IM[ii]            <= IM[ii-1];
-                REG_FILE[ii]      <= REG_FILE[ii-1];
-                DATA_MEM[ii]      <= DATA_MEM[ii-1];
-            end
+    always @(posedge clk) begin
+        //advance golden[] history
+        for (int ii = 9; ii > 1; ii--) begin
+            PC[ii]            <= PC[ii-1];
+            PC_TARGET[ii]     <= PC_TARGET[ii-1];
+            INSTR[ii]         <= INSTR[ii-1];
+            RS1[ii]           <= RS1[ii-1];
+            RS2[ii]           <= RS2[ii-1];
+            RD[ii]            <= RD[ii-1];
+            IM[ii]            <= IM[ii-1];
+            REG_FILE[ii]      <= REG_FILE[ii-1];
+            DATA_MEM[ii]      <= DATA_MEM[ii-1];
         end
     end
 
@@ -756,6 +737,44 @@ module top_riscv_cpu_v2_1();
 
     //task & func defintions
     //============================================================================================================
+
+    task automatic take_branch(
+        logic [31:0] imm_param, 
+        logic [4:0] rs1_param, 
+        logic [4:0] rs2_param, 
+        logic [4:0] rd_param
+    );
+
+        PC_ASYNC <= PC_ASYNC + 32'h4;
+        PC[1] <= PC_ASYNC;
+        PC_TARGET[1] <= PC_ASYNC + imm_param;
+        INSTR[1] <= INSTR_FLUSH;
+        RS1[1] <= rs1_param;
+        RS2[1] <= rs2_param;
+        RD[1] <= rd_param;
+        IM[1] <= imm_param;  
+
+            repeat(1) @(posedge clk);
+        PC_ASYNC <= PC_ASYNC + 32'h4;
+        PC[1]          <= PC_ASYNC;
+        PC_TARGET[1]   <= 'x;
+        INSTR[1]       <= 32'h00000013;
+        RS1[1]         <= 'x;
+        RS2[1]         <= 'x;
+        RD[1]          <= 'x;
+        IM[1]          <= 'x;
+
+            repeat(1) @(posedge clk);
+        PC_ASYNC <= PC[2] + imm_param;
+        PC[1]          <= PC_ASYNC;
+        PC_TARGET[1]   <= 'x;
+        INSTR[1]       <= 32'h00000013;
+        RS1[1]         <= 'x;
+        RS2[1]         <= 'x;
+        RD[1]          <= 'x;
+        IM[1]          <= 'x;
+
+    endtask
 
     //abstracted write access to prevent writing to the zero register
     task automatic write_reg(
