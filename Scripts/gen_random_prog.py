@@ -182,13 +182,12 @@ def main():
 
         #end of program
 
-        for jj in range(10):
+        for jj in range(7):
             f.write(f"nop\n")
-        f.write(f"jal zero, .\n")
-        f.write(f"nop\nnop\nnop\nnop\n")
-        pc_offset = pc_offset + 12
-        f.write(f"nop\n")
-        pc_offset = pc_offset + 1
+        f.write("ebreak\n")
+        for kk in range(7):
+            f.write(f"nop\n")
+        pc_offset = pc_offset + 15
 
 
     return 0

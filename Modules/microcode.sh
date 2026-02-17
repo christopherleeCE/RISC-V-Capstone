@@ -53,6 +53,7 @@
 #SIG retire
 
 SIG halt
+SIG finish
 SIG branch_eq
 SIG branch_neq
 SIG branch_lt
@@ -288,8 +289,11 @@ alu_use_im
 dbus_sel_pc_plus_4
 reg_file_wr_en
 
-# DUMMY OPCODE ???_????____?_????____?_????____010____?_????____000_0000
-# dummy
+EBREAK OPCODE 0000_0000_0001___0_0000___000___0_0000___111_0011
+finish
+
+
+
 
 #
 # DO NOT delete this UD_fault microcode
