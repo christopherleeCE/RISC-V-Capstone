@@ -41,7 +41,7 @@ anyone disagrees or has questions, please reach out - Edgar G.
 
 WAITING LIST: ...
 R-TYPE:
-I-TYPE: LB, LH, LBU, LHU
+I-TYPE: LB, LH, LBU, LHU, SLLI, SRLI, SRAI, SLTI, SLTIU
 B-TYPE: 
 M-TYPE: 
 

@@ -8,7 +8,7 @@ INT12_MAX = 2**11 - 1
 RAND_SECTION_LENGTH = 100
 CHANCE_OF_NON_BRANCH_INSTR = 80
 CHANCE_OF_STORE_LOAD_INSTR = 0
-CHANCE_OF_STORE_VS_LOAD = 50
+CHANCE_OF_STORE_VS_LOAD = 0
 CHANCE_OF_COND_JMP = 80 #verses non conditional branch
 CHANCE_OF_BRANCH_TAKEN = 50
 CHANCE_OF_JAL_VS_JALR = 50
@@ -146,10 +146,10 @@ def main():
 
                 if(randint(0, 99) < CHANCE_OF_STORE_LOAD_INSTR):
                     if(randint(0, 99) < CHANCE_OF_STORE_VS_LOAD):
-                        f.write(f"{choice(load_instr)} {choice(s_regs)}, {4*randint(0, 63)}(zero)\n")
+                        f.write(f"{choice(store_instr)} {choice(s_regs)}, {4*randint(0, 63)}(zero)\n")
 
                     else:
-                        f.write(f"{choice(store_instr)} {choice(s_regs)}, {4*randint(0, 63)}(zero)\n")
+                        f.write(f"{choice(load_instr)} {choice(s_regs)}, {4*randint(0, 63)}(zero)\n")
 
                 else:
                     f.write(gen_arth_instr(choice(arth_instr), choice(a_regs),
