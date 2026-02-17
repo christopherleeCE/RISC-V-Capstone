@@ -87,55 +87,67 @@
 # end:
 #         jal zero, end
 
-# start:
-#         addi a0, zero, 0x10
-#         addi a1, zero, 0x17
-#         add a2, a0, a1
-#         lui a3, 0xF
-#         sub a4, a1, a0
-#         jal ra, . + 4
-#         addi t0, t0, 0x30
-#         addi t1, t1, 0x34
-#         addi t2, t2, 0x38
-#         jal ra, label + 4
-#         addi a5, zero, 0x3C
-#         addi a5, zero, 0x40
-# label:
-#         addi a5, zero, 0x44
-#         sw a2, 0xC(zero)
-#         lw a6, 0xC(zero)
-#         addi a7, zero, 0x40
-#         #jalr ra, a7, 0x8
-#         # nop
-#         # beq a5, zero, beq_label
-#         # nop
-#         # beq a5, a6, beq_label
-#         # nop
-#         nop
-#         beq t0, zero, beq_label #desync here
-#         sw a0, 0(zero)
-#         sw a1, 4(zero)
-#         sw a2, 8(zero)
-#         sw a3, 12(zero)
-#         beq a5, zero, beq_label
-#         lw s8, 0(zero)
-#         lw s9, 4(zero)
-#         lw s10, 8(zero)
-#         lw s11, 16(zero)
-# beq_label:
-#         lw s11, 0(zero)
-#         lw s10, 4(zero)
-#         lw s9, 8(zero)
-#         lw s8, 12(zero)
-#         sw a4, 16(zero)
-#         sw a5, 20(zero)
-#         sw a6, 24(zero)
-#         sw a7, 28(zero)
-# end:
-#         jal ra, end
-#         nop
-#         nop
-#         nop
+start:
+        addi a0, zero, 0x10
+        addi a1, zero, 0x17
+        add a2, a0, a1
+        lui a3, 0xF
+        sub a4, a1, a0
+        jal ra, . + 4
+        addi t0, t0, 0x30
+        addi t1, t1, 0x34
+        addi t2, t2, 0x38
+        jal ra, label + 4
+        addi a5, zero, 0x3C
+        addi a5, zero, 0x40
+label:
+        addi a5, zero, 0x44
+        sw a2, 0xC(zero)
+        lw a6, 0xC(zero)
+        addi a7, zero, 0x40
+        #jalr ra, a7, 0x8
+        # nop
+        # beq a5, zero, beq_label
+        # nop
+        # beq a5, a6, beq_label
+        # nop
+        nop
+        beq t0, zero, beq_label #desync here
+        sw a0, 0(zero)
+        sw a1, 4(zero)
+        sw a2, 8(zero)
+        sw a3, 12(zero)
+        beq a5, zero, beq_label
+        lw s8, 0(zero)
+        lw s9, 4(zero)
+        lw s10, 8(zero)
+        lw s11, 16(zero)
+beq_label:
+        lw s11, 0(zero)
+        lw s10, 4(zero)
+        lw s9, 8(zero)
+        lw s8, 12(zero)
+        sw a4, 16(zero)
+        sw a5, 20(zero)
+        sw a6, 24(zero)
+        sw a7, 28(zero)
+
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        ebreak
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+
 
 
 #         # nop #DNR
@@ -374,39 +386,39 @@
 # The result is returned in the a0 register
 
 # declare some constants
-.equ MULTIPLICAND, 36
-.equ MULTIPLIER, -20
+# .equ MULTIPLICAND, 36
+# .equ MULTIPLIER, -20
 
-.globl _start
+# .globl _start
 
-.text
-_start:
-    li a0, MULTIPLICAND # prepare arguments
-    li a1, MULTIPLIER
+# .text
+# _start:
+#     li a0, MULTIPLICAND # prepare arguments
+#     li a1, MULTIPLIER
     
-    jal shift_add_mult # call the function
+#     jal shift_add_mult # call the function
     
-    nop
-    nop
-    ebreak # pause the program
+#     nop
+#     nop
+#     ebreak # pause the program
     
 
-shift_add_mult: # prepares registers for operation
-    addi t0, zero, 0 # will hold the running sum
-    addi t1, zero, 1 # will need a one for several things
-    addi t2, zero, 31 # a limit to not exceed 32 bits
-    j condition
+# shift_add_mult: # prepares registers for operation
+#     addi t0, zero, 0 # will hold the running sum
+#     addi t1, zero, 1 # will need a one for several things
+#     addi t2, zero, 31 # a limit to not exceed 32 bits
+#     j condition
 
-condition: # will evaluate whether to add partial product
-    and t3, a1, t1 #isolate rightmost digit of multiplier
-    bne t3, t1, advance # only add partial product if bit is one
-    add t0, t0, a0
-    j advance
+# condition: # will evaluate whether to add partial product
+#     and t3, a1, t1 #isolate rightmost digit of multiplier
+#     bne t3, t1, advance # only add partial product if bit is one
+#     add t0, t0, a0
+#     j advance
 
-advance: # will either advance through multiplier or jump to main func.
-    sll a0, a0, t1 # shift the multiplicand left
-    srl a1, a1, t1 # shift the multiplier right (no sign extension)
-    sub t2, t2, t1 # decrement the number of shifts left
-    bne zero, t2, condition # loop until no shifts are left
-    add a0, zero, t0 # load the product for return in a0
-    jr ra # return back from function
+# advance: # will either advance through multiplier or jump to main func.
+#     sll a0, a0, t1 # shift the multiplicand left
+#     srl a1, a1, t1 # shift the multiplier right (no sign extension)
+#     sub t2, t2, t1 # decrement the number of shifts left
+#     bne zero, t2, condition # loop until no shifts are left
+#     add a0, zero, t0 # load the product for return in a0
+#     jr ra # return back from function

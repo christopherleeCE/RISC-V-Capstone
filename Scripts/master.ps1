@@ -42,7 +42,7 @@ for($ii = 0; $ii -lt $runs; $ii++){
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Running simulation..."
-    & ..\Scripts\simulate_sv.ps1 -continue -time 15
+    & ..\Scripts\simulate_sv.ps1 -continue -time 1
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Flow complete."
