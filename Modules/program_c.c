@@ -1,23 +1,40 @@
-
-void _start() __attribute__((naked, used));
-void _start() {
+// minimal_test.c
+__attribute__((naked, used)) 
+void _start(void) {
     __asm__ volatile (
-        "li sp, 0x80\n"  // initialize stack pointer
-        "j main\n"             // jump to main
+        "li sp, 0x100\n"   // initialize stack pointer
+        "jal ra, main\n"    // call main, ra points to ebreak
+        "nop\n"
+        "nop\n"
+        "nop\n"
+        "nop\n"
+        "nop\n"
+        "nop\n"
+        "nop\n"
+        "ebreak\n"          // stop simulation when main returns
+        "nop\n"
+        "nop\n"
+        "nop\n"
+        "nop\n"
+        "nop\n"
+        "nop\n"
+        "nop\n"
     );
 }
 
-
 int main() {
-    int a[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    int b[] = {11, 12, 13, 14, 15, 16, 17, 18, 19};
-    int c[] = {21, 22, 23, 24, 25, 26, 27, 28, 29};
-    int d[] = {31, 32, 33, 34, 35, 36, 37, 38, 39};
-    int e[] = {41, 42, 43, 44, 45, 46, 47, 48, 49};
-    int f[] = {51, 52, 53, 54, 55, 56, 57, 58, 59};
-    int g[] = {61, 62, 63, 64, 65, 66, 67, 68, 69};
-    int h[] = {71, 72, 73, 74, 75, 76, 77, 78, 79};
-    int i[] = {81, 82, 83, 84, 85, 86, 87, 88, 89};
-    int j[] = {91, 92, 93, 94, 95, 96, 97, 98, 99};
-    return 0;
+    int n = 5, i = 0, t1 = 0, t2 = 1, nextTerm;
+
+    while (i < n) {
+        if (i <= 1) {
+            nextTerm = i;
+        } else {
+            nextTerm = t1 + t2;
+            t1 = t2;
+            t2 = nextTerm;
+        }
+        i++;
+    }
+
+    return nextTerm;
 }

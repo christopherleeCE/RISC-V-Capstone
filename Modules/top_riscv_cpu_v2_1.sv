@@ -206,6 +206,7 @@ module top_riscv_cpu_v2_1();
 
     final begin
         if(~ofinish) $error("EBREAK was not called and the simulation did no reach the end of the program, not a PASS");
+        $display("Return value in a0: %0d | 0x%h", REG_FILE[1][10], REG_FILE[1][10]);
     end
 
     //declaration of golden_cpus instr mem, this instansiation should be a perfect mirror of whats instasiated in the DUT (i think)
@@ -669,6 +670,20 @@ module top_riscv_cpu_v2_1();
                 RD[1] <= rd;
                 IM[1] <= imm_u;
 
+            end else if (INSTR_FLUSH == 32'b00000000000100000000000001110011) begin
+                if(show_posedge_golden_calc) $display("\tIdentified as EBREAK.");
+
+                PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                //first entry in the matrix
+                PC[1] <= PC_ASYNC;
+                PC_TARGET[1] <= PC_ASYNC + 4;
+                INSTR[1] <= INSTR_FLUSH;
+                RS1[1] <= 'x;
+                RS2[1] <= 'x;
+                RD[1] <= 'x;
+                IM[1] <= 'x;
+
             end else begin
                 //UNKNOWN ------------------------------
                 if(show_posedge_golden_calc) $display("\t<### WARNING: Instruction type not currently recognized by TB ###>");
@@ -744,7 +759,7 @@ module top_riscv_cpu_v2_1();
         end
 
         if(ofinish == 1'b1) begin
-            $display("EBREAK called and finish singal recieved. Ending Verification... This is not an error, check error report.");
+            $display("EBREAK called and finish singal recieved. Ending Verification...");
             $finish(0);
         end
     end
@@ -1367,7 +1382,14 @@ module top_riscv_cpu_v2_1();
                     else begin $display(" FAILURE"); return 1; end
 
                 end
-                // else return 1;
+
+            end else if (INSTR[row] == 32'b00000000000100000000000001110011) begin
+
+                if(show_negedge_verify_row) $write("\tIdentified as EBREAK:");
+
+                //nothing
+
+                if(row == 5) $display(" Success");
 
             end else begin
                 //UNKNOWN ------------------------------

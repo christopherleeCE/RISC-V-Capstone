@@ -37,7 +37,8 @@ void _start(void) __attribute__((naked, used));
 void _start(void) {
     __asm__ volatile (
         "li sp, 0x1000\n"
-        "j main\n"
+        "jal ra, main\n"
+        "ebreak\n"
     );
 }
 
