@@ -198,7 +198,7 @@ module top_riscv_cpu_v2_1();
 
     final begin
         if(~ofinish) $error("EBREAK was not called and the simulation did no reach the end of the program, not a PASS");
-        $display("Return value in a0: %0d | 0x%h", REG_FILE[1][10], REG_FILE[1][10]);
+        $display("Return value in a0: %0d | 0x%h", $signed(REG_FILE[1][10]), REG_FILE[1][10]);
     end
 
     //declaration of golden_cpus instr mem, this instansiation should be a perfect mirror of whats instasiated in the DUT (i think)
@@ -783,7 +783,7 @@ module top_riscv_cpu_v2_1();
 
         if(ofinish == 1'b1) begin
             $display("EBREAK called and finish singal recieved. Ending Verification...");
-            $finish(0);
+            $finish(17);
         end
     end
 

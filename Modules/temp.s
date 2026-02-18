@@ -126,7 +126,7 @@ li s0, 60
 sw s0, 232(zero)
 li s0, -46
 sw s0, 236(zero)
-li s0, -10
+li s0, -82
 sw s0, 240(zero)
 li s0, -3
 sw s0, 244(zero)

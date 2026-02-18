@@ -49,6 +49,8 @@ int main() {
 
     #ifdef X86_BUILD
         printf("<%d>\n", ret);
+    #else
+        ret = -ret;
     #endif
 
     return ret;

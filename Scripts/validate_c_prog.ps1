@@ -1,4 +1,4 @@
-#Call from 'Modules' directory using ../Scripts/simulate_sv.ps1
+#only works with .text only programs
 
 param(
     [switch]$help,
@@ -10,7 +10,8 @@ param(
     [switch]$continue,
     [switch]$verbose,
     [switch]$v,
-    [int]$time = 100
+    [int]$time = 100,
+    [string]$program_file_name = ''
 )
 
 $vsimArgs = ""
@@ -41,4 +42,24 @@ if ($continue)          { $vsimArgs += " +CONTINUE" }
 if ($verbose)           { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 if ($v)                 { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 
+wsl bash -c "../Scripts/compile_gcc.sh $program_file_name"
 vsim -c -do "file delete -force sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs; run ${time}us; quit -f"
+
+Write-Output('')
+Write-Output("Parsing return value from sim...`n")
+$simReturnValue = [int](
+    (Select-String -Path .\sim.log -Pattern 'Return value in a0:\s+(-?\d+)').Matches[0].Groups[1].Value
+)
+
+Write-Output("Running program in WSL-x86 and parsing return value`n")
+$x86ReturnValue = wsl bash -c "gcc $program_file_name -DX86_BUILD -o x86.out && ./x86.out"
+$x86ReturnValue = [int]$x86ReturnValue.Trim('<', '>')
+
+if($x86ReturnValue -eq $simReturnValue){
+    Write-Output("$($PSStyle.Foreground.Green)Pass... `nsim: $simReturnValue `nx86: $x86ReturnValue$($PSStyle.Reset)`n")
+
+}else{
+    Write-Output("$($PSStyle.Foreground.Red)Fail... `nsim: $simReturnValue `nx86: $x86ReturnValue$($PSStyle.Reset)`n")
+
+}
+
