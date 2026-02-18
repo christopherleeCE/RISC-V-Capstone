@@ -1,4 +1,5 @@
 import sys
+from re import match, IGNORECASE
 from random import randint, choice
 
 INT32_MIN = -2**31
@@ -85,7 +86,11 @@ def gen_arth_instr(instr:str, dest_reg:int, src_reg1:int, src_reg2:int) -> str:
 
     #I-type (arithmetic)
     elif instr in I_TYPE_ARITH:
-        return f"{instr} {dest_reg}, {src_reg1}, {randint(INT12_MIN, INT12_MAX)}\n"
+        if (match(r'sr|sll',instr, IGNORECASE)):
+            # for immediate shifts
+            return f"{instr} {dest_reg}, {src_reg1}, {randint(0, 31)}\n"
+        else:
+            return f"{instr} {dest_reg}, {src_reg1}, {randint(INT12_MIN, INT12_MAX)}\n"
     
     #I-type (load) - to be added
 

@@ -87,66 +87,66 @@
 # end:
 #         jal zero, end
 
-start:
-        addi a0, zero, 0x10
-        addi a1, zero, 0x17
-        add a2, a0, a1
-        lui a3, 0xF
-        sub a4, a1, a0
-        jal ra, . + 4
-        addi t0, t0, 0x30
-        addi t1, t1, 0x34
-        addi t2, t2, 0x38
-        jal ra, label + 4
-        addi a5, zero, 0x3C
-        addi a5, zero, 0x40
-label:
-        addi a5, zero, 0x44
-        sw a2, 0xC(zero)
-        lw a6, 0xC(zero)
-        addi a7, zero, 0x40
-        #jalr ra, a7, 0x8
-        # nop
-        # beq a5, zero, beq_label
-        # nop
-        # beq a5, a6, beq_label
-        # nop
-        nop
-        beq t0, zero, beq_label #desync here
-        sw a0, 0(zero)
-        sw a1, 4(zero)
-        sw a2, 8(zero)
-        sw a3, 12(zero)
-        beq a5, zero, beq_label
-        lw s8, 0(zero)
-        lw s9, 4(zero)
-        lw s10, 8(zero)
-        lw s11, 16(zero)
-beq_label:
-        lw s11, 0(zero)
-        lw s10, 4(zero)
-        lw s9, 8(zero)
-        lw s8, 12(zero)
-        sw a4, 16(zero)
-        sw a5, 20(zero)
-        sw a6, 24(zero)
-        sw a7, 28(zero)
+# start:
+#         addi a0, zero, 0x10
+#         addi a1, zero, 0x17
+#         add a2, a0, a1
+#         lui a3, 0xF
+#         sub a4, a1, a0
+#         jal ra, . + 4
+#         addi t0, t0, 0x30
+#         addi t1, t1, 0x34
+#         addi t2, t2, 0x38
+#         jal ra, label + 4
+#         addi a5, zero, 0x3C
+#         addi a5, zero, 0x40
+# label:
+#         addi a5, zero, 0x44
+#         sw a2, 0xC(zero)
+#         lw a6, 0xC(zero)
+#         addi a7, zero, 0x40
+#         #jalr ra, a7, 0x8
+#         # nop
+#         # beq a5, zero, beq_label
+#         # nop
+#         # beq a5, a6, beq_label
+#         # nop
+#         nop
+#         beq t0, zero, beq_label #desync here
+#         sw a0, 0(zero)
+#         sw a1, 4(zero)
+#         sw a2, 8(zero)
+#         sw a3, 12(zero)
+#         beq a5, zero, beq_label
+#         lw s8, 0(zero)
+#         lw s9, 4(zero)
+#         lw s10, 8(zero)
+#         lw s11, 16(zero)
+# beq_label:
+#         lw s11, 0(zero)
+#         lw s10, 4(zero)
+#         lw s9, 8(zero)
+#         lw s8, 12(zero)
+#         sw a4, 16(zero)
+#         sw a5, 20(zero)
+#         sw a6, 24(zero)
+#         sw a7, 28(zero)
 
-        nop
-        nop
-        nop
-        nop
-        nop
-        nop
-        nop
-        ebreak
-        nop
-        nop
-        nop
-        nop
-        nop
-        nop
-        nop
+#         nop
+#         nop
+#         nop
+#         nop
+#         nop
+#         nop
+#         nop
+#         ebreak
+#         nop
+#         nop
+#         nop
+#         nop
+#         nop
+#         nop
+#         nop
 
 
 
@@ -355,37 +355,37 @@ beq_label:
 # 	jr ra # end function, return to main program
 
 
-# # Very Simple SRA Test - Edgar G.
-# # check for sign preservation with division
-# .globl _start
+# Very Simple SRA Test - Edgar G.
+# check for sign preservation with division
+.globl _start
 
-# .text
+.text
 
-# _start:
-#     li a0, 32 # positive dividend 
-#     li a1, -32 # negative dividend
-#     li a2, -2147483648 # lowest possible signed number
+_start:
+    li a0, 32 # positive dividend 
+    li a1, -32 # negative dividend
+    li a2, -2147483648 # lowest possible signed number
 
-#     li a3, 3 # shift amount (divide by 8)
-#     sra a0, a0, a3 # 32/8 = 4
-#     sra a1, a1, a3 # -32/8 = -4
+    #li a3, 3 # shift amount (divide by 8)
+    srai a0, a0, 3 # 32/8 = 4
+    srai a1, a1, 3 # -32/8 = -4
     
     
-#     li a3, 31 # shift amount (divide by 2^31 = 2,147,483,648)
-#     sra a2, a2, a3 # -2,147,483,648/2,147,483,648 = -1 
+    #li a3, 31 # shift amount (divide by 2^31 = 2,147,483,648)
+    srai a2, a2, 31 # -2,147,483,648/2,147,483,648 = -1 
     
-#     nop # pause the program
-#     nop
-#     ebreak
+    nop # pause the program
+    nop
+    ebreak
 
 
-# SLL Test - Edgar A. Gastelum Martinez
-# Simple shift-add multiplier - does not handle overflow
-# Choose two numbers to multiply by modifying the constants
-# Programs works with negative numbers
-# The result is returned in the a0 register
+# # SLL Test - Edgar A. Gastelum Martinez
+# # Simple shift-add multiplier - does not handle overflow
+# # Choose two numbers to multiply by modifying the constants
+# # Programs works with negative numbers
+# # The result is returned in the a0 register
 
-# declare some constants
+# # declare some constants
 # .equ MULTIPLICAND, 36
 # .equ MULTIPLIER, -20
 
