@@ -29,6 +29,8 @@ TODO make sure that in rand testing the run time is enuf
 
 TODO find a way for the top file to terminate on its own, and not have to if a prog finished
 
+TODO automate directed tests
+
 --------------TEST LOG----------------------------------------------------
 
 WAITING LIST: ...
