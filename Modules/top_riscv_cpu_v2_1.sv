@@ -31,14 +31,6 @@ TODO find a way for the top file to terminate on its own, and not have to if a p
 
 --------------TEST LOG----------------------------------------------------
 
-*NOTE: I now strongly agree with whoever said the verification for BEQ is prone to breaking.
-Unfortunately, this applies for other B-type instructions, so it seems. HOWEVER, I am confident 
-the branch hardware has been working okay so far, including for BNE, BLT, and BGE. If you run 
-the assembly program I wrote for BNE/BLT/BGE, and look at the register dump, the values in s0 
-and s1 match the target value. Within the context of the program, I believe it shows that the
-these three instructions are functioning properly. I will put these as successful for now, if
-anyone disagrees or has questions, please reach out - Edgar G.
-
 WAITING LIST: ...
 R-TYPE:
 I-TYPE: LB, LH, LBU, LHU, SLLI, SRLI, SRAI, SLTI, SLTIU
@@ -439,6 +431,37 @@ module top_riscv_cpu_v2_1();
                         //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] & imm_i, rd, rs1);
                         write_reg(rd, REG_FILE[1][rs1] & imm_i);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                end else if (func3 == 3'b001 && imm_i[11:5] == 7'h00) begin //-------SLLI---------------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as SLLI.");
+                        //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] << imm_i[4:0], rd, rs1);
+                        write_reg(rd, REG_FILE[1][rs1] << imm_i[4:0]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                end else if (func3 == 3'b101 && imm_i[11:5] == 7'h00) begin //-------SRLI---------------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as SRLI.");
+                        //$display("data: %h | rd: %d | rs1: %d", REG_FILE[1][rs1] >> imm_i[4:0], rd, rs1);
+                        write_reg(rd, REG_FILE[1][rs1] >> imm_i[4:0]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                end else if (func3 == 3'b101 && imm_i[11:5] == 7'h20) begin //-------SRAI---------------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as SRAI.");
+                        //$display("data: %h | rd: %d | rs1: %d", $signed(REG_FILE[1][rs1]) >>> imm_i[4:0], rd, rs1);
+                        write_reg(rd, $signed(REG_FILE[1][rs1]) >>> imm_i[4:0]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                end else if (func3 == 3'b010) begin //-------SLTI---------------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as SLTI.");
+                        //$display("data: %h | rd: %d | rs1: %d", ($signed(REG_FILE[1][rs1]) < $signed(imm_i))? 32'd1: 32'd0, rd, rs1);
+                        write_reg(rd, ($signed(REG_FILE[1][rs1]) < $signed(imm_i))? 32'd1: 32'd0);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                end else if (func3 == 3'b011) begin //-------SLTIU---------------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as SLTIU.");
+                        //$display("data: %h | rd: %d | rs1: %d", ($unsigned(REG_FILE[1][rs1]) < $unsigned(imm_i))? 32'd1: 32'd0, rd, rs1);
+                        write_reg(rd, ($unsigned(REG_FILE[1][rs1]) < $unsigned(imm_i))? 32'd1: 32'd0);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
                 end
 
 
@@ -1246,6 +1269,61 @@ module top_riscv_cpu_v2_1();
                     //$display("rd_v: ", rd_v);
                     //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                     if(show_negedge_verify_row) $write("\tIdentified as ANDI:");
+                    if(row == 5) begin                          
+                        //Output - compares the actual and predicted value of rd after the writeback stage
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
+
+                end else if(func3_v == 3'b001 && imm_i_v[11:5] == 7'h00) begin //-------SLLI-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    if(show_negedge_verify_row) $write("\tIdentified as SLLI:");
+                    if(row == 5) begin                          
+                        //Output - compares the actual and predicted value of rd after the writeback stage
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
+
+                end else if(func3_v == 3'b101 && imm_i_v[11:5] == 7'h00) begin //-------SRLI-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    if(show_negedge_verify_row) $write("\tIdentified as SRLI:");
+                    if(row == 5) begin                          
+                        //Output - compares the actual and predicted value of rd after the writeback stage
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
+
+                end else if(func3_v == 3'b101 && imm_i_v[11:5] == 7'h20) begin //-------SRAI-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    if(show_negedge_verify_row) $write("\tIdentified as SRAI:");
+                    if(row == 5) begin                          
+                        //Output - compares the actual and predicted value of rd after the writeback stage
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
+
+                end else if(func3_v == 3'b010) begin //-------SLTI-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    if(show_negedge_verify_row) $write("\tIdentified as SLTI:");
+                    if(row == 5) begin                          
+                        //Output - compares the actual and predicted value of rd after the writeback stage
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
+                        else begin $display(" FAILURE"); return 1; end
+
+                    end
+
+                end else if(func3_v == 3'b011) begin //-------SLTIU-------------------------------
+                    //$display("rd_v: ", rd_v);
+                    //$display("dut:%d gold:%d", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                    if(show_negedge_verify_row) $write("\tIdentified as SLTIU:");
                     if(row == 5) begin                          
                         //Output - compares the actual and predicted value of rd after the writeback stage
                         assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
