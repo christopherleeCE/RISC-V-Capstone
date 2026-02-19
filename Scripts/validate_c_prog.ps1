@@ -1,6 +1,8 @@
 #only works with .text only programs
 
 param(
+    [Parameter(Position = 0)]
+    [string]$program_file_name = '',
     [switch]$help,
     [switch]$golden_calc,
     [switch]$dut_dump,
@@ -8,10 +10,8 @@ param(
     [switch]$verify_output,
     [switch]$no_verify,
     [switch]$continue,
-    [switch]$verbose,
     [switch]$v,
-    [int]$time = 100,
-    [string]$program_file_name = ''
+    [int]$time = 100
 )
 
 $vsimArgs = ""
@@ -19,6 +19,8 @@ $vsimArgs = ""
 if ($Help) {
     # You can put your usage message here
     Write-Output "
+    Usage: validate_c_prog.ps1 myProgram.c
+
     -help:              shows this dialog
     -golden_calc:       shows the debug info for the golden values calculated on every posedge
     -dut_dump:          shows a dump of all dut on every negedge
@@ -26,12 +28,12 @@ if ($Help) {
     -verify_output:     shows debug info of verify_row()'s
     -no_verify:         disable verification, script will verify if this argument is NOT given
     -continue:          continue simulation even on instruction failure
-    -verbose:           enables -golden_calc -dut_dump -golden_history -verify_output -continue
-    -v:                 same as -verbose
+    -v:                 enables -golden_calc -dut_dump -golden_history -verify_output -continue
     -time <INTEGER>     sets the runtime of the questia simulation to be <INTEGER> micro seconds, default is 2us
     "
     exit 0
 }
+
 
 if ($golden_calc)       { $vsimArgs += " +GOLDEN_CALC" }
 if ($dut_dump)          { $vsimArgs += " +DUT_DUMP" }

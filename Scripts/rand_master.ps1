@@ -1,10 +1,24 @@
 #vibe-coded garbage :)
 
 param(
-    [int]$runs = 1
+    [int]$runs = 1,
+    [switch]$help
 )
 
 $ErrorActionPreference = "Stop"
+
+if($help){
+    Write-Output("
+    -help: brings up this dialog
+    -runs NUM:  sets the randomized testing to run NUM tests
+    
+    This Script will generate a random .s file, simulate and validate it, and store the results
+    in the <GITHOME/Logs/raw_random/> directory, along with a _master.log file that sumaraizes the
+    results of all the iterations of the test
+        ")
+
+    exit(0)
+}
 
 # Get the current directory name
 $currentDirName = Split-Path -Leaf (Get-Location)
@@ -14,8 +28,8 @@ if ($currentDirName -ne "Modules") {
     exit 1
 }
 
-$logFolder = "..\Logs\raw"
-$masterLog = Join-Path $logFolder "master.log"
+$logFolder = "..\Logs\raw_random"
+$masterLog = Join-Path $logFolder "_master.log"
 
 # Create the folder if it doesn't exist
 if (-not (Test-Path $logFolder)) {
