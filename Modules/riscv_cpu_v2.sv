@@ -69,9 +69,9 @@ module riscv_cpu_v2
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
 
     logic [142:0] d2e_data_D;          //decode to execute data signals
-    logic [29:0] d2e_control_D;       //decode to execute control signals
+    logic [30:0] d2e_control_D;       //decode to execute control signals
     logic [142:0] d2e_data_E;       //decode to execute post pipeline
-    logic [29:0] d2e_control_E;    //decode to execute control signals post pipeline
+    logic [30:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [100:0] e2m_data_E;          //execute to memory data signals
     logic [9:0] e2m_control_E;       //execute to memory control signals
@@ -324,7 +324,8 @@ module riscv_cpu_v2
         dbus_sel_pc_plus_4,
         reg_file_wr_en,
         halt_D,
-        finish_D
+        finish_D,
+        rs1_2_pc
     };
 
 /* < ID/EX > */ //====================================================================================================
@@ -340,7 +341,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(30)
+        .WIDTH(31)
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
@@ -384,7 +385,8 @@ module riscv_cpu_v2
         dbus_sel_pc_plus_4_E,
         reg_file_wr_en_E,
         halt_E,
-        finish_E
+        finish_E,
+        rs1_2_pc_E
     } = d2e_control_E;
 
     //Data Hazard Forwarding MUXes for RS1
@@ -417,7 +419,9 @@ module riscv_cpu_v2
     alu #(
         .WIDTH(32)
     ) my_alu (
-        .operand_a(RS1_DATA_E_FWD),
+        .operand_a(
+            rs1_2_pc_E ? PC_E : RS1_DATA_E_FWD    //for AUIPC, use PC instead of RS1 data as operand A
+            ),
         .operand_b(
             alu_use_im_E ? IM_E : RS2_DATA_E_FWD   // IM changed to IM_E
             ),
