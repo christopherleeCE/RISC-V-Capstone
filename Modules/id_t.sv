@@ -25,7 +25,6 @@ module id_t(
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
-                //im[11:0] = instr[31:20];
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
@@ -33,7 +32,6 @@ module id_t(
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
-                //im[11:0] = instr[31:20];
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
@@ -41,7 +39,6 @@ module id_t(
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
-                //im[11:0] = instr[31:20];
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
@@ -49,7 +46,6 @@ module id_t(
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
-                //im[11:0] = instr[31:20];
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
@@ -57,7 +53,6 @@ module id_t(
                 rs2 = '0;
                 rs1 = instr[19:15];
                 rd = instr[11:7];
-                //im[11:0] = instr[31:20];
                 im = {{20{instr[31]}}, instr[31:20]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
@@ -65,7 +60,6 @@ module id_t(
                 rs2 = instr[24:20];
                 rs1 = instr[19:15];
                 rd = '0;
-                //im[11:0] = {instr[31:25], instr[11:7]};
                 im = {{20{instr[31]}}, instr[31:25], instr[11:7]}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
@@ -73,7 +67,6 @@ module id_t(
                 rs2 = instr[24:20];
                 rs1 = instr[19:15];
                 rd = '0;
-                //im[12:0] = {instr[31], instr[7], instr[30:25], instr[11:8], 1'b0}'
                 im = {{19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
@@ -81,7 +74,6 @@ module id_t(
                 rs2 = '0;
                 rs1 = '0;
                 rd = instr[11:7];
-                //im[31:12] = instr[31:12];
                 im = {instr[31:12], 12'h0};
             end
 
@@ -89,7 +81,6 @@ module id_t(
                 rs2 = '0;
                 rs1 = '0;
                 rd = instr[11:7];
-                //im[31:12] = instr[31:12];
                 im = {instr[31:12], 12'h0};
             end                    
 
@@ -97,7 +88,6 @@ module id_t(
                 rs2 = '0;
                 rs1 = '0;
                 rd = instr[11:7];
-                //im[20:0] = {instr[31], instr[19:12], instr[20], instr[30:21], 1'b0};
                 im = {{11{instr[31]}}, instr[31], instr[19:12], instr[20], instr[30:21], 1'b0}; //sign extending, so if zero, gets padded w/ zeros, but if negative (sign bit = 1), get padded w/ 1's
             end
 
