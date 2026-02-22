@@ -36,6 +36,7 @@ TODO automate directed tests
 WAITING LIST: ...
 R-TYPE:
 I-TYPE: LB, LH, LBU, LHU, SRAI
+S-TYPE: SB, SH
 B-TYPE: 
 M-TYPE: 
 U-TYPE: AUIPC
