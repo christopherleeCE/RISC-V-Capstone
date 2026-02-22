@@ -1,4 +1,17 @@
 Modules/work/
+Modules/transcipt
 Modules/sim.log
+Modules/data.bin
+Modules/instr.bin
+Modules/program_asm.o
+Modules/program_c.o
+Modules/program_asm.elf
+Modules/program_c.elf
+Modules/program.log
+Modules/x86.out
+Modules/temp.s
+Modules/data_memory.txt
+Modules/instruction_memory.txt
+
 Logs
 .vscode
