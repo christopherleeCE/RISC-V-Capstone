@@ -69,19 +69,19 @@ module riscv_cpu_v2
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
 
     logic [142:0] d2e_data_D;          //decode to execute data signals
-    logic [30:0] d2e_control_D;       //decode to execute control signals
+    logic [29:0] d2e_control_D;       //decode to execute control signals
     logic [142:0] d2e_data_E;       //decode to execute post pipeline
-    logic [30:0] d2e_control_E;    //decode to execute control signals post pipeline
+    logic [29:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [100:0] e2m_data_E;          //execute to memory data signals
-    logic [9:0] e2m_control_E;       //execute to memory control signals
+    logic [8:0] e2m_control_E;       //execute to memory control signals
     logic [100:0] e2m_data_M;       //execute to memory post pipeline
-    logic [9:0] e2m_control_M;    //execute to memory control signals post pipeline  
+    logic [8:0] e2m_control_M;    //execute to memory control signals post pipeline  
 
     logic [100:0] m2w_data_M;          //memory to writeback data signals
-    logic [5:0] m2w_control_M;       //memory to writeback control signals
+    logic [4:0] m2w_control_M;       //memory to writeback control signals
     logic [100:0] m2w_data_W;       //memory to writeback post pipeline
-    logic [5:0] m2w_control_W;    //memory to writeback control signals post pipeline    
+    logic [4:0] m2w_control_W;    //memory to writeback control signals post pipeline    
 
     //control signals after 1 pipeline reg
     logic reg_file_wr_en_E;
@@ -131,7 +131,6 @@ module riscv_cpu_v2
 
     // halt goes through pipeline
     logic halt_D, halt_E, halt_M, halt_W;
-    logic finish_D, finish_E, finish_M, finish_W, finish_PWB;
 
     // flush signals for control hazard handling
     logic flush_FD, flush_DE;  
@@ -144,35 +143,26 @@ module riscv_cpu_v2
     logic R2_case_rf2alu;
     logic R2_case_rf2rf;
 
-    // pipeline advance for data signals
-    logic pipeline_advance; //when high, pipeline regs advance
-
     // separate advance signals for control pipeline regs
     logic pipeline_advance_FD;
     logic pipeline_advance_DE; 
     logic pipeline_advance_EM;
     logic pipeline_advance_MW;
-    logic pipeline_advance_PWB;
 
-    //for rn, pipeline always advances
-    assign pipeline_advance = 1'b1;
-
-    //can change specific stage register depending on if stalling is implemented
-    assign pipeline_advance_FD = pipeline_advance;
-    assign pipeline_advance_DE = pipeline_advance;
-    assign pipeline_advance_EM = pipeline_advance;
-    assign pipeline_advance_MW = pipeline_advance;
-    assign pipeline_advance_PMW = pipeline_advance;
+    //gradually stop pipeline advance as halt moves through pipeline
+    assign pipeline_advance_FD = !halt_D;
+    assign pipeline_advance_DE = !halt_E;
+    assign pipeline_advance_EM = !halt_M;
+    assign pipeline_advance_MW = !halt_W;
 
     // Before the first clock, halt is asserted by default since no valid OPCODE has come from the fetch pipeline yet
     // Thus we have to wait for the first clock
-    assign halt_D = (halt && (PC != '0));
-    assign finish_D = (finish && (PC != '0));
+    assign halt_D = (halt && (PC != '0)) || finish;
 
     // once halt gets to end of pipeline, can stop CPU
     // (all instructions have fully gone through pipeline)
-    assign ohalt = halt_W;
-    assign ofinish = finish_PWB;
+    assign ohalt = halt_W && halt;
+    assign ofinish = halt_W && finish;
 
     //conditional and unconditional branch logic
     assign branch_taken = ( ( branch_eq_E && zero_flag ) ||
@@ -324,7 +314,6 @@ module riscv_cpu_v2
         dbus_sel_pc_plus_4,
         reg_file_wr_en,
         halt_D,
-        finish_D,
         rs1_2_pc
     };
 
@@ -341,7 +330,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(31)
+        .WIDTH(30)
     ) id_ex_control_reg (
         .d(d2e_control_D),      // Include control signals in pipeline
         .clk(clk),
@@ -385,7 +374,6 @@ module riscv_cpu_v2
         dbus_sel_pc_plus_4_E,
         reg_file_wr_en_E,
         halt_E,
-        finish_E,
         rs1_2_pc_E
     } = d2e_control_E;
 
@@ -458,8 +446,7 @@ module riscv_cpu_v2
         dbus_sel_data_mem_E,
         dbus_sel_pc_plus_4_E,
         reg_file_wr_en_E,
-        halt_E,
-        finish_E
+        halt_E
     };    
 
 /* < EX/MEM > */ //====================================================================================================
@@ -476,7 +463,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(10)
+        .WIDTH(9)
     ) ex_mem_control_reg (
         .d(e2m_control_E),      // Include control signals in pipeline
         .clk(clk),
@@ -498,8 +485,7 @@ module riscv_cpu_v2
         dbus_sel_data_mem_M,
         dbus_sel_pc_plus_4_M,
         reg_file_wr_en_M,
-        halt_M,
-        finish_M
+        halt_M
     } = e2m_control_M;     
 
     //TODO implement rst, in current state data mem entries are initialized to 0xXXXXXXXX
@@ -526,8 +512,7 @@ module riscv_cpu_v2
         dbus_sel_data_mem_M,
         dbus_sel_pc_plus_4_M,
         reg_file_wr_en_M,
-        halt_M,
-        finish_M
+        halt_M
     };        
 
 /* < MEM/WB > */ //====================================================================================================
@@ -543,7 +528,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(6)
+        .WIDTH(5)
     ) mem_wb_control_reg (
         .d(m2w_control_M),      // Include control signals in pipeline
         .clk(clk),
@@ -561,8 +546,7 @@ module riscv_cpu_v2
         dbus_sel_data_mem_W,
         dbus_sel_pc_plus_4_W,
         reg_file_wr_en_W,
-        halt_W,
-        finish_W
+        halt_W
     } = m2w_control_W;         
 
     //dbus mux
@@ -576,15 +560,5 @@ module riscv_cpu_v2
         default : RD_DATA = '0;
         endcase
     end
-
-    dff_async_reset #(
-        .WIDTH(1)
-    ) wb_pwb_control_reg (
-        .d(finish_W),      // Include control signals in pipeline
-        .clk(clk),
-        .rst(rst),
-        .wr_en(pipeline_advance_PMW),
-        .q(finish_PWB)
-    );
 
 endmodule
