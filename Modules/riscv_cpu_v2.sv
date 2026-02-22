@@ -150,7 +150,7 @@ module riscv_cpu_v2
     logic pipeline_advance_MW;
 
     //gradually stop pipeline advance as halt moves through pipeline
-    assign pipeline_advance_FD = ( !halt_D || flush_FD );
+    assign pipeline_advance_FD = !halt_D;
     assign pipeline_advance_DE = !halt_E;
     assign pipeline_advance_EM = !halt_M;
     assign pipeline_advance_MW = !halt_W;
