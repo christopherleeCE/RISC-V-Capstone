@@ -13,23 +13,12 @@ will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant
 1, 2, 3, 4 no verificaitn is done, but it still progresses through all of those rows over the coarse of five(?) clks, once addi is in
 gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
 
-TODO for the arth instruciton compare the whole regfile instead
-just the destination register, you cant just do regdut == reggold[4],
-cause according to chat, if there is an x in the structure, even in 
-reggold[1] for example the assertion fails, so you need to do a for loop,
-and doing that is prob easier to do in a task/func but ill do that l8r
+TODO add auipc to branch_v1.s, and actual non randmized test
 
-TODO see if curren beq verification can be broken at (plz dont...) : it can :( fix plz
 
-TODO expand gen_random_prog.py with branching
 
-TODO make sure run time for master.ps1 is enuf
 
-TODO make sure that in rand testing the run time is enuf
 
-TODO find a way for the top file to terminate on its own, and not have to if a prog finished
-
-TODO automate directed tests
 
 --------------TEST LOG----------------------------------------------------
 

@@ -51,6 +51,9 @@ if (-not (Test-Path $logFolder)) {
 Write-Host "Running from Modules folder, continuing..."
 
 if($program_file_name -eq ''){
+    # Write-Output "full loop"
+    # Write-Output (Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s -File)
+    # exit 0
     foreach($file in Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s -File) {
 
         $wslPath = "../Programs/directed/passing/$($file.name)"

@@ -8,6 +8,9 @@ output_file = "instruction_memory.txt"
 # Example line: 0: 01050513 addi a0,a0,16
 hex_pattern = re.compile(r'^\s*[0-9a-f]+:\s+([0-9a-f]{8})', re.IGNORECASE)
 
+with open("data_memory.txt", 'w') as f_data:
+    pass
+
 with open(input_file, 'r') as f_in, open(output_file, 'w') as f_out:
     for line in f_in:
         match = hex_pattern.match(line)
