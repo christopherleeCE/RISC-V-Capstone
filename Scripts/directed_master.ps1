@@ -6,6 +6,9 @@ param(
     [switch]$help
 )
 
+$startTime = Get-Date
+$timer = [System.Diagnostics.Stopwatch]::StartNew()
+
 $ErrorActionPreference = "Stop"
 $runTime = 100
 
@@ -166,6 +169,12 @@ if ($globalAnyErrors) {
 } else {
     Add-Content -Path $masterLog "CLEAN PASS: No warnings or errors"
 }
+
+$timer.Stop()
+$endTime = Get-Date
+Add-Content -Path $masterLog "Verification Started: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+Add-Content -Path $masterLog "Verification Finished: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+Add-Content -Path $masterLog "Verification Time: $($timer.Elapsed.ToString('hh\:mm\:ss\.ff'))"
 
 Write-Host "Master log updated at $masterLog"
 
