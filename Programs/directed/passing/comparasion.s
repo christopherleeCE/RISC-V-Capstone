@@ -155,3 +155,14 @@ sltu s3, zero, t0      # s3 = 0
 xor t0, a2, a2
 sltu s4, zero, t0      # s4 = 0
 
+nop
+nop
+nop
+nop
+nop
+ebreak
+nop
+nop
+nop
+nop
+nop

@@ -312,12 +312,12 @@ module top_riscv_cpu_v2_1();
 
                     end else if (func3 == 3'b001) begin //----SLL------------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as SLL.");
-                        write_reg(rd, REG_FILE[1][rs1] << REG_FILE[1][rs2]);
+                        write_reg(rd, REG_FILE[1][rs1] << REG_FILE[1][rs2][4:0]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b101) begin //----SRL------------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as SRL.");
-                        write_reg(rd, REG_FILE[1][rs1] >> REG_FILE[1][rs2]);
+                        write_reg(rd, REG_FILE[1][rs1] >> REG_FILE[1][rs2][4:0]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //NOTE - will have to check if this is the right way compare signed vs. unsigned numbers
@@ -341,7 +341,7 @@ module top_riscv_cpu_v2_1();
                         
                     end else if (func3 == 3'b101) begin //----SRA---------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as SRA.");
-                        write_reg(rd, $signed(REG_FILE[1][rs1]) >>> REG_FILE[1][rs2]);
+                        write_reg(rd, $signed(REG_FILE[1][rs1]) >>> REG_FILE[1][rs2][4:0]);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
                         
                     end

@@ -29,7 +29,7 @@ branch: XXX
     jal
     jalr
 
-comparasion: XXX
+comparasion: ###
     slt
     sltu
     slti
@@ -37,7 +37,7 @@ comparasion: XXX
     #seq
     #sne
 
-ebreak: XXX
+ebreak: ###
     ebreak
 
 load_store: XXX
@@ -52,7 +52,7 @@ load_store: XXX
     lui
     auipc
 
-shift_logic: XXX
+shift_logic: ###
     sll
     srl
     sra

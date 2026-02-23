@@ -1,4 +1,4 @@
-#just randomly generated
+#just randomly generated, might get more delibrate with how this is done l8r -chris
 bne zero, t1, . + 12
 bge t5, t6, . + 12
 bne t4, t5, . + 20
@@ -499,6 +499,7 @@ beq zero, t1, . + 12
 beq zero, t4, . + 24
 bne zero, t1, . + 12
 beq t4, t5, . + 4
+
 nop
 nop
 nop
