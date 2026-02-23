@@ -1,0 +1,3 @@
+Collaborative project for ASU's EEE488/489 Senior Design Laboratory. Group members are Ayomide Laguda, Christopher Lee, Edgar Gastelum, Mark Zaldivar, Holden Laughlin,.
+
+This project is synthesizing and deploying a RV32IM 5 stage pipelined microprocessor to an FPGA that is capable of running compiled C code from the RV32 GCC toolchain. Design is a split memory architecture pipelined design with hazard control. The verification side uses automated directed and randomized testing. Simulation for verification is done in Questa, using powershell, bash, and python scripting to accelerate the verification process.
