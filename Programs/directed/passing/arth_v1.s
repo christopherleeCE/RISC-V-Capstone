@@ -5,10 +5,10 @@ This program is a test for the following insturcitons
     addi
     add
     sub
-mul
-mulh
-mulsu
-mulu
+    mul
+    mulh
+    mulsu
+    mulu
 div
 divu
 rem
