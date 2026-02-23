@@ -7,6 +7,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$runTime = 100
 
 if($help){
     Write-Output("
@@ -51,6 +52,9 @@ if (-not (Test-Path $logFolder)) {
 Write-Host "Running from Modules folder, continuing..."
 
 if($program_file_name -eq ''){
+    # Write-Output "full loop"
+    # Write-Output (Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s -File)
+    # exit 0
     foreach($file in Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s -File) {
 
         $wslPath = "../Programs/directed/passing/$($file.name)"
@@ -66,7 +70,7 @@ if($program_file_name -eq ''){
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Running simulation..."
-        & ..\Scripts\simulate_sv.ps1 -continue -time 15 #most likely long enuf, will give error if not
+        & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Moving results..."
@@ -92,7 +96,7 @@ if($program_file_name -eq ''){
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Running simulation..."
-    & ..\Scripts\simulate_sv.ps1 -continue -time 15 #most likely long enuf, will give error if not
+    & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Moving results..."
@@ -165,4 +169,7 @@ if ($globalAnyErrors) {
 
 Write-Host "Master log updated at $masterLog"
 
+Write-Host "`n===============================================`n"
+Get-Content $masterLog
+Write-Host "`n===============================================`n"
 

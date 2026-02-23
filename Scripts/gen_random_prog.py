@@ -109,7 +109,11 @@ def main():
     pc_offset = 0
 
     #instructions implemented so far
-    arth_instr = ["add", "mul", "and", "or", "xor", "srl", "sra", "sll", "slt", "sltu",
+    arth_instr = ["add", "mul", "and", "or", "xor", 
+                # "srl",
+                # "sra",
+                # "sll",
+                   "slt", "sltu",
                    "addi", "xori", "ori", "andi", "slli", "srli", "srai", "slti", "sltiu"]
     load_instr = ["lb", "lh", "lw", "lbu", "lhu"]
     store_instr = ["sb", "sh", "sw"]
@@ -200,14 +204,3 @@ def main():
 
 
 main()
-
-
-# master.ps1
-
-# python gen random prog
-
-# assemble (called from master.ps1 using wsl) -> program.log
-
-# instrmem.py
-
-# simulate_sv.ps1
