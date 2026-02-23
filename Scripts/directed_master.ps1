@@ -7,6 +7,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$runTime = 100
 
 if($help){
     Write-Output("
@@ -69,7 +70,7 @@ if($program_file_name -eq ''){
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Running simulation..."
-        & ..\Scripts\simulate_sv.ps1 -continue -time 15 #most likely long enuf, will give error if not
+        & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Moving results..."
@@ -95,7 +96,7 @@ if($program_file_name -eq ''){
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Running simulation..."
-    & ..\Scripts\simulate_sv.ps1 -continue -time 15 #most likely long enuf, will give error if not
+    & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Moving results..."
@@ -168,4 +169,7 @@ if ($globalAnyErrors) {
 
 Write-Host "Master log updated at $masterLog"
 
+Write-Host "`n===============================================`n"
+Get-Content $masterLog
+Write-Host "`n===============================================`n"
 

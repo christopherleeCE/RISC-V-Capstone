@@ -190,6 +190,7 @@ module top_riscv_cpu_v2_1();
     end
 
     final begin
+        $display("Ending PC: %h", PC_ASYNC);
         if(~ofinish) $error("EBREAK was not called and the simulation did no reach the end of the program, not a PASS");
         $display("Return value in a0: %0d | 0x%h", $signed(REG_FILE[1][10]), REG_FILE[1][10]);
     end
@@ -1201,8 +1202,8 @@ module top_riscv_cpu_v2_1();
                 //Output - compares the actual and expected value of rd after the writeback stage (row = 5)
                 if(row == 5) begin
 
-                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); return 1; end
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                            else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                 end
 
@@ -1218,9 +1219,9 @@ module top_riscv_cpu_v2_1();
                         //TODO, do a reg by reg and data by data comparasion for validation here,
                         //once that task has been built as seen at ~line 1
 
-                        if(row == 5) $display(" Success");
-                        //assert() $display(" Success");
-                        //else begin $display(" FAILURE"); return 1; end
+                        if(row == 5) $display(" Success: 0x%h", PC[row]);
+                        //assert() $display(" Success: 0x%h", PC[row]);
+                        //else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end else begin
                         //$display("rd_v: ", rd_v);
@@ -1230,8 +1231,8 @@ module top_riscv_cpu_v2_1();
                         if(row == 5) begin                        
                             
                             //Output - compares the actual and predicted value of rd after the writeback stage
-                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                            else begin $display(" FAILURE"); return 1; end
+                            assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                            else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                         end
                     end
@@ -1242,8 +1243,8 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as XORI:");
                     if(row == 5) begin                          
                         //Output - compares the actual and predicted value of rd after the writeback stage
-                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
 
@@ -1253,8 +1254,8 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as ORI:");
                     if(row == 5) begin                          
                         //Output - compares the actual and predicted value of rd after the writeback stage
-                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
             
@@ -1264,8 +1265,8 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as ANDI:");
                     if(row == 5) begin                          
                         //Output - compares the actual and predicted value of rd after the writeback stage
-                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
 
@@ -1275,8 +1276,8 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SLLI:");
                     if(row == 5) begin                          
                         //Output - compares the actual and predicted value of rd after the writeback stage
-                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
 
@@ -1286,8 +1287,8 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SRLI:");
                     if(row == 5) begin                          
                         //Output - compares the actual and predicted value of rd after the writeback stage
-                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
 
@@ -1297,8 +1298,8 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SRAI:");
                     if(row == 5) begin                          
                         //Output - compares the actual and predicted value of rd after the writeback stage
-                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
 
@@ -1308,8 +1309,8 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SLTI:");
                     if(row == 5) begin                          
                         //Output - compares the actual and predicted value of rd after the writeback stage
-                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
 
@@ -1319,8 +1320,8 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SLTIU:");
                     if(row == 5) begin                          
                         //Output - compares the actual and predicted value of rd after the writeback stage
-                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
 
@@ -1337,8 +1338,8 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as LW:");
                     if(row == 5) begin
 
-                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
                 end
@@ -1353,8 +1354,8 @@ module top_riscv_cpu_v2_1();
                     // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                     if(row == 3) begin
 
-                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
                 end
@@ -1369,8 +1370,8 @@ module top_riscv_cpu_v2_1();
 
                     if(row == 4) begin
 
-                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end//$display("dut: %d, gold: %d, *rs1_v + imm_s: %d, *rs1_v: %d, imm_s: %d", cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2], DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2], REG_FILE[4][rs1_v] + imm_s_v, REG_FILE[4][rs1_v], imm_s_v);
 
@@ -1387,8 +1388,8 @@ module top_riscv_cpu_v2_1();
                     // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                     if(row == 3) begin
                         
-                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
                     
@@ -1397,8 +1398,8 @@ module top_riscv_cpu_v2_1();
                     // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                     if(row == 3) begin
                         
-                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
                     
@@ -1407,8 +1408,8 @@ module top_riscv_cpu_v2_1();
                     // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                     if(row == 3) begin
                         
-                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
                     
@@ -1417,8 +1418,8 @@ module top_riscv_cpu_v2_1();
                     // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                     if(row == 3) begin
                         
-                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success");
-                        else begin $display(" FAILURE"); return 1; end
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                     end
                     
@@ -1435,8 +1436,8 @@ module top_riscv_cpu_v2_1();
                 // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                 if(row == 3) begin
                     
-                    assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success"); //here
-                    else begin $display(" FAILURE"); return 1; end
+                    assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success: 0x%h", PC[row]); //here
+                    else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                 end
 
@@ -1449,8 +1450,8 @@ module top_riscv_cpu_v2_1();
                 if(show_negedge_verify_row) $write("\tIdentified as LUI:");
                 if(row == 5) begin
 
-                    assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success");
-                    else begin $display(" FAILURE"); return 1; end
+                    assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                    else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
                 end
 
@@ -1460,7 +1461,7 @@ module top_riscv_cpu_v2_1();
 
                 //nothing
 
-                if(row == 5) $display(" Success");
+                if(row == 5) $display(" Success: 0x%h", PC[row]);
 
             end else begin
                 //UNKNOWN ------------------------------

@@ -116,6 +116,17 @@ mulhsu s2, a1, a0 # 0xFFFFFFFF
 mulhsu s3, a0, a1 # 0xFFFFFFFE
 mulhu s4, a1, a0 # 0xFFFFFFFE
 
+nop
+nop
+nop
+nop
+nop
+ebreak
+nop
+nop
+nop
+nop
+nop
 #TODO
 # div
 # divu

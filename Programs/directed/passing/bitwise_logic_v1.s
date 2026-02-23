@@ -74,3 +74,15 @@ xori s3, a3, -1 #0xFFF
 xori s4, a7, -256 #0xF00
 xori s5, a7, 0x0F0
 xori s6, a7, 0x00F
+
+nop
+nop
+nop
+nop
+nop
+ebreak
+nop
+nop
+nop
+nop
+nop
