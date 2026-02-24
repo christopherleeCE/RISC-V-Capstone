@@ -3,7 +3,8 @@
 param(
     [Parameter(Position = 0)]
     [string]$program_file_name = '',
-    [switch]$help
+    [switch]$help,
+    [switch]$v
 )
 
 $startTime = Get-Date
@@ -22,6 +23,7 @@ if($help){
     _master.log will be moved into the Logs/raw_directed/ directory, and will get cleared whenver this script run
 
     -help:  Brings up this dialog
+    -v:     verbose .log output
     ")
 
     exit(0)
@@ -73,7 +75,11 @@ if($program_file_name -eq ''){
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Running simulation..."
+        if($v){
+        & ..\Scripts\simulate_sv.ps1 -v -time $runTime #most likely long enuf, will give error if not
+        }else{
         & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
+        }
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Moving results..."
@@ -99,7 +105,11 @@ if($program_file_name -eq ''){
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Running simulation..."
+    if($v){
+    & ..\Scripts\simulate_sv.ps1 -v -time $runTime #most likely long enuf, will give error if not
+    }else{
     & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
+    }
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Moving results..."
