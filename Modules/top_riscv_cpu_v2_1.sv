@@ -687,6 +687,25 @@ module top_riscv_cpu_v2_1();
                 RD[1] <= rd;
                 IM[1] <= imm_u;
 
+            end else if (opcode == 7'b0010111) begin  //------U-TYPE-(AUIPC)-------------------------------
+                {imm_u[31:12], rd} = INSTR_FLUSH[31:7];
+                imm_u[11:0] = 12'b0;
+                if(show_posedge_golden_calc) $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode: 0b%b", imm_u, rd, opcode); //instruction info
+
+                //----AUIPC---------------
+                if(show_posedge_golden_calc) $display("\tIdentified as AUIPC.");
+                write_reg(rd, imm_u + PC_ASYNC); //I'm not 100% if this is the proper way, will correct if needed
+                PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                //first entry in the matrix
+                PC[1] <= PC_ASYNC;
+                PC_TARGET[1] <= PC_ASYNC + 4;
+                INSTR[1] <= INSTR_FLUSH;
+                RS1[1] <= 'x;
+                RS2[1] <= 'x;
+                RD[1] <= rd;
+                IM[1] <= imm_u;
+
             end else if (INSTR_FLUSH == 32'b00000000000100000000000001110011) begin
                 if(show_posedge_golden_calc) $display("\tIdentified as EBREAK.");
 
@@ -1448,6 +1467,20 @@ module top_riscv_cpu_v2_1();
 
                 //----LUI---------------
                 if(show_negedge_verify_row) $write("\tIdentified as LUI:");
+                if(row == 5) begin
+
+                    assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                    else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+
+                end
+
+             end else if (opcode_v == 7'b0010111) begin  //------U-TYPE-(AUIPC)-------------------------------
+                {imm_u_v[31:12], rd_v} = INSTR[row][31:7];
+                imm_u_v[11:0] = 12'b0;
+                if(show_negedge_verify_row) $display("\tU-Type: imm: 0b%b, rsd: 0b%b, opcode_v: 0b%b", imm_u_v, rd_v, opcode_v); //instruction info
+
+                //----AUIPC---------------
+                if(show_negedge_verify_row) $write("\tIdentified as AUIPC:");
                 if(row == 5) begin
 
                     assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
