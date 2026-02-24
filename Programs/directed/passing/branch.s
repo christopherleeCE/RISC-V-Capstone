@@ -1,13 +1,12 @@
 #just randomly generated, might get more delibrate with how this is done l8r -chris
-bne zero, t1, . + 12
-bge t5, t6, . + 12
-bne t4, t5, . + 20
-bne zero, t1, . + 24
-blt t6, t5, . + 24
-bne zero, t1, . + 16
-jalr ra, sp, 28
-beq t1, t2, . + 4
-bne zero, t4, . + 20
+li t0, 17
+li t1, 32
+li t2, 32
+li t3, 0
+li t4, -13
+li t5, -13
+li t6, -37
+
 jal ra, . + 4
 bge t1, t2, . + 24
 bne t4, t5, . + 16
