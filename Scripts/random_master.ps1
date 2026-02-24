@@ -2,7 +2,8 @@
 
 param(
     [int]$runs = 1,
-    [switch]$help
+    [switch]$help,
+    [switch]$v
 )
 
 $startTime = Get-Date
@@ -61,7 +62,12 @@ for($ii = 0; $ii -lt $runs; $ii++){
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Running simulation..."
-    & ..\Scripts\simulate_sv.ps1 -continue -time 100
+
+    if($v){
+        & ..\Scripts\simulate_sv.ps1 -v -time 100
+    }else{
+        & ..\Scripts\simulate_sv.ps1 -continue -time 100
+    }
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Flow complete."

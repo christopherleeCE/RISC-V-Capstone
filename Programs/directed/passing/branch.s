@@ -1,3 +1,5 @@
+#todo add bgeu and bltu when they get implemented
+
 li t0, 17
 li t1, 32
 li t2, 32
