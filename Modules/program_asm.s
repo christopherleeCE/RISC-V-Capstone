@@ -355,7 +355,7 @@
 # 	jr ra # end function, return to main program
 
 
-# Very Simple SRAI Test - Edgar G.
+# Very Simple SRA Test - Edgar G.
 # check for sign preservation with division
 .globl _start
 

@@ -200,14 +200,3 @@ def main():
 
 
 main()
-
-
-# master.ps1
-
-# python gen random prog
-
-# assemble (called from master.ps1 using wsl) -> program.log
-
-# instrmem.py
-
-# simulate_sv.ps1

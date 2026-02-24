@@ -5,12 +5,17 @@ param(
     [switch]$help
 )
 
+$startTime = Get-Date
+$timer = [System.Diagnostics.Stopwatch]::StartNew()
+
 $ErrorActionPreference = "Stop"
 
 if($help){
     Write-Output("
     -help: brings up this dialog
     -runs NUM:  sets the randomized testing to run NUM tests
+
+    For refrence my home computer (kinda beefy but no really) takes 4 minutes for 100 runs, 1000 took about 40 minutes
     
     This Script will generate a random .s file, simulate and validate it, and store the results
     in the <GITHOME/Logs/raw_random/> directory, along with a _master.log file that sumaraizes the
@@ -56,7 +61,7 @@ for($ii = 0; $ii -lt $runs; $ii++){
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Running simulation..."
-    & ..\Scripts\simulate_sv.ps1 -continue -time 15
+    & ..\Scripts\simulate_sv.ps1 -continue -time 100
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
     Write-Host "Flow complete."
@@ -133,6 +138,14 @@ if ($globalAnyErrors) {
     Add-Content -Path $masterLog "CLEAN PASS: No warnings or errors"
 }
 
+$timer.Stop()
+$endTime = Get-Date
+Add-Content -Path $masterLog "Verification Started: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+Add-Content -Path $masterLog "Verification Finished: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+Add-Content -Path $masterLog "Verification Time: $($timer.Elapsed.ToString('hh\:mm\:ss\.ff'))"
+
 Write-Host "Master log updated at $masterLog"
 
-
+Write-Host "`n===============================================`n"
+Get-Content $masterLog
+Write-Host "`n===============================================`n"
