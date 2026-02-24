@@ -546,8 +546,43 @@ module top_riscv_cpu_v2_1();
 
                 if(func3 == 3'b010) begin //----SW-------------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as SW.");
-                    //DATA_MEM[1][(REG_FILE[1][rs1] + imm_s)>>2] <= REG_FILE[1][rs2]; //old implementation
+
                     write_data_mem(REG_FILE[1][rs2], (REG_FILE[1][rs1] + imm_s), FULL_WORD);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    PC_TARGET[1] <= PC_ASYNC + 32'h4;
+                    INSTR[1] <= INSTR_FLUSH;
+                    RS1[1] <= rs1;
+                    RS2[1] <= rs2;
+                    RD[1] <= 'x;
+                    IM[1] <= imm_s;
+
+                end
+
+                if(func3 == 3'b001) begin //----SH-------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as SH.");
+
+                    write_data_mem(REG_FILE[1][rs2], (REG_FILE[1][rs1] + imm_s), HALF_WORD);
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    PC_TARGET[1] <= PC_ASYNC + 32'h4;
+                    INSTR[1] <= INSTR_FLUSH;
+                    RS1[1] <= rs1;
+                    RS2[1] <= rs2;
+                    RD[1] <= 'x;
+                    IM[1] <= imm_s;
+
+                end
+
+
+                if(func3 == 3'b000) begin //----SB-------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as SB.");
+
+                    write_data_mem(REG_FILE[1][rs2], (REG_FILE[1][rs1] + imm_s), BYTE);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //first entry in the matrix
