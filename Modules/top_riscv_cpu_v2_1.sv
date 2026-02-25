@@ -13,7 +13,7 @@ will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant
 1, 2, 3, 4 no verificaitn is done, but it still progresses through all of those rows over the coarse of five(?) clks, once addi is in
 gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
 
-TODO add auipc to branch_v1.s, and actual non randmized test
+TODO expand branch.s with unsigned versions when implemented
 
 
 
@@ -24,19 +24,19 @@ TODO add auipc to branch_v1.s, and actual non randmized test
 
 WAITING LIST: ...
 R-TYPE:
-I-TYPE: LB, LH, LBU, LHU, SRAI
-S-TYPE: SB, SH
+I-TYPE:  SRAI
+S-TYPE:
 B-TYPE: 
 M-TYPE: 
-U-TYPE: AUIPC
+U-TYPE:
 
 SUCCESSFUL TESTS:
 R-TYPE: ADD, SUB, XOR, AND, OR, SLL, SRL, SRA, SLT, SLTU
-I-TYPE: ADDI/NOP, XORI, ANDI, ORI, SLLI, SRLI, SLTI, SLTIU, LW, JALR
-S-TYPE: SW
+I-TYPE: ADDI/NOP, XORI, ANDI, ORI, SLLI, SRLI, SLTI, SLTIU, LW, LB, LH, LBU, LHU, JALR
+S-TYPE: SW, SB, SH
 B-TYPE: BEQ, BNE, BLT, BGE
 J-TYPE: JAL
-U-TYPE: LUI
+U-TYPE: LUI, AUIPC
 M-TYPE: MUL, MULH, MULHSU, MULHU
 
 UNSUCCESSFUL TESTS:
@@ -453,13 +453,13 @@ module top_riscv_cpu_v2_1();
                 end else if (func3 == 3'b010) begin //-------SLTI---------------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as SLTI.");
                         //$display("data: %h | rd: %d | rs1: %d", ($signed(REG_FILE[1][rs1]) < $signed(imm_i))? 32'd1: 32'd0, rd, rs1);
-                        write_reg(rd, ($signed(REG_FILE[1][rs1]) < $signed(imm_i))? 32'd1: 32'd0);
+                        write_reg(rd, ($signed(REG_FILE[1][rs1]) < $signed(imm_i)) ? 32'd1: 32'd0);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end else if (func3 == 3'b011) begin //-------SLTIU---------------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as SLTIU.");
                         //$display("data: %h | rd: %d | rs1: %d", ($unsigned(REG_FILE[1][rs1]) < $unsigned(imm_i))? 32'd1: 32'd0, rd, rs1);
-                        write_reg(rd, ($unsigned(REG_FILE[1][rs1]) < $unsigned(imm_i))? 32'd1: 32'd0);
+                        write_reg(rd, ($unsigned(REG_FILE[1][rs1]) < $unsigned(imm_i)) ? 32'd1: 32'd0);
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 end
@@ -805,7 +805,7 @@ module top_riscv_cpu_v2_1();
 
                 //----AUIPC---------------
                 if(show_posedge_golden_calc) $display("\tIdentified as AUIPC.");
-                write_reg(rd, imm_u + PC_ASYNC); //I'm not 100% if this is the proper way, will correct if needed
+                write_reg(rd, imm_u + PC_ASYNC); //I'm not 100% if this is the proper way, will correct if needed | edgar i tested it out, and i think its fine, i manually replcaed pc_asyn with some values and it appears to be overflowing how it should -chris
                 PC_ASYNC <= PC_ASYNC + 32'h4;
 
                 //first entry in the matrix
