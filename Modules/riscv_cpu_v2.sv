@@ -215,7 +215,7 @@ module riscv_cpu_v2
 
     instruction_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(512)
+        .ENTRY_COUNT(1024)
     ) instr_mem (
         .read_address(PC),
         .read_data(INSTR_F)

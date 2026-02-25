@@ -10,7 +10,7 @@ INT20_MIN = -2**19
 INT20_MAX = 2**19 - 1
 UINT20_MIN = 0
 UINT20_MAX = 2**20 - 1
-RAND_SECTION_LENGTH = 300
+RAND_SECTION_LENGTH = 800
 CHANCE_OF_NON_BRANCH_INSTR = 80
 CHANCE_OF_STORE_LOAD_INSTR = 20
 CHANCE_OF_STORE_VS_LOAD = 50
@@ -217,6 +217,13 @@ def main():
         #no pc_offset inc here
 
         for ii in range(RAND_SECTION_LENGTH):
+
+            #reset pc offset, and rerwrite sp to avoid going out of bounds of the jalr im bounds
+            if(4*pc_offset > 2000):
+                pc_offset = 0
+                for jj in range(10):
+                    f.write(f"nop\n") #its possible that the sp reset gets jumped past, pad with nops to prevent that
+                f.write(f"jal sp, . + 4\n")
 
             #non branch instructions
             if(randint(0, 99) < CHANCE_OF_NON_BRANCH_INSTR):

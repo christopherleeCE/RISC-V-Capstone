@@ -11,7 +11,7 @@ $startTime = Get-Date
 $timer = [System.Diagnostics.Stopwatch]::StartNew()
 
 $ErrorActionPreference = "Stop"
-$runTime = 100
+$runTime = 200
 
 if($help){
     Write-Output("

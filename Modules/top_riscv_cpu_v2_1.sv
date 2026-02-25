@@ -13,7 +13,7 @@ will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant
 1, 2, 3, 4 no verificaitn is done, but it still progresses through all of those rows over the coarse of five(?) clks, once addi is in
 gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
 
-TODO expand branch.s with unsigned versions when implemented
+TODO expand branch.s with unsigned versions when implemented, jump backwards testing
 
 
 
@@ -202,7 +202,7 @@ module top_riscv_cpu_v2_1();
     //if the DUT.sv's declaration changes, it should be mirrored here
     instruction_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(512)
+        .ENTRY_COUNT(1024)
     ) instr_mem (
         .read_address(PC_ASYNC),
         .read_data(INSTR_ASYNC)
