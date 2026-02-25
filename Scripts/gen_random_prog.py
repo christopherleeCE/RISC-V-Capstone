@@ -6,21 +6,34 @@ INT32_MIN = -2**31
 INT32_MAX = 2**31 - 1
 INT12_MIN = -2**11
 INT12_MAX = 2**11 - 1
-RAND_SECTION_LENGTH = 100
+INT20_MIN = -2**19
+INT20_MAX = 2**19 - 1
+UINT20_MIN = 0
+UINT20_MAX = 2**20 - 1
+RAND_SECTION_LENGTH = 300
 CHANCE_OF_NON_BRANCH_INSTR = 80
-CHANCE_OF_STORE_LOAD_INSTR = 0
-CHANCE_OF_STORE_VS_LOAD = 0
+CHANCE_OF_STORE_LOAD_INSTR = 20
+CHANCE_OF_STORE_VS_LOAD = 50
 CHANCE_OF_COND_JMP = 80 #verses non conditional branch
 CHANCE_OF_BRANCH_TAKEN = 50
 CHANCE_OF_JAL_VS_JALR = 50
 
+#instructions implemented so far
+arth_instr = ["add", "sub", "xor", "or", "and", "sll", "srl", "sra", "slt", "sltu",
+            "mul", "mulh", "mulhsu", "mulhu",# "div", "divu", "rem", "remu",
+            "addi", "xori", "ori", "andi", "slli", "srli", "srai", "slti", "sltiu",
+            "lui", "auipc"]
+load_instr = ["lb", "lh", "lw", "lbu", "lhu"]
+store_instr = ["sb", "sh", "sw"]
+cond_branch_instr = ["beq", "bne", "blt", "bge"]#, "bltu", "bgeu"]
+a_regs = ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"]
+t_regs = ["t0", "t1", "t2", "t3", "t4", "t5", "t6"]
+s_regs = ["s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11"]
 
-#string constant/literal of all the instructions in the RV32I
-R_TYPE = ["add", "sub", "xor", "and", "sll", "srl", "sra", "slt", "or",
-                "sltu", "mul", "mulh", "mulhsu", "mulhu" ]
-I_TYPE_ARITH = ["addi", "xori", "ori", "andi", "slli", "srli","srai",
-                 "slti", "sltiu"]
-
+R_TYPE  = ["add", "sub", "xor", "or", "and", "sll", "srl", "sra", "slt", "sltu",
+        "mul", "mulh", "mulhsu", "mulhu", "div", "divu", "rem", "remu"]
+I_TYPE_ARITH = ["addi", "xori", "ori", "andi", "slli", "srli", "srai", "slti", "sltiu"]
+U_TYPE = ["lui", "auipc"]
 
 # CHANCE_OF_NON_BRANCH_INSTR
 #     !CHANCE_OF_STORE_LOAD_INSTR
@@ -37,6 +50,9 @@ I_TYPE_ARITH = ["addi", "xori", "ori", "andi", "slli", "srli","srai",
 #     ***
 #     !CHANCE_OF_COND_JMP
 
+# todo, byte offsets in load and store
+# lui, and auipc
+
 def gen_branch_instr(instr:str, taken:bool, pc_offset:int) -> str:
     if(instr == "beq"):
         if(taken):
@@ -46,7 +62,7 @@ def gen_branch_instr(instr:str, taken:bool, pc_offset:int) -> str:
             return choice((f"beq zero, t1, . + {4*randint(1, 6)}\n",
                            f"beq zero, t4, . + {4*randint(1, 6)}\n"))
         
-    if(instr == "bne"):
+    elif(instr == "bne"):
         if(taken):
             return choice((f"bne zero, t1, . + {4*randint(1, 6)}\n",
                            f"bne zero, t4, . + {4*randint(1, 6)}\n"))
@@ -54,7 +70,7 @@ def gen_branch_instr(instr:str, taken:bool, pc_offset:int) -> str:
             return choice((f"bne t1, t2, . + {4*randint(1, 6)}\n",
                            f"bne t4, t5, . + {4*randint(1, 6)}\n"))
 
-    if(instr == "blt"):
+    elif(instr == "blt"):
         if(taken):
             return choice((f"blt t0, t1, . + {4*randint(1, 6)}\n",
                            f"blt t6, t5, . + {4*randint(1, 6)}\n"))
@@ -62,7 +78,7 @@ def gen_branch_instr(instr:str, taken:bool, pc_offset:int) -> str:
             return choice((f"blt t1, t0, . + {4*randint(1, 6)}\n",
                            f"blt t5, t6, . + {4*randint(1, 6)}\n"))
         
-    if(instr == "bge"):
+    elif(instr == "bge"):
         if(taken):
             return choice((f"bge t1, t0, . + {4*randint(1, 6)}\n", #greater then
                            f"bge t5, t6, . + {4*randint(1, 6)}\n", #greater then
@@ -72,35 +88,38 @@ def gen_branch_instr(instr:str, taken:bool, pc_offset:int) -> str:
             return choice((f"bge t0, t1, . + {4*randint(1, 6)}\n", #less then
                            f"bge t6, t5, . + {4*randint(1, 6)}\n")) #less then
         
-    if(instr == "bltu"):
+    elif(instr == "bltu"):
         if(taken):
-            return choice((f"bltu t3, t0, {4*randint(1, 6)}\n", #pos < 0
-                           f"bltu t3, t6, {4*randint(1, 6)}\n", #neg < 0
-                           f"bltu t0, t6, {4*randint(1, 6)}\n")) #pos < neg
+            return choice((f"bltu t3, t0, . + {4*randint(1, 6)}\n", #pos < 0
+                           f"bltu t3, t6, . + {4*randint(1, 6)}\n", #neg < 0
+                           f"bltu t0, t6, . + {4*randint(1, 6)}\n")) #pos < neg
         else: #not taken
-            return choice((f"bltu t0, t3, {4*randint(1, 6)}\n", #pos > 0
-                           f"bltu t6, t3, {4*randint(1, 6)}\n", #neg > 0
-                           f"bltu t6, t0, {4*randint(1, 6)}\n", #neg > pos
-                           f"bltu t1, t2, {4*randint(1, 6)}\n", #pos == pos
-                           f"bltu t4, t5, {4*randint(1, 6)}\n")) #neg == neg
+            return choice((f"bltu t0, t3, . + {4*randint(1, 6)}\n", #pos > 0
+                           f"bltu t6, t3, . + {4*randint(1, 6)}\n", #neg > 0
+                           f"bltu t6, t0, . + {4*randint(1, 6)}\n", #neg > pos
+                           f"bltu t1, t2, . + {4*randint(1, 6)}\n", #pos == pos
+                           f"bltu t4, t5, . + {4*randint(1, 6)}\n")) #neg == neg
 
-    if(instr == "bgeu"):
+    elif(instr == "bgeu"):
         if(taken):
-            return choice((f"bgeu t0, t3, {4*randint(1, 6)}\n", #pos > 0
-                           f"bgeu t6, t3, {4*randint(1, 6)}\n", #neg > 0
-                           f"bgeu t6, t0, {4*randint(1, 6)}\n", #neg > pos
-                           f"bgeu t1, t2, {4*randint(1, 6)}\n", #pos == pos
-                           f"bgeu t4, t5, {4*randint(1, 6)}\n")) #neg == neg
+            return choice((f"bgeu t0, t3, . + {4*randint(1, 6)}\n", #pos > 0
+                           f"bgeu t6, t3, . + {4*randint(1, 6)}\n", #neg > 0
+                           f"bgeu t6, t0, . + {4*randint(1, 6)}\n", #neg > pos
+                           f"bgeu t1, t2, . + {4*randint(1, 6)}\n", #pos == pos
+                           f"bgeu t4, t5, . + {4*randint(1, 6)}\n")) #neg == neg
         else: #not taken
-            return choice((f"bgeu t3, t0, {4*randint(1, 6)}\n", #pos < 0
-                           f"bgeu t3, t6, {4*randint(1, 6)}\n", #neg < 0
-                           f"bgeu t0, t6, {4*randint(1, 6)}\n")) #pos < neg
+            return choice((f"bgeu t3, t0, . + {4*randint(1, 6)}\n", #pos < 0
+                           f"bgeu t3, t6, . + {4*randint(1, 6)}\n", #neg < 0
+                           f"bgeu t0, t6, . + {4*randint(1, 6)}\n")) #pos < neg
             
-    if(instr == "jal"):
+    elif(instr == "jal"):
         return f"jal ra, . + {4*randint(1, 6)}\n"
 
-    if(instr == "jalr"):
+    elif(instr == "jalr"):
         return f"jalr ra, sp, {4*(pc_offset + randint(1, 6))}\n"
+    
+    else: # no match, for whatever reason
+         return f"{instr}: THROW ERROR PLEASE :)\n"
 
 def gen_arth_instr(instr:str, dest_reg:int, src_reg1:int, src_reg2:int) -> str:
 
@@ -110,37 +129,61 @@ def gen_arth_instr(instr:str, dest_reg:int, src_reg1:int, src_reg2:int) -> str:
 
     #I-type (arithmetic)
     elif instr in I_TYPE_ARITH:
-        if (match(r'sr|sll',instr, IGNORECASE)):
+        if (match(r'sr|sll', instr, IGNORECASE)):
             # for immediate shifts
             return f"{instr} {dest_reg}, {src_reg1}, {randint(0, 31)}\n"
+        
+        elif(match(r'slti|sltiu', instr, IGNORECASE)):
+            #jank way of doing it but i dont feel like adding to the probabilties, uses a regs with different distribution
+            return f"{instr} {dest_reg}, {choice(a_regs)}, {randint(INT12_MIN, INT12_MAX)}\n"
+
         else:
             return f"{instr} {dest_reg}, {src_reg1}, {randint(INT12_MIN, INT12_MAX)}\n"
-    
-    #I-type (load) - to be added
-
+        
+    elif instr in U_TYPE:
+        return f"{instr} {dest_reg}, {randint(UINT20_MIN, UINT20_MAX)}\n"
+        
     else: # no match, for whatever reason
-         return f"{instr}\n"
+         return f"{instr}: THROW ERROR PLEASE :)\n"
     
-# def gen_load_instr(i):
+def gen_load_instr(instr:str, dest_reg:int):
 
-# def gen_store_isntr():
-    
+    if(instr == "lw"):
+        return f"{instr} {dest_reg}, {4*randint(0, 63)}(zero)\n"
 
+    elif(instr == "lh"):
+        return f"{instr} {dest_reg}, {2*randint(0, 127)}(zero)\n"
+
+    elif(instr == "lb"):
+        return f"{instr} {dest_reg}, {randint(0, 255)}(zero)\n"
+
+    elif(instr == "lhu"):
+        return f"{instr} {dest_reg}, {2*randint(0, 127)}(zero)\n"
+
+    elif(instr == "lbu"):
+        return f"{instr} {dest_reg}, {randint(0, 255)}(zero)\n"
+
+    else:
+        return f"{instr}: THROW ERROR PLEASE :)\n"
+
+def gen_store_instr(instr:str, dest_reg:int):
+
+    if(instr == "sw"):
+        return f"{instr} {dest_reg}, {4*randint(0, 63)}(zero)\n"
+
+    elif(instr == "sh"):
+        return f"{instr} {dest_reg}, {2*randint(0, 127)}(zero)\n"
+
+    elif(instr == "sb"):
+        return f"{instr} {dest_reg}, {randint(0, 255)}(zero)\n"
+
+    else:
+        return f"{instr}: THROW ERROR PLEASE :)\n"
 
 def main():
 
     #pc_offset, excludes labels
     pc_offset = 0
-
-    #instructions implemented so far
-    arth_instr = ["add", "mul", "and", "or", "xor", "srl", "sra", "sll", "slt", "sltu",
-                   "addi", "xori", "ori", "andi", "slli", "srli", "srai", "slti", "sltiu"]
-    load_instr = ["lb", "lh", "lw", "lbu", "lhu"]
-    store_instr = ["sb", "sh", "sw"]
-    cond_branch_instr = ["beq", "bne", "blt", "bge"]#, "bltu", "bgeu"]
-    a_regs = ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"]
-    t_regs = ["t0", "t1", "t2", "t3", "t4", "t5", "t6"]
-    s_regs = ["s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11"]
 
     with open("temp.s", "w") as f:
 
@@ -162,6 +205,10 @@ def main():
             f.write(f"li {reg}, {randint(INT32_MIN, INT32_MAX)}\n")
         f.write("\n")
 
+        for reg in a_regs:
+            f.write(f"li {reg}, {randint(INT12_MIN, INT12_MAX)}\n")
+        f.write("\n")
+
         #genarate random instructions either branching or nonbranching
         label_count = 0        
         
@@ -176,13 +223,15 @@ def main():
 
                 if(randint(0, 99) < CHANCE_OF_STORE_LOAD_INSTR):
                     if(randint(0, 99) < CHANCE_OF_STORE_VS_LOAD):
-                        f.write(f"{choice(store_instr)} {choice(s_regs)}, {4*randint(0, 63)}(zero)\n")
+                        f.write(gen_store_instr(choice(store_instr), choice(s_regs)))
+                        pc_offset = pc_offset + 1
 
                     else:
-                        f.write(f"{choice(load_instr)} {choice(s_regs)}, {4*randint(0, 63)}(zero)\n")
+                        f.write(gen_load_instr(choice(load_instr), choice(s_regs)))
+                        pc_offset = pc_offset + 1
 
                 else:
-                    f.write(gen_arth_instr(choice(arth_instr), choice(a_regs),
+                    f.write(gen_arth_instr(choice(arth_instr), "ra",
                                                     choice(s_regs), choice(s_regs)))
                     pc_offset = pc_offset + 1
 

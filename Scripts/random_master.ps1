@@ -11,6 +11,7 @@ $startTime = Get-Date
 $timer = [System.Diagnostics.Stopwatch]::StartNew()
 
 $ErrorActionPreference = "Stop"
+$runTime = 100
 
 if($help){
     Write-Output("
@@ -68,9 +69,9 @@ if(-not $no_verify){
         Write-Host "Running simulation $($ii+1)/$runs..." -ForegroundColor Magenta
 
         if($v){
-            & ..\Scripts\simulate_sv.ps1 -v -time 100
+            & ..\Scripts\simulate_sv.ps1 -v -time $runTime
         }else{
-            & ..\Scripts\simulate_sv.ps1 -continue -time 100
+            & ..\Scripts\simulate_sv.ps1 -continue -time $runTime
         }
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
