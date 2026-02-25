@@ -164,3 +164,12 @@ Write-Host "Master log updated at $masterLog"
 Write-Host "`n===============================================`n"
 Get-Content $masterLog
 Write-Host "`n===============================================`n"
+
+if ($globalAnyErrors) {
+    Write-Host "FAIL: Errors detected in one or more logs`n" -ForegroundColor Red
+} elseif ($globalAnyWarnings) {
+    Write-Host "PASS: " -ForegroundColor Green -NoNewline
+    Write-Host "Warnings present`n" -ForegroundColor Yellow
+} else {
+    Write-Host "CLEAN PASS: No warnings or errors`n" -ForegroundColor Green
+}
