@@ -60,7 +60,11 @@ if($program_file_name -eq ''){
     # Write-Output "full loop"
     # Write-Output (Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s -File)
     # exit 0
+    $runs = (Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s).count
+    $runCount = 0
+
     foreach($file in Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s -File) {
+        $runCount++
 
         $wslPath = "../Programs/directed/passing/$($file.name)"
         Write-Host $wslPath
@@ -74,7 +78,8 @@ if($program_file_name -eq ''){
         python3 .\load_instr_mem_file.py
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
-        Write-Host "Running simulation..."
+        Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
+
         if($v){
         & ..\Scripts\simulate_sv.ps1 -v -time $runTime #most likely long enuf, will give error if not
         }else{
@@ -90,6 +95,9 @@ if($program_file_name -eq ''){
     }
 }else{
 
+    $runs = 1
+    $runCount = 1
+
     $file = Get-Item "..\Programs\directed\passing\$program_file_name"
 
     $wslPath = "../Programs/directed/passing/$($file.name)"
@@ -104,7 +112,8 @@ if($program_file_name -eq ''){
     python3 .\load_instr_mem_file.py
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
-    Write-Host "Running simulation..."
+    Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
+    
     if($v){
     & ..\Scripts\simulate_sv.ps1 -v -time $runTime #most likely long enuf, will give error if not
     }else{
