@@ -65,7 +65,7 @@ if(-not $no_verify){
         python3 .\load_instr_mem_file.py
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
-        Write-Host "Running simulation $($ii+1)/$runs..."
+        Write-Host "Running simulation $($ii+1)/$runs..." -ForegroundColor Magenta
 
         if($v){
             & ..\Scripts\simulate_sv.ps1 -v -time 100

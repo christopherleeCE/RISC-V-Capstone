@@ -186,7 +186,9 @@ module top_riscv_cpu_v2_1();
             rst = 1'b0;
             @(posedge clk);
         end
-
+    
+        $readmemh("data_memory.txt", DATA_MEM[1]); //load the memory
+   
         rst = 1'b1; //disable the reset
     end
 
@@ -251,9 +253,9 @@ module top_riscv_cpu_v2_1();
             if(show_posedge_golden_calc) $display("\n\n\n<* rst = 0, intializing *>");
             PC_ASYNC <= '0;
 
-            for(int ii; ii < DATA_MEM_EC; ii++) begin
-                DATA_MEM[1][ii] <= 32'h0;
-            end
+            // for(int ii; ii < DATA_MEM_EC; ii++) begin
+            //     DATA_MEM[1][ii] <= 32'h0;
+            // end
 
 
 

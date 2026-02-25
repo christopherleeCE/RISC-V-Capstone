@@ -9,7 +9,8 @@ output_file = "instruction_memory.txt"
 hex_pattern = re.compile(r'^\s*[0-9a-f]+:\s+([0-9a-f]{8})', re.IGNORECASE)
 
 with open("data_memory.txt", 'w') as f_data:
-    pass
+    for ii in range(256):
+        f_data.write("00000000\n")
 
 with open(input_file, 'r') as f_in, open(output_file, 'w') as f_out:
     for line in f_in:

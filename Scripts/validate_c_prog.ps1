@@ -58,10 +58,10 @@ $x86ReturnValue = wsl bash -c "gcc $program_file_name -DX86_BUILD -o x86.out && 
 $x86ReturnValue = [int]$x86ReturnValue.Trim('<', '>')
 
 if($x86ReturnValue -eq $simReturnValue){
-    Write-Output("$($PSStyle.Foreground.Green)Pass... `nsim: $simReturnValue `nx86: $x86ReturnValue$($PSStyle.Reset)`n")
+    Write-Host "Pass... `nsim: $simReturnValue `nx86: $x86ReturnValue`n" -ForegroundColor Green
 
 }else{
-    Write-Output("$($PSStyle.Foreground.Red)Fail... `nsim: $simReturnValue `nx86: $x86ReturnValue$($PSStyle.Reset)`n")
+    Write-Host "Fail... `nsim: $simReturnValue `nx86: $x86ReturnValue`n" -ForegroundColor Red
 
 }
 
