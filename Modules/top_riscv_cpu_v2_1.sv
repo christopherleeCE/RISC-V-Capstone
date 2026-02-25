@@ -50,6 +50,7 @@ module top_riscv_cpu_v2_1();
 
     //declarations
     parameter int CLOCK_PERIOD = 20;
+    parameter int DATA_MEM_EC = 256;
 
     //bits for storying debug level
     bit show_posedge_golden_calc;
@@ -116,8 +117,8 @@ module top_riscv_cpu_v2_1();
     logic [4:0] RS2 [9:1];
     logic [4:0] RD [9:1];
     logic [31:0] IM [9:1];
-    logic [31:0] REG_FILE [9:1] [31:0] = '{default: 32'b0};;
-    logic [31:0] DATA_MEM [9:1] [255:0];
+    logic [31:0] REG_FILE [9:1] [31:0] = '{default: 32'b0};
+    logic [31:0] DATA_MEM [9:1] [DATA_MEM_EC-1:0];
 
     //the "async" of the golden signals, name comes from one of the early topv2 builds, just think of this as golden[0], the if stage
     //there is no regfile_async or datamem_async, because @posedge we write str8 to regfile[1] and datamem[1], this makes the debug out
@@ -249,6 +250,11 @@ module top_riscv_cpu_v2_1();
 
             if(show_posedge_golden_calc) $display("\n\n\n<* rst = 0, intializing *>");
             PC_ASYNC <= '0;
+
+            for(int ii; ii < DATA_MEM_EC; ii++) begin
+                DATA_MEM[1][ii] <= 32'h0;
+            end
+
 
 
         //if the pc is not being redirected in the dut, and rst is not low, gold calculations are made
@@ -468,7 +474,77 @@ module top_riscv_cpu_v2_1();
                 if(func3 == 3'b010) begin //----LW------------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as LW.");
                     //write_reg(rd, DATA_MEM[1][(REG_FILE[1][rs1] + imm_i)>>2]); //old implementation
-                    write_reg(rd, read_data_mem(REG_FILE[1][rs1] + imm_i, FULL_WORD, .is_signed(0)));
+                    write_reg(rd, read_data_mem(REG_FILE[1][rs1] + imm_i, FULL_WORD, .is_signed(1)));
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    PC_TARGET[1] <= PC_ASYNC + 32'h4;
+                    INSTR[1] <= INSTR_FLUSH;
+                    RS1[1] <= rs1;
+                    RS2[1] <= 'x;
+                    RD[1] <= rd;
+                    IM[1] <= imm_i;
+
+                end
+
+                if(func3 == 3'b001) begin //----LH------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as LH.");
+                    //write_reg(rd, DATA_MEM[1][(REG_FILE[1][rs1] + imm_i)>>2]); //old implementation
+                    write_reg(rd, read_data_mem(REG_FILE[1][rs1] + imm_i, HALF_WORD, .is_signed(1)));
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    PC_TARGET[1] <= PC_ASYNC + 32'h4;
+                    INSTR[1] <= INSTR_FLUSH;
+                    RS1[1] <= rs1;
+                    RS2[1] <= 'x;
+                    RD[1] <= rd;
+                    IM[1] <= imm_i;
+
+                end
+
+
+                if(func3 == 3'b000) begin //----LB------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as LB.");
+                    //write_reg(rd, DATA_MEM[1][(REG_FILE[1][rs1] + imm_i)>>2]); //old implementation
+                    write_reg(rd, read_data_mem(REG_FILE[1][rs1] + imm_i, BYTE, .is_signed(1)));
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    PC_TARGET[1] <= PC_ASYNC + 32'h4;
+                    INSTR[1] <= INSTR_FLUSH;
+                    RS1[1] <= rs1;
+                    RS2[1] <= 'x;
+                    RD[1] <= rd;
+                    IM[1] <= imm_i;
+
+                end
+
+                if(func3 == 3'b101) begin //----LHU------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as LHU.");
+                    //write_reg(rd, DATA_MEM[1][(REG_FILE[1][rs1] + imm_i)>>2]); //old implementation
+                    write_reg(rd, read_data_mem(REG_FILE[1][rs1] + imm_i, HALF_WORD, .is_signed(0)));
+                    PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    //first entry in the matrix
+                    PC[1] <= PC_ASYNC;
+                    PC_TARGET[1] <= PC_ASYNC + 32'h4;
+                    INSTR[1] <= INSTR_FLUSH;
+                    RS1[1] <= rs1;
+                    RS2[1] <= 'x;
+                    RD[1] <= rd;
+                    IM[1] <= imm_i;
+
+                end
+
+
+                if(func3 == 3'b100) begin //----LBU------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as LBU.");
+                    //write_reg(rd, DATA_MEM[1][(REG_FILE[1][rs1] + imm_i)>>2]); //old implementation
+                    write_reg(rd, read_data_mem(REG_FILE[1][rs1] + imm_i, BYTE, .is_signed(0)));
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     //first entry in the matrix
@@ -887,10 +963,9 @@ module top_riscv_cpu_v2_1();
 
     endtask
 
-    localparam WORD_ADDR_BIT_WIDTH = 8;
     task automatic write_data_mem(
         input logic [31:0] data,
-        input logic [WORD_ADDR_BIT_WIDTH+1:0] byte_addr, //2 larger bw then the word address space
+        input logic [31:0] byte_addr, //2 larger bw then the word address space
         input store_type_t store_type
     );
 
@@ -900,7 +975,7 @@ module top_riscv_cpu_v2_1();
 
         logic [3:0] byte_en;
         logic [31:0] aligned_data;
-        logic [WORD_ADDR_BIT_WIDTH-1:0] word_addr;
+        logic [29:0] word_addr;
 
         {word_flag, half_word_flag, byte_flag} = store_type;
 
@@ -937,7 +1012,7 @@ module top_riscv_cpu_v2_1();
     endtask
 
     function automatic logic[31:0] read_data_mem(
-        input logic [WORD_ADDR_BIT_WIDTH+1:0] byte_addr, //2 larger bw then the word address space
+        input logic [31:0] byte_addr, //2 larger bw then the word address space
         input store_type_t store_type,
         input logic is_signed
     );
@@ -950,7 +1025,7 @@ module top_riscv_cpu_v2_1();
         logic [31:0] data;
         logic [31:0] aligned_data;
         logic [31:0] result;
-        logic [WORD_ADDR_BIT_WIDTH-1:0] word_addr;
+        logic [29:0] word_addr;
 
         {word_flag, half_word_flag, byte_flag} = store_type;
 
@@ -1116,7 +1191,7 @@ module top_riscv_cpu_v2_1();
                 if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
                     $write("\n\t");
                 end
-                $write("\t%2d: 0x%8h", ii, DATA_MEM[c][ii]);
+                $write("\t%2d: 0x%8h", 4*ii, DATA_MEM[c][ii]);
             end
         end
     endtask
@@ -1153,7 +1228,7 @@ module top_riscv_cpu_v2_1();
                     if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
                         $write("\n\t");
                     end
-                    $write("\t%2d: 0x%h", ii, DATA_MEM[c][ii]);
+                    $write("\t%2d: 0x%h", 4*ii, DATA_MEM[c][ii]);
                 end
             end
 
@@ -1398,6 +1473,48 @@ module top_riscv_cpu_v2_1();
                     end
                 end
 
+                if(func3_v == 3'b001) begin //----LH------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as LH:");
+                    if(row == 5) begin
+
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+
+                    end
+                end
+
+                if(func3_v == 3'b000) begin //----LB------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as LB:");
+                    if(row == 5) begin
+
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+
+                    end
+                end
+
+                if(func3_v == 3'b101) begin //----LHU------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as LHU:");
+                    if(row == 5) begin
+
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+
+                    end
+                end
+
+                if(func3_v == 3'b100) begin //----LBU------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as LBU:");
+                    if(row == 5) begin
+
+                        assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+
+                    end
+                end
+
+
+
             end else if (opcode_v == 7'b1100111) begin //---I-TYPE (JALR) ------------------------------------------
                 {imm_i_v[11:0], rs1_v, func3_v, rd_v} = INSTR[row][31:7];
                 imm_i_v[31:12] = {20{imm_i_v[11]}};
@@ -1427,9 +1544,32 @@ module top_riscv_cpu_v2_1();
                         assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
-                    end//$display("dut: %d, gold: %d, *rs1_v + imm_s: %d, *rs1_v: %d, imm_s: %d", cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2], DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2], REG_FILE[4][rs1_v] + imm_s_v, REG_FILE[4][rs1_v], imm_s_v);
-
+                    end
                 end
+
+                if(func3_v == 3'b001) begin //----SH-------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as SH:");
+
+                    if(row == 4) begin
+
+                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+
+                    end
+                end
+
+                if(func3_v == 3'b000) begin //----SB-------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as SB:");
+
+                    if(row == 4) begin
+
+                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+
+                    end
+                end
+
+
 
             end else if (opcode_v == 7'b1100011) begin //------B-TYPE----------------------------
                 {imm_b_v[12], imm_b_v[10:5], rs2_v, rs1_v, func3_v, imm_b_v[4:1], imm_b_v[11]} = INSTR[row][31:7];

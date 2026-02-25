@@ -3,6 +3,7 @@
 param(
     [int]$runs = 1,
     [switch]$help,
+    [switch]$no_verify,
     [switch]$v
 )
 
@@ -15,6 +16,7 @@ if($help){
     Write-Output("
     -help: brings up this dialog
     -runs NUM:  sets the randomized testing to run NUM tests
+    -no_verify: doesnt run any verification only generates a masterlog with the current contents of raw_random dirctory
 
     For refrence my home computer (kinda beefy but no really) takes 4 minutes for 100 runs, 1000 took about 40 minutes
     
@@ -41,46 +43,49 @@ $masterLog = Join-Path $logFolder "_master.log"
 if (-not (Test-Path $logFolder)) {
     New-Item -ItemType Directory -Path $logFolder | Out-Null
 } else {
+    if(-not $no_verify){
     # Remove all files in the folder
     Get-ChildItem $logFolder -File | Remove-Item -Force
+    }
 }
 
 Write-Host "Running from Modules folder, continuing..."
+if(-not $no_verify){
+    for($ii = 0; $ii -lt $runs; $ii++){
 
-for($ii = 0; $ii -lt $runs; $ii++){
+        Write-Host "Generating random assembly..."
+        python3 ..\Scripts\gen_random_prog.py
+        if ($LASTEXITCODE -ne 0) { exit 1 }
 
-    Write-Host "Generating random assembly..."
-    python3 ..\Scripts\gen_random_prog.py
-    if ($LASTEXITCODE -ne 0) { exit 1 }
+        Write-Host "Assembling in WSL..."
+        wsl bash -c "riscv64-unknown-elf-as -march=rv32im temp.s -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
+        if ($LASTEXITCODE -ne 0) { exit 1 }
 
-    Write-Host "Assembling in WSL..."
-    wsl bash -c "riscv64-unknown-elf-as -march=rv32im temp.s -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
-    if ($LASTEXITCODE -ne 0) { exit 1 }
+        Write-Host "Writing instruction memory file..."
+        python3 .\load_instr_mem_file.py
+        if ($LASTEXITCODE -ne 0) { exit 1 }
 
-    Write-Host "Writing instruction memory file..."
-    python3 .\load_instr_mem_file.py
-    if ($LASTEXITCODE -ne 0) { exit 1 }
+        Write-Host "Running simulation $($ii+1)/$runs..."
 
-    Write-Host "Running simulation..."
+        if($v){
+            & ..\Scripts\simulate_sv.ps1 -v -time 100
+        }else{
+            & ..\Scripts\simulate_sv.ps1 -continue -time 100
+        }
+        if ($LASTEXITCODE -ne 0) { exit 1 }
 
-    if($v){
-        & ..\Scripts\simulate_sv.ps1 -v -time 100
-    }else{
-        & ..\Scripts\simulate_sv.ps1 -continue -time 100
+        Write-Host "Flow complete."
+
+        # Copy temp.s and program.log to log folder with iteration number
+        $tempSName = "temp_$ii.s"
+        $simLogName = "sim_$ii.log"
+
+        Copy-Item ".\temp.s" -Destination (Join-Path $logFolder $tempSName) -Force
+        Copy-Item ".\sim.log" -Destination (Join-Path $logFolder $simLogName) -Force
+
+        Write-Host "Saved logs for iteration $ii"
+
     }
-    if ($LASTEXITCODE -ne 0) { exit 1 }
-
-    Write-Host "Flow complete."
-
-    # Copy temp.s and program.log to log folder with iteration number
-    $tempSName = "temp_$ii.s"
-    $simLogName = "sim_$ii.log"
-
-    Copy-Item ".\temp.s" -Destination (Join-Path $logFolder $tempSName) -Force
-    Copy-Item ".\sim.log" -Destination (Join-Path $logFolder $simLogName) -Force
-
-    Write-Host "Saved logs for iteration $ii"
-
 }
 
 # Clear master log if it exists
@@ -149,6 +154,10 @@ $endTime = Get-Date
 Add-Content -Path $masterLog "Verification Started: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 Add-Content -Path $masterLog "Verification Finished: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 Add-Content -Path $masterLog "Verification Time: $($timer.Elapsed.ToString('hh\:mm\:ss\.ff'))"
+
+if($no_verify){
+    Add-Content -Path $masterLog "`n`n<<<* WARNING *>>> No verification was done, only a masterlog was generated based on the leftover files in the raw_random directory"
+}
 
 Write-Host "Master log updated at $masterLog"
 

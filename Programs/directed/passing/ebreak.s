@@ -1,19 +1,19 @@
 #going to test the timing of the ebreak, not really a validation
-li s0, 10
-li s1, 11
-li s2, 12
-li s3, 13
-li s4, 14
-li s5, 15
+li x10, 10
+li x11, 11
+li x12, 12
+li x13, 13
+li x14, 14
+li x15, 15
 ebreak #supposedly we should only see the regs s0 -> s5 changed
 #and the is what happens in the dut, but because of the nature of the way the top file is set up,
 #up to i think about s10 gets written to in the golden, which is fine, i dont exactly see that causing
 #any issues with validation 
 # -chris
-li s6, 16
-li s7, 17
-li s8, 18
-li s9, 19
-li s10, 20
-li s11, 21
+li x16, 16
+li x17, 17
+li x18, 18 #this is the last guy that sees results reflected in the golden
+li x19, 19
+li x20, 20
+li x21, 21
 
