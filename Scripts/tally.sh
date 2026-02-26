@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+echo
+echo "this can take a while, ~1 minute 30 seconds for 10000 files"
+echo
+
 # Recursive globbing
 shopt -s globstar nullglob
 

@@ -19,7 +19,7 @@ if($help){
     -runs NUM:  sets the randomized testing to run NUM tests
     -no_verify: doesnt run any verification only generates a masterlog with the current contents of raw_random dirctory
 
-    For refrence my home computer (kinda beefy but no really) takes 4 minutes for 100 runs, 1000 took about 40 minutes
+    For refrence my home computer (kinda beefy but not really) takes 4:30 minutes for 100 runs, 1000 took about 45 minutes
     
     This Script will generate a random .s file, simulate and validate it, and store the results
     in the <GITHOME/Logs/raw_random/> directory, along with a _master.log file that sumaraizes the
@@ -52,7 +52,7 @@ if (-not (Test-Path $logFolder)) {
 
 Write-Host "Running from Modules folder, continuing..."
 if(-not $no_verify){
-    for($ii = 0; $ii -lt $runs; $ii++){
+    for($ii = 1; $ii -le $runs; $ii++){
 
         Write-Host "Generating random assembly..."
         python3 ..\Scripts\gen_random_prog.py
@@ -66,7 +66,7 @@ if(-not $no_verify){
         python3 .\load_instr_mem_file.py
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
-        Write-Host "Running simulation $($ii+1)/$runs..." -ForegroundColor Magenta
+        Write-Host "Running simulation $($ii)/$runs..." -ForegroundColor Magenta
 
         if($v){
             & ..\Scripts\simulate_sv.ps1 -v -time $runTime

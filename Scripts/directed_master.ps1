@@ -91,7 +91,6 @@ if($program_file_name -eq ''){
         Copy-Item $wslPath -Destination (Join-Path $logFolder $file.name) -Force
         Copy-Item ".\sim.log" -Destination (Join-Path $logFolder "$($file.BaseName).log") -Force
 
-        Write-Host "Finished testing all programs.."
     }
 }else{
 
