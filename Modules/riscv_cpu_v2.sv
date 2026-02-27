@@ -69,9 +69,9 @@ module riscv_cpu_v2
     logic [63:0] f2d_data_D;       //fetch to decode post pipeline    
 
     logic [142:0] d2e_data_D;          //decode to execute data signals
-    logic [29:0] d2e_control_D;       //decode to execute control signals
+    logic [33:0] d2e_control_D;       //decode to execute control signals
     logic [142:0] d2e_data_E;       //decode to execute post pipeline
-    logic [29:0] d2e_control_E;    //decode to execute control signals post pipeline
+    logic [33:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [100:0] e2m_data_E;          //execute to memory data signals
     logic [8:0] e2m_control_E;       //execute to memory control signals

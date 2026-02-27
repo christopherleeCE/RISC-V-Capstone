@@ -27,7 +27,7 @@ R-TYPE:
 I-TYPE:
 S-TYPE:
 B-TYPE: 
-M-TYPE: 
+M-TYPE: DIV, DIVU, REM, REMU
 U-TYPE:
 
 SUCCESSFUL TESTS:
@@ -382,6 +382,26 @@ module top_riscv_cpu_v2_1();
                         product = $unsigned({ 32'b0, REG_FILE[1][rs1] }) *
                                 $unsigned({ 32'b0, REG_FILE[1][rs2] });
                         write_reg(rd, product[63:32]);
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b100) begin //----DIV---------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as DIV.");
+                        write_reg(rd, $signed(REG_FILE[1][rs1]) / $signed(REG_FILE[1][rs2]));
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b101) begin //----DIVU---------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as DIVU.");
+                        write_reg(rd, $unsigned(REG_FILE[1][rs1]) / $unsigned(REG_FILE[1][rs2]));
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b110) begin //----REM---------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as REM.");
+                        write_reg(rd, $signed(REG_FILE[1][rs1]) % $signed(REG_FILE[1][rs2]));
+                        PC_ASYNC <= PC_ASYNC + 32'h4;
+
+                    end else if (func3 == 3'b111) begin //----REMU---------------------------
+                        if(show_posedge_golden_calc) $display("\tIdentified as REMU.");
+                        write_reg(rd, $unsigned(REG_FILE[1][rs1]) % $unsigned(REG_FILE[1][rs2]));
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end
@@ -748,6 +768,48 @@ module top_riscv_cpu_v2_1();
                 end else if(func3 == 3'b101) begin //----BGE------------------------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as BGE.");
                     if(REG_FILE[1][rs1] >= REG_FILE[1][rs2]) begin
+                        if(show_posedge_golden_calc) $display("Branch Taken");
+
+                        take_branch({{19{imm_b[12]}}, imm_b[12:0]}, rs1, rs2, 'x);
+
+                    end else begin
+                        if(show_posedge_golden_calc) $display("Branch not Taken");
+
+                        PC_ASYNC <= PC_ASYNC + 4;
+
+                        PC[1] <= PC_ASYNC;
+                        PC_TARGET[1] <= PC_ASYNC + 4;
+                        INSTR[1] <= INSTR_FLUSH;
+                        RS1[1] <= rs1;
+                        RS2[1] <= rs2;
+                        RD[1] <= 'x;
+                        IM[1] <= imm_b;
+                    end
+                    
+                end else if(func3 == 3'b110) begin //----BLTU------------------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as BLTU.");
+                    if($unsigned(REG_FILE[1][rs1]) < $unsigned(REG_FILE[1][rs2])) begin
+                        if(show_posedge_golden_calc) $display("Branch Taken");
+
+                        take_branch({{19{imm_b[12]}}, imm_b[12:0]}, rs1, rs2, 'x);
+
+                    end else begin
+                        if(show_posedge_golden_calc) $display("Branch not Taken");
+
+                        PC_ASYNC <= PC_ASYNC + 4;
+
+                        PC[1] <= PC_ASYNC;
+                        PC_TARGET[1] <= PC_ASYNC + 4;
+                        INSTR[1] <= INSTR_FLUSH;
+                        RS1[1] <= rs1;
+                        RS2[1] <= rs2;
+                        RD[1] <= 'x;
+                        IM[1] <= imm_b;
+                    end
+                    
+                end else if(func3 == 3'b111) begin //----BGEU------------------------------------------------
+                    if(show_posedge_golden_calc) $display("\tIdentified as BGEU.");
+                    if($unsigned(REG_FILE[1][rs1]) >= $unsigned(REG_FILE[1][rs2])) begin
                         if(show_posedge_golden_calc) $display("Branch Taken");
 
                         take_branch({{19{imm_b[12]}}, imm_b[12:0]}, rs1, rs2, 'x);
@@ -1326,6 +1388,18 @@ module top_riscv_cpu_v2_1();
                     end else if (func3_v == 3'b011) begin //----MULHU------------------------------
                         if(show_negedge_verify_row) $write("\tIdentified as MULHU:");
 
+                    end else if (func3_v == 3'b100) begin //----DIV------------------------------
+                        if(show_negedge_verify_row) $write("\tIdentified as DIV:");
+
+                    end else if (func3_v == 3'b101) begin //----DIVU------------------------------
+                        if(show_negedge_verify_row) $write("\tIdentified as DIVU:");
+
+                    end else if (func3_v == 3'b110) begin //----REM------------------------------
+                        if(show_negedge_verify_row) $write("\tIdentified as REM:");
+
+                    end else if (func3_v == 3'b111) begin //----REMU------------------------------
+                        if(show_negedge_verify_row) $write("\tIdentified as REMU:");
+
                     end
 
                 end
@@ -1611,6 +1685,26 @@ module top_riscv_cpu_v2_1();
                     
                 end else if(func3_v == 3'b101) begin //----BGE------------------------------------------------
                     if(show_negedge_verify_row) $write("\tIdentified as BGE:");
+                    // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
+                    if(row == 3) begin
+                        
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+
+                    end
+                    
+                end else if(func3_v == 3'b110) begin //----BLTU------------------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as BLTU:");
+                    // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
+                    if(row == 3) begin
+                        
+                        assert(cpu_dut.pc_reg.q == PC_ASYNC) $display(" Success: 0x%h", PC[row]);
+                        else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+
+                    end
+                    
+                end else if(func3_v == 3'b111) begin //----BGEU------------------------------------------------
+                    if(show_negedge_verify_row) $write("\tIdentified as BGEU:");
                     // $display("dut: %h, gold: %h", cpu_dut.pc_reg.q, PC_ASYNC);
                     if(row == 3) begin
                         
