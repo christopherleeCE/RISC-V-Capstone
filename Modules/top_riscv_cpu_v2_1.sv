@@ -15,7 +15,7 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 
 TODO expand branch.s with unsigned versions when implemented, jump backwards testing
 
-
+TODO check divs' an rem's against rars
 
 
 
