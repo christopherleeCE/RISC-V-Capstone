@@ -9,6 +9,10 @@ module alu
     input logic alu_sel_mulh,
     input logic alu_sel_mulhsu,
     input logic alu_sel_mulhu,
+    input logic alu_sel_div,
+    input logic alu_sel_divu,
+    input logic alu_sel_rem,
+    input logic alu_sel_remu,
     input logic alu_sel_and,
     input logic alu_sel_or,
     input logic alu_sel_xor,
@@ -54,6 +58,11 @@ logic slt_result, sltu_result;
 assign slt_result = signed_a < signed_b;
 assign sltu_result = operand_a < operand_b;
 
+// NOTE - This operator "/" appears to be the most straightforward way to
+// do division in SystemVerilog within one-clock cycle. However, it is
+// stated the circuit generated during synthesis is particularly resource
+// intensive; if any alternatives are known, they might be worth exploring.
+
 always_comb begin
     unique case(1'b1)
     alu_sel_add : result = operand_a + operand_b; // ADD
@@ -62,6 +71,10 @@ always_comb begin
     alu_sel_mulh : result = product_ss[2*WIDTH-1:WIDTH];  // MULH
     alu_sel_mulhsu : result = product_su[2*WIDTH-1:WIDTH]; // MULHSU
     alu_sel_mulhu : result = product_uu[2*WIDTH-1:WIDTH];  // MULHU
+    alu_sel_div : result = signed_a / signed_b; // DIV
+    alu_sel_divu : result = operand_a / operand_b; //DIVU
+    alu_sel_rem : result = signed_a % signed_b; // REM
+    alu_sel_remu : result = operand_a % operand_b; //REMU
     alu_sel_and : result = operand_a & operand_b; // AND
     alu_sel_or : result = operand_a | operand_b; // OR
     alu_sel_xor : result = operand_a ^ operand_b; // XOR
