@@ -1,4 +1,11 @@
 #TODO, test auipc with pc > 1kb
+    .section .data
+    .word 0x00000000
+
+    .section .text
+    .globl _start
+
+_start:
 
 li a0, 0x00000000
 li a1, 0x55555555
@@ -37,8 +44,8 @@ li x21, 0x11223344
 li x22, 0x11223344
 li x23, 0x11223344
 
-li sp, 0x00000008 #testing if forwarding works in grabing the right sp
-li sp, 0x00000000
+li sp, 0x00001008 #testing if forwarding works in grabing the right sp
+li sp, 0x00001000
 sw t0, 0(sp)
 sw t0, 4(sp)
 sw t0, 8(sp)
@@ -72,7 +79,7 @@ sw t0, 44(sp)
 # sw t0, 120(sp)
 # sw t0, 124(sp)
 
-li sp, 0x00000000
+li sp, 0x00001000
 sb a0, 0(sp)
 sb a1, 1(sp)
 sb a2, 2(sp)
@@ -90,7 +97,7 @@ sb a2, 13(sp)
 sb a3, 14(sp)
 sb a0, 15(sp)
 
-li sp, 0x00000010
+li sp, 0x00001010
 sh a0, 0(sp)
 sh a1, 2(sp)
 sh a1, 4(sp)
@@ -100,7 +107,7 @@ sh a3, 10(sp)
 sh a3, 12(sp)
 sh a2, 14(sp)
 
-li sp, 0x00000020
+li sp, 0x00001020
 sw a0, 0(sp)
 sw a1, 4(sp)
 sw a2, 8(sp)
@@ -123,7 +130,7 @@ sw a3, 12(sp)
 0xFFFFFFFF
 */
 
-li sp, 0
+li sp, 0x00001000
 lb x16, 0(sp)
 lb x17, 5(sp)
 lb x18, 10(sp)

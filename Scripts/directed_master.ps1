@@ -3,7 +3,9 @@
 param(
     [Parameter(Position = 0)]
     [string]$program_file_name = '',
+    [switch]$no_run,
     [switch]$help,
+
     [switch]$v
 )
 
@@ -22,8 +24,9 @@ if($help){
     Programs/directed/ directory. Regardless a _master.log summary file is created. The individual results, and the 
     _master.log will be moved into the Logs/raw_directed/ directory, and will get cleared whenver this script run
 
-    -help:  Brings up this dialog
-    -v:     verbose .log output
+    -help:      Brings up this dialog
+    -v:         verbose .log output
+    -no_run:    if you give a file name, followed by no run, it will only load instruction_memory.txt and data_memory.txt, will not run simulation, use this to get an objdump of the program
     ")
 
     exit(0)
@@ -70,12 +73,16 @@ if($program_file_name -eq ''){
         Write-Host $wslPath
         Write-Host "Testing $wslPath..."
 
-        Write-Host "Assembling in WSL..."
-        wsl bash -c "riscv64-unknown-elf-as -march=rv32im $wslPath -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        # Write-Host "Assembling in WSL..."
+        # wsl bash -c "riscv64-unknown-elf-as -march=rv32im $wslPath -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
+        # if ($LASTEXITCODE -ne 0) { exit 1 }
 
-        Write-Host "Writing instruction memory file..."
-        python3 .\load_instr_mem_file.py
+        # Write-Host "Writing instruction memory file..."
+        # python3 .\load_instr_mem_file.py
+        # if ($LASTEXITCODE -ne 0) { exit 1 }
+
+        Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
+        wsl bash -c "../Scripts/assemble_gas.sh $wslPath"
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
@@ -103,13 +110,21 @@ if($program_file_name -eq ''){
     Write-Host $wslPath
     Write-Host "Testing $wslPath..."
 
-    Write-Host "Assembling in WSL..."
-    wsl bash -c "riscv64-unknown-elf-as -march=rv32im $wslPath -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
+    # Write-Host "Assembling in WSL..."
+    # wsl bash -c "riscv64-unknown-elf-as -march=rv32im $wslPath -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
+    # if ($LASTEXITCODE -ne 0) { exit 1 }
+
+    # Write-Host "Writing instruction memory file..."
+    # python3 .\load_instr_mem_file.py
+    # if ($LASTEXITCODE -ne 0) { exit 1 }
+
+    Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
+    wsl bash -c "../Scripts/assemble_gas.sh $wslPath"
     if ($LASTEXITCODE -ne 0) { exit 1 }
 
-    Write-Host "Writing instruction memory file..."
-    python3 .\load_instr_mem_file.py
-    if ($LASTEXITCODE -ne 0) { exit 1 }
+    if($no_run){
+        exit 0
+    }
 
     Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
     
@@ -161,12 +176,12 @@ foreach ($tempFile in $logFiles) {
         # Update global flags if any issues are found in this file
         if ($fileErrors -gt 0) {
             $globalAnyErrors = $true
-            Add-Content -Path $masterLog "$($tempFile.Name): FAIL (Errors: $fileErrors, Warnings: $fileWarnings)"
+            Add-Content -Path $masterLog "FAIL (Errors: $fileErrors, Warnings: $fileWarnings): $($tempFile.Name)"
         }else{
             if($fileWarnings -gt 0){
-                Add-Content -Path $masterLog "$($tempFile.Name): PASS (Errors: $fileErrors, Warnings: $fileWarnings)"
+                Add-Content -Path $masterLog "PASS (Errors: $fileErrors, Warnings: $fileWarnings): $($tempFile.Name)"
             }else{
-                Add-Content -Path $masterLog "$($tempFile.Name): CLEAN PASS (Errors: $fileErrors, Warnings: $fileWarnings)"
+                Add-Content -Path $masterLog "CLEAN PASS (Errors: $fileErrors, Warnings: $fileWarnings): $($tempFile.Name)"
             }
         }
         if ($fileWarnings -gt 0) { $globalAnyWarnings = $true }

@@ -13,10 +13,14 @@ div
 divu
 rem
 remu
-ebreak
 
 and more that will be manually retested in other programs, (lui for example)
 */
+
+    .section .text
+    .globl _start
+
+_start:
 
 #prep registers
 li a0, 0x0
