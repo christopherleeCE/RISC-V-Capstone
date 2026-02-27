@@ -3,6 +3,7 @@
 param(
     [Parameter(Position = 0)]
     [string]$program_file_name = '',
+    [string]$directory = "full_isa",
     [switch]$no_run,
     [switch]$help,
 
@@ -36,12 +37,21 @@ if($help){
 $currentDirName = Split-Path -Leaf (Get-Location)
 
 if ($currentDirName -ne "Modules") {
-    Write-Host "`nError: Script must be run from the Modules folder. Current folder is $currentDirName`n"
+    Write-Host "`nError: Script must be run from the Modules folder. Current folder is $currentDirName`n" -ForegroundColor Red
     exit 1
 }
 
-if (-not (Test-Path "../Programs/directed/passing/$program_file_name")) {
-    Write-Host "`nError: File <$program_file_name> does not exist in ../Programs/directed/passing/`n"
+$targetPath = "../Programs/directed/$directory"
+if (-not (Test-Path $targetPath)) {
+    Write-Host "`nError: Directory '$directory' does not exist in ../Programs/directed/`n" -ForegroundColor Red
+    exit 1
+}
+
+#convering all .sh to linux line endings
+wsl bash -c "dos2unix ../Scripts/*.sh"
+
+if (-not (Test-Path "../Programs/directed/$directory/$program_file_name")) {
+    Write-Host "`nError: File <$program_file_name> does not exist in ../Programs/directed/$directory/`n" -ForegroundColor Red
     exit(1)
 }
 
@@ -61,15 +71,15 @@ Write-Host "Running from Modules folder, continuing..."
 
 if($program_file_name -eq ''){
     # Write-Output "full loop"
-    # Write-Output (Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s -File)
+    # Write-Output (Get-ChildItem -Path ..\Programs\directed\$directory\ -Filter *.s -File)
     # exit 0
-    $runs = (Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s).count
+    $runs = (Get-ChildItem -Path ..\Programs\directed\$directory\ -Filter *.s).count
     $runCount = 0
 
-    foreach($file in Get-ChildItem -Path ..\Programs\directed\passing\ -Filter *.s -File) {
+    foreach($file in Get-ChildItem -Path ..\Programs\directed\$directory\ -Filter *.s -File) {
         $runCount++
 
-        $wslPath = "../Programs/directed/passing/$($file.name)"
+        $wslPath = "../Programs/directed/$directory/$($file.name)"
         Write-Host $wslPath
         Write-Host "Testing $wslPath..."
 
@@ -104,9 +114,9 @@ if($program_file_name -eq ''){
     $runs = 1
     $runCount = 1
 
-    $file = Get-Item "..\Programs\directed\passing\$program_file_name"
+    $file = Get-Item "..\Programs\directed\$directory\$program_file_name"
 
-    $wslPath = "../Programs/directed/passing/$($file.name)"
+    $wslPath = "../Programs/directed/$directory/$($file.name)"
     Write-Host $wslPath
     Write-Host "Testing $wslPath..."
 

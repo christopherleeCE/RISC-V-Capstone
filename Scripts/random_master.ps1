@@ -33,7 +33,7 @@ if($help){
 $currentDirName = Split-Path -Leaf (Get-Location)
 
 if ($currentDirName -ne "Modules") {
-    Write-Host "Error: Script must be run from the Modules folder. Current folder is $currentDirName"
+    Write-Host "Error: Script must be run from the Modules folder. Current folder is $currentDirName" -ForegroundColor Red
     exit 1
 }
 
