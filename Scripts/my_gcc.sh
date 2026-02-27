@@ -83,6 +83,7 @@ elif [ "$mode" = "gcc" ] ; then
     -ffreestanding \
     -T linker.ld \
     "$file" \
+    -lgcc \
     -o program.elf
 
     # riscv64-unknown-elf-gcc \
