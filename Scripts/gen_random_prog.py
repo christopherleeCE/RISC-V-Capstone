@@ -20,7 +20,7 @@ CHANCE_OF_JAL_VS_JALR = 50
 
 #instructions implemented so far
 arth_instr = ["add", "sub", "xor", "or", "and", "sll", "srl", "sra", "slt", "sltu",
-            "mul", "mulh", "mulhsu", "mulhu",# "div", "divu", "rem", "remu",
+            "mul", "mulh", "mulhsu", "mulhu", "div", "divu", "rem", "remu",
             "addi", "xori", "ori", "andi", "slli", "srli", "srai", "slti", "sltiu",
             "lui", "auipc"]
 load_instr = ["lb", "lh", "lw", "lbu", "lhu"]
