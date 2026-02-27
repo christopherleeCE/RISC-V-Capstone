@@ -74,6 +74,10 @@ SIG alu_sel_mul
 SIG alu_sel_mulh
 SIG alu_sel_mulhsu
 SIG alu_sel_mulhu
+SIG alu_sel_div
+SIG alu_sel_divu
+SIG alu_sel_rem
+SIG alu_sel_remu
 SIG alu_sel_and
 SIG alu_sel_or
 SIG alu_sel_xor
@@ -152,6 +156,26 @@ reg_file_wr_en
 
 MULHU OPCODE 000_0001____?_????____?_????____011____?_????____011_0011
 alu_sel_mulhu
+dbus_sel_alu
+reg_file_wr_en
+
+DIV OPCODE 000_0001____?_????____?_????____100____?_????____011_0011
+alu_sel_div
+dbus_sel_alu
+reg_file_wr_en
+
+DIVU OPCODE 000_0001____?_????____?_????____101____?_????____011_0011
+alu_sel_divu
+dbus_sel_alu
+reg_file_wr_en
+
+REM OPCODE 000_0001____?_????____?_????____110____?_????____011_0011
+alu_sel_rem
+dbus_sel_alu
+reg_file_wr_en
+
+REMU OPCODE 000_0001____?_????____?_????____111____?_????____011_0011
+alu_sel_remu
 dbus_sel_alu
 reg_file_wr_en
 
