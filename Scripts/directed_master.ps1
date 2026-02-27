@@ -22,15 +22,24 @@ if($help){
     Write-Output("
     Usage: GITHOME/Modules >> ../Scripts/direct_master.ps1 myProgram.s -optional_flags
 
-    myProgram.s must be a program in the Programs/directed/ directory. The script will run validation using that program
+    myProgram.s must be a program in the Programs/directed/<SUBDIRECTORY>/ directory. The script will run validation using that program
     if you do not give it a myProgram.s when calling the script, it will run vaidation on all of the programs in the
-    Programs/directed/ directory. Regardless a _master.log summary file is created. The individual results, and the 
+    Programs/directed/<SUBDIRECTORY>/ directory. Regardless a _master.log summary file is created. The individual results, and the 
     _master.log will be moved into the Logs/raw_directed/ directory, and will get cleared whenver this script run
 
     -help:      Brings up this dialog
     -v:         verbose .log output
-    -no_run:    if you give a file name, followed by no run, it will only load instruction_memory.txt and data_memory.txt, will not run simulation, use this to get an objdump of the program
-    -compile:   use this flag if you want it to use a c file instead of an s file, if in c mode it will compare the result with that same c file ran natively on x86, only comparasion made is the return value of main()
+    -no_run:    if you give a file name, followed by no run, it will only load instruction_memory.txt
+                and data_memory.txt, will not run simulation, use this to get an objdump of the program
+    -compile:   use this flag if you want it to use a c file instead of an s file, if in c mode it will
+                compare the result with that same c file ran natively on x86, only comparasion made is
+                the return value of main(), just like in asm mode, if you dont give it a file name it
+                will grab every file and run them through the simuation (except instead of all the .s
+                files it will run all the .c files.)
+    -directory: lets you specify the <SUBDIRECTORY>, usage example
+                ..\Scripts\directed_master.ps1 retep.c -directory full_isa -compile                                            
+                'full_isa' being the <SUBDIRECTORY>, if none is given the default is 'full_isa'
+    
     ")
 
     exit(0)

@@ -52,8 +52,8 @@ BEGIN {
             ebreak \
             mul \
             mulh \
-            mulsu \
-            mulu \
+            mulhsu \
+            mulhu \
             div \
             divu \
             rem \
