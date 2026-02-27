@@ -45,6 +45,8 @@ riscv64-unknown-elf-objcopy \
   --gap-fill 0x00 \
   --pad-to 0x2000 \
   program_asm.elf data.bin
+
+truncate -s 4096 data.bin
 hexdump -v -e '1/4 "%08x\n"' data.bin > data_memory.txt
 
 
