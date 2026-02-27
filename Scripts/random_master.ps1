@@ -120,12 +120,12 @@ foreach ($file in $logFiles) {
         # Update global flags if any issues are found in this file
         if ($fileErrors -gt 0) {
             $globalAnyErrors = $true
-            Add-Content -Path $masterLog "$($file.Name): FAIL (Errors: $fileErrors, Warnings: $fileWarnings)"
+            Add-Content -Path $masterLog "FAIL (Errors: $fileErrors, Warnings: $fileWarnings): $($file.Name)"
         }else{
             if($fileWarnings -gt 0){
-                Add-Content -Path $masterLog "$($file.Name): PASS (Errors: $fileErrors, Warnings: $fileWarnings)"
+                Add-Content -Path $masterLog "PASS (Errors: $fileErrors, Warnings: $fileWarnings): $($file.Name)"
             }else{
-                Add-Content -Path $masterLog "$($file.Name): CLEAN PASS (Errors: $fileErrors, Warnings: $fileWarnings)"
+                Add-Content -Path $masterLog "CLEAN PASS (Errors: $fileErrors, Warnings: $fileWarnings): $($file.Name)"
             }
         }
         if ($fileWarnings -gt 0) { $globalAnyWarnings = $true }

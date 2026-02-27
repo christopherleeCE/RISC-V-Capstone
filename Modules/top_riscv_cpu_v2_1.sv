@@ -50,7 +50,9 @@ module top_riscv_cpu_v2_1();
 
     //declarations
     parameter int CLOCK_PERIOD = 20;
-    parameter int DATA_MEM_EC = 256;
+    parameter int DATA_MEM_EC = 1024;
+    parameter int LOWEST_DATA_MEM_ADDR = 32'h1000;
+
 
     //bits for storying debug level
     bit show_posedge_golden_calc;
@@ -186,10 +188,14 @@ module top_riscv_cpu_v2_1();
             rst = 1'b0;
             @(posedge clk);
         end
-    
-        $readmemh("data_memory.txt", DATA_MEM[1]); //load the memory
    
         rst = 1'b1; //disable the reset
+    end
+
+    initial begin
+
+        $readmemh("data_memory.txt", DATA_MEM[1]); //load the memory
+
     end
 
     final begin
@@ -207,6 +213,15 @@ module top_riscv_cpu_v2_1();
         .read_address(PC_ASYNC),
         .read_data(INSTR_ASYNC)
     );
+
+    // always @(posedge clk) begin
+    //     dump_instr_mem_first32();
+    // end
+
+    // always @(negedge clk) begin
+    //     dump_instr_mem_first32();
+    // end
+
 
     //golden results calculated on posedge
     always @(posedge clk) begin
@@ -967,10 +982,11 @@ module top_riscv_cpu_v2_1();
 
     task automatic write_data_mem(
         input logic [31:0] data,
-        input logic [31:0] byte_addr, //2 larger bw then the word address space
+        input logic [31:0] raw_byte_addr, //2 larger bw then the word address space
         input store_type_t store_type
     );
 
+        logic [31:0] byte_addr;
         logic word_flag;
         logic half_word_flag;
         logic byte_flag;
@@ -979,6 +995,7 @@ module top_riscv_cpu_v2_1();
         logic [31:0] aligned_data;
         logic [29:0] word_addr;
 
+        byte_addr = raw_byte_addr - LOWEST_DATA_MEM_ADDR;
         {word_flag, half_word_flag, byte_flag} = store_type;
 
         if (word_flag && (byte_addr[1:0] != 2'b00)) 
@@ -1014,11 +1031,12 @@ module top_riscv_cpu_v2_1();
     endtask
 
     function automatic logic[31:0] read_data_mem(
-        input logic [31:0] byte_addr, //2 larger bw then the word address space
+        input logic [31:0] raw_byte_addr, //2 larger bw then the word address space
         input store_type_t store_type,
         input logic is_signed
     );
 
+        logic [31:0] byte_addr;
         logic word_flag;
         logic half_word_flag;
         logic byte_flag;
@@ -1029,6 +1047,7 @@ module top_riscv_cpu_v2_1();
         logic [31:0] result;
         logic [29:0] word_addr;
 
+        byte_addr = raw_byte_addr - LOWEST_DATA_MEM_ADDR;
         {word_flag, half_word_flag, byte_flag} = store_type;
 
         if (word_flag && (byte_addr[1:0] != 2'b00)) 
@@ -1150,6 +1169,26 @@ module top_riscv_cpu_v2_1();
         end
     endtask
 
+    task automatic dump_instr_mem_first32;
+        int i;
+        begin
+            $display("---- Instruction Memory Dump (first 32 words) ----");
+            for (i = 0; i < 32; i++) begin
+                $display("addr %0d (0x%08x) : %08x",
+                        i,
+                        i*4,
+                        instr_mem.instr_mem[i]);
+            end
+            for (i = 0; i < 32; i++) begin
+                $display("addr %0d (0x%08x) : %08x",
+                        i,
+                        i*4,
+                        cpu_dut.instr_mem.instr_mem[i]);
+            end
+            $display("---------------------------------------------------");
+        end
+    endtask
+
     task reg_dut_dump();
         begin
             $write("\nREG_FILE_DUT Dump");
@@ -1176,12 +1215,12 @@ module top_riscv_cpu_v2_1();
 
     task data_mem_dut_dump();
         begin
-            $display("\n\tDATA_MEM_DUT Dump");
-            for(int ii = 0; ii < 256; ii++) begin
+            $write("\n\tDATA_MEM_DUT Dump\n\t");
+            for(int ii = 255; ii >= 0; ii--) begin
+                $write("\t%2d: 0x%8h", ii, cpu_dut.my_data_mem.data_mem[ii]);
                 if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
                     $write("\n\t");
                 end
-                $write("\t%2d: 0x%8h", ii, cpu_dut.my_data_mem.data_mem[ii]);
             end
         end
     endtask
@@ -1189,11 +1228,11 @@ module top_riscv_cpu_v2_1();
     task data_mem_gold_ii_dump(int c);
         begin
             $write("\n\tDATA_MEM_GOLD: Row(%1d)", c);
-            for(int ii = 0; ii < 32; ii++) begin
+            for(int ii = 31; ii >= 0; ii--) begin
+                $write("\t%2d: 0x%8h", ii, DATA_MEM[c][ii]);
                 if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
                     $write("\n\t");
                 end
-                $write("\t%2d: 0x%8h", 4*ii, DATA_MEM[c][ii]);
             end
         end
     endtask
@@ -1225,12 +1264,13 @@ module top_riscv_cpu_v2_1();
                     $write("%5s: 0x%h", reg_name[r], REG_FILE[c][r]);
                 end
 
-                $write("\n\tDATA_MEM");
-                for(int ii = 0; ii < 32; ii++) begin
+                 $write("\n\tDATA_MEM\n\t");
+                for(int ii = 31; ii >= 0; ii--) begin
+                    $write("\t%2d: 0x%h", ii, DATA_MEM[c][ii]);
+
                     if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
                         $write("\n\t");
                     end
-                    $write("\t%2d: 0x%h", 4*ii, DATA_MEM[c][ii]);
                 end
             end
 
@@ -1542,10 +1582,10 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SW:");
 
                     if(row == 4) begin
-
-                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success: 0x%h", PC[row]);
+                        // $display("dut: %h, gold: %h", cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                        assert(cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
-
+                        
                     end
                 end
 
@@ -1553,10 +1593,10 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SH:");
 
                     if(row == 4) begin
-
-                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success: 0x%h", PC[row]);
+                        // $display("dut: %h, gold: %h", cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                        assert(cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
-
+                        
                     end
                 end
 
@@ -1564,10 +1604,10 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SB:");
 
                     if(row == 4) begin
-
-                        assert(cpu_dut.my_data_mem.data_mem[(cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v)>>2] == DATA_MEM[4][(REG_FILE[4][rs1_v] + imm_s_v)>>2]) $display(" Success: 0x%h", PC[row]);
+                        // $display("dut: %h, gold: %h", cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                        assert(cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
-
+                        
                     end
                 end
 

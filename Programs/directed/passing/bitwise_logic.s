@@ -10,6 +10,11 @@ andi
 
 */
 
+    .section .text
+    .globl _start
+
+_start:
+
 li a0, 0x00000000
 li a1, 0x55555555
 li a2, 0xAAAAAAAA

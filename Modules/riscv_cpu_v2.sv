@@ -16,7 +16,7 @@ module riscv_cpu_v2
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
     `include "sig_declare.inc";
 
-    //TODO some bus declarations may be missing, and those dont show up in questa's console :( but that is a bridge we will burn l8r
+    parameter int LOWEST_DATA_MEM_ADDR = 32'h1000;
 
     //new terminology:
     // f=fetch, d=decode, e=execute, m=memory, w=writeback
@@ -57,6 +57,7 @@ module riscv_cpu_v2
     logic [31:0] ALU_W;
     logic [31:0] DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_W;
+    logic [31:0] DATA_MEM_ADDR;
 
     logic zero_flag;               //from alu, is the result zero?
     logic less_than;              //from alu, is op1 < op2? (for signed comparisons)
@@ -488,14 +489,14 @@ module riscv_cpu_v2
         halt_M
     } = e2m_control_M;     
 
-    //TODO implement rst, in current state data mem entries are initialized to 0xXXXXXXXX
-    //-chris
+    assign DATA_MEM_ADDR = ALU_M - LOWEST_DATA_MEM_ADDR;
+
     data_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(256)
+        .ENTRY_COUNT(1024)
     ) my_data_mem (
-        .readAddr(ALU_M),
-        .writeAddr(ALU_M),
+        .readAddr(DATA_MEM_ADDR),
+        .writeAddr(DATA_MEM_ADDR),
         .writeData(RS2_DATA_M),
         .writeEn(data_mem_wr_en_M),
         .readData(DATA_MEM_OUT),

@@ -1,3 +1,9 @@
+
+    .section .text
+    .globl _start
+
+_start:
+
 #going to test the timing of the ebreak, not really a validation
 li x10, 10
 li x11, 11

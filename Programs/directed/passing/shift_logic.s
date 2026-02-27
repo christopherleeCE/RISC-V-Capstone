@@ -1,3 +1,9 @@
+
+    .section .text
+    .globl _start
+
+_start:
+
 li t0, 0x00000000
 li t1, 0x55555555
 li t2, 0xAAAAAAAA
@@ -331,10 +337,17 @@ srai x11, t3, 7
 srai x12, t3, 30
 srai x13, t3, 31
 
-
-# End
+nop
+nop
+nop
+nop
+nop
 ebreak
-
+nop
+nop
+nop
+nop
+nop
 
 # sll
 # srl
@@ -345,14 +358,3 @@ ebreak
 
 
 
-nop
-nop
-nop
-nop
-nop
-ebreak
-nop
-nop
-nop
-nop
-nop

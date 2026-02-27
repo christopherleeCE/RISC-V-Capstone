@@ -149,19 +149,19 @@ def gen_arth_instr(instr:str, dest_reg:int, src_reg1:int, src_reg2:int) -> str:
 def gen_load_instr(instr:str, dest_reg:int):
 
     if(instr == "lw"):
-        return f"{instr} {dest_reg}, {4*randint(0, 63)}(zero)\n"
+        return f"{instr} {dest_reg}, {4*randint(0, 63)}(gp)\n"
 
     elif(instr == "lh"):
-        return f"{instr} {dest_reg}, {2*randint(0, 127)}(zero)\n"
+        return f"{instr} {dest_reg}, {2*randint(0, 127)}(gp)\n"
 
     elif(instr == "lb"):
-        return f"{instr} {dest_reg}, {randint(0, 255)}(zero)\n"
+        return f"{instr} {dest_reg}, {randint(0, 255)}(gp)\n"
 
     elif(instr == "lhu"):
-        return f"{instr} {dest_reg}, {2*randint(0, 127)}(zero)\n"
+        return f"{instr} {dest_reg}, {2*randint(0, 127)}(gp)\n"
 
     elif(instr == "lbu"):
-        return f"{instr} {dest_reg}, {randint(0, 255)}(zero)\n"
+        return f"{instr} {dest_reg}, {randint(0, 255)}(gp)\n"
 
     else:
         return f"{instr}: THROW ERROR PLEASE :)\n"
@@ -169,13 +169,13 @@ def gen_load_instr(instr:str, dest_reg:int):
 def gen_store_instr(instr:str, dest_reg:int):
 
     if(instr == "sw"):
-        return f"{instr} {dest_reg}, {4*randint(0, 63)}(zero)\n"
+        return f"{instr} {dest_reg}, {4*randint(0, 63)}(gp)\n"
 
     elif(instr == "sh"):
-        return f"{instr} {dest_reg}, {2*randint(0, 127)}(zero)\n"
+        return f"{instr} {dest_reg}, {2*randint(0, 127)}(gp)\n"
 
     elif(instr == "sb"):
-        return f"{instr} {dest_reg}, {randint(0, 255)}(zero)\n"
+        return f"{instr} {dest_reg}, {randint(0, 255)}(gp)\n"
 
     else:
         return f"{instr}: THROW ERROR PLEASE :)\n"
@@ -187,18 +187,20 @@ def main():
 
     with open("temp.s", "w") as f:
 
-        f.write(f"li t0, 17\n")
-        f.write(f"li t1, 32\n")
-        f.write(f"li t2, 32\n")
-        f.write(f"li t3, 0\n") #not used
-        f.write(f"li t4, -13\n")
-        f.write(f"li t5, -13\n")
-        f.write(f"li t6, -37\n")
+        f.write("li t0, 17\n")
+        f.write("li t1, 32\n")
+        f.write("li t2, 32\n")
+        f.write("li t3, 0\n") #not used
+        f.write("li t4, -13\n")
+        f.write("li t5, -13\n")
+        f.write("li t6, -37\n")
+        f.write("\n")
+        f.write("li gp, 0x1000\n")
         f.write("\n")
 
         for ii in range(64):
             f.write(f"li s0, {randint(-100, 100)}\n")
-            f.write(f"sw s0, {4*ii}(zero)\n")
+            f.write(f"sw s0, {4*ii}(gp)\n")
         f.write("\n")
 
         for reg in s_regs:
