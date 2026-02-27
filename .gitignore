@@ -1,12 +1,15 @@
 Modules/work/
 Modules/transcript
 Modules/sim.log
+Modules/diff.log
 Modules/data.bin
 Modules/instr.bin
 Modules/program_asm.o
 Modules/program_c.o
+Modules/program.o
 Modules/program_asm.elf
 Modules/program_c.elf
+Modules/program.elf
 Modules/program.log
 Modules/x86.out
 Modules/temp.s

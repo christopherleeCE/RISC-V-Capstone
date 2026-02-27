@@ -17,6 +17,7 @@ TODO expand branch.s with unsigned versions when implemented, jump backwards tes
 
 TODO check divs' an rem's against rars
 
+TODO _start in library?
 
 
 
@@ -1654,9 +1655,10 @@ module top_riscv_cpu_v2_1();
 
                 if(func3_v == 3'b010) begin //----SW-------------------------------------
                     if(show_negedge_verify_row) $write("\tIdentified as SW:");
-
+                                    
                     if(row == 4) begin
                         // $display("dut: %h, gold: %h", cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                        // $display("addr: %h, %h", ((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2, ((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
                         assert(cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         
@@ -1668,6 +1670,7 @@ module top_riscv_cpu_v2_1();
 
                     if(row == 4) begin
                         // $display("dut: %h, gold: %h", cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                        // $display("addr: %h, %h", ((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2, ((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
                         assert(cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         
@@ -1679,6 +1682,7 @@ module top_riscv_cpu_v2_1();
 
                     if(row == 4) begin
                         // $display("dut: %h, gold: %h", cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                        // $display("addr: %h, %h", ((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2, ((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
                         assert(cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         

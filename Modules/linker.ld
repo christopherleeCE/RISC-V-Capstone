@@ -6,6 +6,8 @@ MEMORY
     DMEM (rw)  : ORIGIN = 0x00001000, LENGTH = 4K
 }
 
+_estack = ORIGIN(DMEM) + LENGTH(DMEM);
+
 SECTIONS
 {
     /* Instruction memory */
