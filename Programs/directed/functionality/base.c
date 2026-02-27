@@ -1,35 +1,12 @@
-#ifndef X86_BUILD
-
-extern unsigned int _estack;
-__attribute__((naked, used)) 
-void _start(void) {
-    __asm__ volatile (
-        "la sp, _estack\n"   // initialize stack pointer
-        "jal ra, main\n"    // call main, ra points to ebreak
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "ebreak\n"          // stop simulation when main returns
-
-    );
-}
-
-#else
-#include "stdio.h"
-#endif
+//must include tb.h, and must be in the same directory as the .c file
+#include "tb.h"
 
 int main() {
 
-    int ret = 0;
+    //do some code, get your value
 
-    #ifdef X86_BUILD
-        ret = ret;
-        printf("<%d>\n", ret);
-    #endif
+    //return you value here, pass in into tb_return then to return as shown
+    return tb_return(7);
 
-    return ret;
 }
+

@@ -1,26 +1,4 @@
-#ifndef X86_BUILD
-
-extern unsigned int _estack;
-__attribute__((naked, used)) 
-void _start(void) {
-    __asm__ volatile (
-        "la sp, _estack\n"   // initialize stack pointer
-        "jal ra, main\n"    // call main, ra points to ebreak
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "ebreak\n"          // stop simulation when main returns
-
-    );
-}
-
-#else
-#include "stdio.h"
-#endif
+#include "tb.h"
 
 int main() {
     int n = 7, i = 0, t1 = 0, t2 = 1, nextTerm;
@@ -36,12 +14,10 @@ int main() {
         i++;
     }
 
-    int ret = nextTerm;
-
+    //my name is retep, and i am evil
     #ifdef X86_BUILD
-        ret = -ret;
-        printf("<%d>\n", ret);
+        nextTerm = nextTerm;
     #endif
 
-    return ret;
+    return tb_return(nextTerm);
 }

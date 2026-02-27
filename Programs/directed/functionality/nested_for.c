@@ -1,26 +1,4 @@
-#ifndef X86_BUILD
-
-extern unsigned int _estack;
-__attribute__((naked, used)) 
-void _start(void) {
-    __asm__ volatile (
-        "la sp, _estack\n"   // initialize stack pointer
-        "jal ra, main\n"    // call main, ra points to ebreak
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "ebreak\n"          // stop simulation when main returns
-
-    );
-}
-
-#else
-#include "stdio.h"
-#endif
+#include "tb.h"
 
 int main() {
     int sum = 0;
@@ -31,11 +9,5 @@ int main() {
         }
     }
 
-    int ret = sum;
-    
-    #ifdef X86_BUILD
-        printf("<%d>\n", ret);
-    #endif
-
-    return ret;
+    return tb_return(sum);
 }
