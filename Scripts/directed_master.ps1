@@ -424,22 +424,20 @@ if(-not $compile){
     foreach ($file in $diffFiles) {
 
         $content = Get-Content $file.FullName
+        $simLine = $content | Select-String "sim:"
+        $x86Line = $content | Select-String "x86:"
         
         if ($content[0] -match "Pass") {
 
-            Add-Content -Path $masterLog -Value "CLEAN PASS: $($file.Name)"
-        } 
-        elseif ($content[0] -match "Fail") {
+            Add-Content -Path $masterLog -Value "CLEAN PASS: ($($simLine.ToString().Trim()), $($x86Line.ToString().Trim())): $($file.Name)"
+
+        } elseif ($content[0] -match "Fail") {
 
             $diffAnyGlobalErrors = $true
-            $simLine = $content | Select-String "sim:"
-            $x86Line = $content | Select-String "x86:"
-            
-            # Format: DIFF FAIL (sim: 8, x86: -8): peter_diff.log
-            $resultStr = "FAIL ($($simLine.ToString().Trim()), $($x86Line.ToString().Trim())): $($file.Name)"
-            Add-Content -Path $masterLog -Value $resultStr
-        } 
-        else {
+
+            Add-Content -Path $masterLog -Value "FAIL: ($($simLine.ToString().Trim()), $($x86Line.ToString().Trim())): $($file.Name)"
+
+        } else {
             Add-Content -Path $masterLog -Value "UNKNOWN: $($file.Name) (Check formatting)"
             $diffAnyGlobalErrors = $true
         }

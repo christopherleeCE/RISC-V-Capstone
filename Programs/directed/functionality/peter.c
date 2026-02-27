@@ -1,11 +1,6 @@
-// minimal_test.c
-
-
-
 #ifndef X86_BUILD
 
 extern unsigned int _estack;
-
 __attribute__((naked, used)) 
 void _start(void) {
     __asm__ volatile (
@@ -22,13 +17,10 @@ void _start(void) {
 
     );
 }
+
 #else
-
 #include "stdio.h"
-
 #endif
-
-
 
 int main() {
     int n = 7, i = 0, t1 = 0, t2 = 1, nextTerm;
