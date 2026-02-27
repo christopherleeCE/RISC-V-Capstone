@@ -266,7 +266,7 @@ if(-not $compile){
 
             Write-Output("`nParsing return value from sim...`n")
             # 1. Capture the match object
-            $match = Select-String -Path .\sim.log -Pattern 'Return value in a0:\s+(-?\d+)'
+            $match = Select-String -Path .\sim.log -Pattern 'Return value in DUT a0:\s+(-?\d+)'
 
             # 2. Check if the object is null (no match found)
             if ($null -ne $match) {
@@ -338,7 +338,7 @@ if(-not $compile){
 
         Write-Output("`nParsing return value from sim...`n")
         # 1. Capture the match object
-        $match = Select-String -Path .\sim.log -Pattern 'Return value in a0:\s+(-?\d+)'
+        $match = Select-String -Path .\sim.log -Pattern 'Return value in DUT a0:\s+(-?\d+)'
 
         # 2. Check if the object is null (no match found)
         if ($null -ne $match) {
