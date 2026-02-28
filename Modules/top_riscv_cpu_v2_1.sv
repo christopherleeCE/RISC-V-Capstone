@@ -763,7 +763,7 @@ module top_riscv_cpu_v2_1();
                     
                 end else if(func3 == 3'b100) begin //----BLT------------------------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as BLT.");
-                    if(REG_FILE[1][rs1] < REG_FILE[1][rs2]) begin
+                    if($signed(REG_FILE[1][rs1]) < $signed(REG_FILE[1][rs2])) begin
                         if(show_posedge_golden_calc) $display("Branch Taken");
 
                         take_branch({{19{imm_b[12]}}, imm_b[12:0]}, rs1, rs2, 'x);
@@ -784,7 +784,7 @@ module top_riscv_cpu_v2_1();
                     
                 end else if(func3 == 3'b101) begin //----BGE------------------------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as BGE.");
-                    if(REG_FILE[1][rs1] >= REG_FILE[1][rs2]) begin
+                    if($signed(REG_FILE[1][rs1]) >= $signed(REG_FILE[1][rs2])) begin
                         if(show_posedge_golden_calc) $display("Branch Taken");
 
                         take_branch({{19{imm_b[12]}}, imm_b[12:0]}, rs1, rs2, 'x);
