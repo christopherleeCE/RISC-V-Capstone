@@ -25,7 +25,7 @@ arth_instr = ["add", "sub", "xor", "or", "and", "sll", "srl", "sra", "slt", "slt
             "lui", "auipc"]
 load_instr = ["lb", "lh", "lw", "lbu", "lhu"]
 store_instr = ["sb", "sh", "sw"]
-cond_branch_instr = ["beq", "bne", "blt", "bge"]#, "bltu", "bgeu"]
+cond_branch_instr = ["beq", "bne", "blt", "bge", "bltu", "bgeu"]
 a_regs = ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"]
 t_regs = ["t0", "t1", "t2", "t3", "t4", "t5", "t6"]
 s_regs = ["s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11"]
@@ -90,15 +90,15 @@ def gen_branch_instr(instr:str, taken:bool, pc_offset:int) -> str:
         
     elif(instr == "bltu"):
         if(taken):
-            return choice((f"bltu t3, t0, . + {4*randint(1, 6)}\n", #pos < 0
-                           f"bltu t3, t6, . + {4*randint(1, 6)}\n", #neg < 0
-                           f"bltu t0, t6, . + {4*randint(1, 6)}\n")) #pos < neg
+            return choice((f"bltu t3, t0, . + {4*randint(1, 6)}\n", #0 < pos
+                           f"bltu t3, t6, . + {4*randint(1, 6)}\n", #0 < neg_u
+                           f"bltu t0, t6, . + {4*randint(1, 6)}\n")) #pos < neg_u
         else: #not taken
             return choice((f"bltu t0, t3, . + {4*randint(1, 6)}\n", #pos > 0
-                           f"bltu t6, t3, . + {4*randint(1, 6)}\n", #neg > 0
-                           f"bltu t6, t0, . + {4*randint(1, 6)}\n", #neg > pos
+                           f"bltu t6, t3, . + {4*randint(1, 6)}\n", #neg_u > 0
+                           f"bltu t6, t0, . + {4*randint(1, 6)}\n", #neg_u > pos
                            f"bltu t1, t2, . + {4*randint(1, 6)}\n", #pos == pos
-                           f"bltu t4, t5, . + {4*randint(1, 6)}\n")) #neg == neg
+                           f"bltu t4, t5, . + {4*randint(1, 6)}\n")) #neg_u == neg_u
 
     elif(instr == "bgeu"):
         if(taken):
