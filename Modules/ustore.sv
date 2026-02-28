@@ -68,36 +68,40 @@ always_comb begin
     6'd28: sig = 35'b00001000000000000000000000000000000; // branch_lt
 // ==== INSTRUCTION: BGE ====
     6'd29: sig = 35'b00000100000000000000000000000000000; // branch_gte
+// ==== INSTRUCTION: BLTU ====
+    6'd30: sig = 35'b00001000000000000000000000000000010; // alu_sel_sltu branch_lt
+// ==== INSTRUCTION: BGEU ====
+    6'd31: sig = 35'b00000100000000000000000000000000010; // alu_sel_sltu branch_gte
 // ==== INSTRUCTION: ADDI ====
-    6'd30: sig = 35'b00000001100000011000000000000000000; // alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd32: sig = 35'b00000001100000011000000000000000000; // alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: ORI ====
-    6'd31: sig = 35'b00000001100000010000000000010000000; // alu_sel_or alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd33: sig = 35'b00000001100000010000000000010000000; // alu_sel_or alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: XORI ====
-    6'd32: sig = 35'b00000001100000010000000000001000000; // alu_sel_xor alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd34: sig = 35'b00000001100000010000000000001000000; // alu_sel_xor alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: ANDI ====
-    6'd33: sig = 35'b00000001100000010000000000100000000; // alu_sel_and alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd35: sig = 35'b00000001100000010000000000100000000; // alu_sel_and alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: SLLI ====
-    6'd34: sig = 35'b00000001100000010000000000000100000; // alu_sel_sll alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd36: sig = 35'b00000001100000010000000000000100000; // alu_sel_sll alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: SRLI ====
-    6'd35: sig = 35'b00000001100000010000000000000010000; // alu_sel_srl alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd37: sig = 35'b00000001100000010000000000000010000; // alu_sel_srl alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: SRAI ====
-    6'd36: sig = 35'b00000001100000010000000000000001000; // alu_sel_sra alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd38: sig = 35'b00000001100000010000000000000001000; // alu_sel_sra alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: SLTI ====
-    6'd37: sig = 35'b00000001100000010000000000000000100; // alu_sel_slt alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd39: sig = 35'b00000001100000010000000000000000100; // alu_sel_slt alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: SLTIU ====
-    6'd38: sig = 35'b00000001100000010000000000000000010; // alu_sel_sltu alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd40: sig = 35'b00000001100000010000000000000000010; // alu_sel_sltu alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: LUI ====
-    6'd39: sig = 35'b00000001100000011000000000000000000; // alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
+    6'd41: sig = 35'b00000001100000011000000000000000000; // alu_sel_add alu_use_im dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: AUIPC ====
-    6'd40: sig = 35'b00000001100000011000000000000000001; // alu_sel_add alu_use_im rs1_2_pc dbus_sel_alu reg_file_wr_en
+    6'd42: sig = 35'b00000001100000011000000000000000001; // alu_sel_add alu_use_im rs1_2_pc dbus_sel_alu reg_file_wr_en
 // ==== INSTRUCTION: JAL ====
-    6'd41: sig = 35'b00000011001000000000000000000000000; // jump_en dbus_sel_pc_plus_4 reg_file_wr_en
+    6'd43: sig = 35'b00000011001000000000000000000000000; // jump_en dbus_sel_pc_plus_4 reg_file_wr_en
 // ==== INSTRUCTION: JALR ====
-    6'd42: sig = 35'b00000011001000011000000000000000000; // jump_en alu_sel_add alu_use_im dbus_sel_pc_plus_4 reg_file_wr_en
+    6'd44: sig = 35'b00000011001000011000000000000000000; // jump_en alu_sel_add alu_use_im dbus_sel_pc_plus_4 reg_file_wr_en
 // ==== INSTRUCTION: EBREAK ====
-    6'd43: sig = 35'b01000000000000000000000000000000000; // finish
+    6'd45: sig = 35'b01000000000000000000000000000000000; // finish
 // ==== LABEL: UD_fault ====
-    6'd44: sig = 35'b10000000000000000000000000000000000; // halt
+    6'd46: sig = 35'b10000000000000000000000000000000000; // halt
     default: sig = 35'd0;
   endcase
 end

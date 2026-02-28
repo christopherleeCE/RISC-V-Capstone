@@ -112,7 +112,7 @@ end
 
 // Flag assignments
 assign zero_flag = ( result == '0 ); 
-assign less_than = slt_result;
+assign less_than = alu_sel_sltu ? sltu_result : slt_result;
 
 endmodule
 
