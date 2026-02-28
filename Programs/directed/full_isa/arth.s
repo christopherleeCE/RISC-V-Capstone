@@ -120,106 +120,106 @@ mulhsu s2, a1, a0 # 0xFFFFFFFF
 mulhsu s3, a0, a1 # 0xFFFFFFFE
 mulhu s4, a1, a0 # 0xFFFFFFFE
 
-# #div and rem
-# li a1, 53
-# li a0, 10
-#  div s0, a1, a0 # 5
-#  rem s1, a1, a0 # 3
-# divu s2, a1, a0 # 5
-# remu s3, a1, a0 # 3
-#  div s4, a0, a1 # 0
-#  rem s5, a0, a1 # 10
-# divu s6, a0, a1 # 0
-# remu s7, a0, a1 # 10
+#div and rem
+li a1, 53
+li a0, 10
+ div s0, a1, a0 # 5
+ rem s1, a1, a0 # 3
+divu s2, a1, a0 # 5
+remu s3, a1, a0 # 3
+ div s4, a0, a1 # 0
+ rem s5, a0, a1 # 10
+divu s6, a0, a1 # 0
+remu s7, a0, a1 # 10
 
-# li a1, 53
-# li a0, -10
-#  div s0, a1, a0 # -5
-#  rem s1, a1, a0 # 3
-# divu s2, a1, a0 # 0
-# remu s3, a1, a0 # 53
-#  div s4, a0, a1 # 0
-#  rem s5, a0, a1 # -10
-# divu s6, a0, a1 # 81,037,118
-# remu s7, a0, a1 # 32
+li a1, 53
+li a0, -10
+ div s0, a1, a0 # -5
+ rem s1, a1, a0 # 3
+divu s2, a1, a0 # 0
+remu s3, a1, a0 # 53
+ div s4, a0, a1 # 0
+ rem s5, a0, a1 # -10
+divu s6, a0, a1 # 81,037,118
+remu s7, a0, a1 # 32
 
-# li a1, -53
-# li a0, 10
-#  div s0, a1, a0 # -5
-#  rem s1, a1, a0 # -3
-# divu s2, a1, a0 # 429,496,724
-# remu s3, a1, a0 # 3
-#  div s4, a0, a1 # 0
-#  rem s5, a0, a1 # 10
-# divu s6, a0, a1 # 0
-# remu s7, a0, a1 # 10
+li a1, -53
+li a0, 10
+ div s0, a1, a0 # -5
+ rem s1, a1, a0 # -3
+divu s2, a1, a0 # 429,496,724
+remu s3, a1, a0 # 3
+ div s4, a0, a1 # 0
+ rem s5, a0, a1 # 10
+divu s6, a0, a1 # 0
+remu s7, a0, a1 # 10
 
-# li a1, -53
-# li a0, -10
-#  div s0, a1, a0 # 5
-#  rem s1, a1, a0 # -3
-# divu s2, a1, a0 # 0
-# remu s3, a1, a0 # -53
-#  div s4, a0, a1 # 0
-#  rem s5, a0, a1 # -10
-# divu s6, a0, a1 # 1
-# remu s7, a0, a1 # 43
+li a1, -53
+li a0, -10
+ div s0, a1, a0 # 5
+ rem s1, a1, a0 # -3
+divu s2, a1, a0 # 0
+remu s3, a1, a0 # -53
+ div s4, a0, a1 # 0
+ rem s5, a0, a1 # -10
+divu s6, a0, a1 # 1
+remu s7, a0, a1 # 43
 
-# li a0, 23
-# li a1, -23
-#  div s0, a0, zero # -1
-#  rem s1, a0, zero # 23
-# divu s2, a0, zero # -1
-# remu s3, a0, zero # 23
-#  div s4, a1, zero # -1
-#  rem s5, a1, zero # -23
-# divu s6, a1, zero # -1
-# remu s7, a1, zero # -23
-#  div s0, zero, a0 # 0
-#  rem s1, zero, a0 # 0
-# divu s2, zero, a0 # 0
-# remu s3, zero, a0 # 0
-#  div s4, zero, a1 # 0
-#  rem s5, zero, a1 # 0
-# divu s6, zero, a1 # 0
-# remu s7, zero, a1 # 0
+li a0, 23
+li a1, -23
+ div s0, a0, zero # -1
+ rem s1, a0, zero # 23
+divu s2, a0, zero # -1
+remu s3, a0, zero # 23
+ div s4, a1, zero # -1
+ rem s5, a1, zero # -23
+divu s6, a1, zero # -1
+remu s7, a1, zero # -23
+ div s0, zero, a0 # 0
+ rem s1, zero, a0 # 0
+divu s2, zero, a0 # 0
+remu s3, zero, a0 # 0
+ div s4, zero, a1 # 0
+ rem s5, zero, a1 # 0
+divu s6, zero, a1 # 0
+remu s7, zero, a1 # 0
 
-# li a0, 23
-# li a1, -23
-#  div s0, zero, zero # -1
-#  rem s1, zero, zero # 0
-# divu s2, zero, zero # -1
-# remu s3, zero, zero # 0
-#  div s0, a0, a0 # 1
-#  rem s1, a0, a0 # 0
-# divu s2, a0, a0 # 1
-# remu s3, a0, a0 # 0
-#  div s4, a1, a1 # 1
-#  rem s5, a1, a1 # 0
-# divu s6, a1, a1 # 1
-# remu s7, a1, a1 # 0
+li a0, 23
+li a1, -23
+ div s0, zero, zero # -1
+ rem s1, zero, zero # 0
+divu s2, zero, zero # -1
+remu s3, zero, zero # 0
+ div s0, a0, a0 # 1
+ rem s1, a0, a0 # 0
+divu s2, a0, a0 # 1
+remu s3, a0, a0 # 0
+ div s4, a1, a1 # 1
+ rem s5, a1, a1 # 0
+divu s6, a1, a1 # 1
+remu s7, a1, a1 # 0
 
-# li a1, 0x80000000
-# li a0, -1
-#  div s0, a1, a0 # -2147483648
-#  rem s1, a1, a0 # 0
-# divu s2, a1, a0 # 0
-# remu s3, a1, a0 # -2147483648
-#  div s4, a0, a1 # 0
-#  rem s5, a0, a1 # -1
-# divu s6, a0, a1 # 1
-# remu s7, a0, a1 # 2147483647
+li a1, 0x80000000
+li a0, -1
+ div s0, a1, a0 # -2147483648
+ rem s1, a1, a0 # 0
+divu s2, a1, a0 # 0
+remu s3, a1, a0 # -2147483648
+ div s4, a0, a1 # 0
+ rem s5, a0, a1 # -1
+divu s6, a0, a1 # 1
+remu s7, a0, a1 # 2147483647
 
-# li a1, 0x80000000
-# li a0, 0x7FFFFFFF
-#  div s0, a1, a0 # -1
-#  rem s1, a1, a0 # -1
-# divu s2, a1, a0 # 1
-# remu s3, a1, a0 # 1
-#  div s4, a0, a1 # 0
-#  rem s5, a0, a1 # 2147483647
-# divu s6, a0, a1 # 0
-# remu s7, a0, a1 # 2147483647
+li a1, 0x80000000
+li a0, 0x7FFFFFFF
+ div s0, a1, a0 # -1
+ rem s1, a1, a0 # -1
+divu s2, a1, a0 # 1
+remu s3, a1, a0 # 1
+ div s4, a0, a1 # 0
+ rem s5, a0, a1 # 2147483647
+divu s6, a0, a1 # 0
+remu s7, a0, a1 # 2147483647
 
 nop
 nop

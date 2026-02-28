@@ -403,22 +403,22 @@ module top_riscv_cpu_v2_1();
 
                     end else if (func3 == 3'b100) begin //----DIV---------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as DIV.");
-                        write_reg(rd, $signed(REG_FILE[1][rs1]) / $signed(REG_FILE[1][rs2]));
+                        write_reg(rd, div( REG_FILE[1][rs1], REG_FILE[1][rs2] ));
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b101) begin //----DIVU---------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as DIVU.");
-                        write_reg(rd, $unsigned(REG_FILE[1][rs1]) / $unsigned(REG_FILE[1][rs2]));
+                        write_reg(rd, divu( REG_FILE[1][rs1], REG_FILE[1][rs2] ));
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b110) begin //----REM---------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as REM.");
-                        write_reg(rd, $signed(REG_FILE[1][rs1]) % $signed(REG_FILE[1][rs2]));
+                        write_reg(rd, rem( REG_FILE[1][rs1], REG_FILE[1][rs2] ));
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end else if (func3 == 3'b111) begin //----REMU---------------------------
                         if(show_posedge_golden_calc) $display("\tIdentified as REMU.");
-                        write_reg(rd, $unsigned(REG_FILE[1][rs1]) % $unsigned(REG_FILE[1][rs2]));
+                        write_reg(rd, remu( REG_FILE[1][rs1], REG_FILE[1][rs2] ));
                         PC_ASYNC <= PC_ASYNC + 32'h4;
 
                     end
@@ -1351,6 +1351,53 @@ module top_riscv_cpu_v2_1();
         );
     endfunction
 
+    function automatic logic [31:0] div(logic [31:0] base, logic [31:0] diviser);
+        if(diviser == 32'h0) begin
+            return 32'hFFFFFFFF;
+
+        end else if((base == 32'h80000000) && (diviser == 32'hFFFFFFFF)) begin
+            return base;
+
+        end else begin
+            return $signed(base) / $signed(diviser);
+
+        end
+    endfunction
+
+    function automatic logic [31:0] divu(logic [31:0] base, logic [31:0] diviser);
+        if(diviser == 32'h0) begin
+            return 32'hFFFFFFFF;
+
+        end else begin
+            return $unsigned(base) / $unsigned(diviser);
+
+        end
+    endfunction
+
+    function automatic logic [31:0] rem(logic [31:0] base, logic [31:0] diviser);
+        if(diviser == 32'h0) begin
+            return base;
+
+        end else if((base == 32'h80000000) && (diviser == 32'hFFFFFFFF)) begin
+            return 32'h00000000;
+
+        end else begin
+            return $signed(base) % $signed(diviser);
+
+        end
+    endfunction
+
+    function automatic logic [31:0] remu(logic [31:0] base, logic [31:0] diviser);
+        if(diviser == 32'h0) begin
+            return base;
+
+        end else begin
+            return $unsigned(base) % $unsigned(diviser);
+
+        end
+    endfunction
+
+
     //verify_row(1), will parse and verify golden[1], this task uses if statements that check the row to ensure
     //that for example addi will only be verified if its in verify_row(5)/golden[5] (post writeback), hoever addi
     //will not be veified if its in verify_row(2)/golden[2], or 1 or 4, etc.
@@ -1449,6 +1496,7 @@ module top_riscv_cpu_v2_1();
                 //Output - compares the actual and expected value of rd after the writeback stage (row = 5)
                 if(row == 5) begin
 
+                            // $display("[dut] [gold] %h, %h\n\n", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                             assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
                             else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
