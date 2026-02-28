@@ -8,6 +8,9 @@ int fact(int n) {
 
 int main() {
 
-    return tb_return( fact(5) );
+    //n = 34 and onward result in 0
+    //stack overflow at n = 128
+    //they grow up so fast, our first proper stack overflow
+    return tb_return( fact(300000) );
 
 }
