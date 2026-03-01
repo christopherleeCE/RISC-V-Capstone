@@ -16,7 +16,7 @@ CHANCE_OF_STORE_LOAD_INSTR = 20
 CHANCE_OF_STORE_VS_LOAD = 50
 CHANCE_OF_COND_JMP = 80 #verses non conditional branch
 CHANCE_OF_BRANCH_TAKEN = 50
-CHANCE_OF_JAL_VS_JALR = 50
+CHANGE_OF_JUMP_BACKWARDS = 50
 
 #instructions implemented so far
 arth_instr = ["add", "sub", "xor", "or", "and", "sll", "srl", "sra", "slt", "sltu",
@@ -49,75 +49,81 @@ U_TYPE = ["lui", "auipc"]
 #     *   !CHANCE_OF_BRANCH_TAKEN
 #     ***
 #     !CHANCE_OF_COND_JMP
+#           CHANCE_JUMP_BACKWARDS
+#           *
+#           *
+#           !CHANCE_JUMP+BACKWARS
 
-# todo, byte offsets in load and store
-# lui, and auipc
+def gen_branch_instr(instr:str, taken:bool, pc_offset:int, backwards:int) -> str:
+    label = [f". + {4*randint(1, 6)}", "loop_back"]
 
-def gen_branch_instr(instr:str, taken:bool, pc_offset:int) -> str:
     if(instr == "beq"):
         if(taken):
-            return choice((f"beq t1, t2, . + {4*randint(1, 6)}\n",
-                           f"beq t4, t5, . + {4*randint(1, 6)}\n"))
+            return choice((f"beq t1, t2, { label[backwards] }\n",
+                           f"beq t4, t5, { label[backwards] }\n"))
         else: #not taken
-            return choice((f"beq zero, t1, . + {4*randint(1, 6)}\n",
-                           f"beq zero, t4, . + {4*randint(1, 6)}\n"))
+            return choice((f"beq zero, t1, { label[backwards] }\n",
+                           f"beq zero, t4, { label[backwards] }\n"))
         
     elif(instr == "bne"):
         if(taken):
-            return choice((f"bne zero, t1, . + {4*randint(1, 6)}\n",
-                           f"bne zero, t4, . + {4*randint(1, 6)}\n"))
+            return choice((f"bne zero, t1, { label[backwards] }\n",
+                           f"bne zero, t4, { label[backwards] }\n"))
         else: #not taken
-            return choice((f"bne t1, t2, . + {4*randint(1, 6)}\n",
-                           f"bne t4, t5, . + {4*randint(1, 6)}\n"))
+            return choice((f"bne t1, t2, { label[backwards] }\n",
+                           f"bne t4, t5, { label[backwards] }\n"))
 
     elif(instr == "blt"):
         if(taken):
-            return choice((f"blt t0, t1, . + {4*randint(1, 6)}\n",
-                           f"blt t6, t5, . + {4*randint(1, 6)}\n"))
+            return choice((f"blt t0, t1, { label[backwards] }\n",
+                           f"blt t6, t5, { label[backwards] }\n"))
         else: #not taken
-            return choice((f"blt t1, t0, . + {4*randint(1, 6)}\n",
-                           f"blt t5, t6, . + {4*randint(1, 6)}\n"))
+            return choice((f"blt t1, t0, { label[backwards] }\n",
+                           f"blt t5, t6, { label[backwards] }\n"))
         
     elif(instr == "bge"):
         if(taken):
-            return choice((f"bge t1, t0, . + {4*randint(1, 6)}\n", #greater then
-                           f"bge t5, t6, . + {4*randint(1, 6)}\n", #greater then
-                           f"bge t1, t2, . + {4*randint(1, 6)}\n", #equal to
-                           f"bge t4, t5, . + {4*randint(1, 6)}\n",))#equal to
+            return choice((f"bge t1, t0, { label[backwards] }\n", #greater then
+                           f"bge t5, t6, { label[backwards] }\n", #greater then
+                           f"bge t1, t2, { label[backwards] }\n", #equal to
+                           f"bge t4, t5, { label[backwards] }\n",))#equal to
         else: #not taken
-            return choice((f"bge t0, t1, . + {4*randint(1, 6)}\n", #less then
-                           f"bge t6, t5, . + {4*randint(1, 6)}\n")) #less then
+            return choice((f"bge t0, t1, { label[backwards] }\n", #less then
+                           f"bge t6, t5, { label[backwards] }\n")) #less then
         
     elif(instr == "bltu"):
         if(taken):
-            return choice((f"bltu t3, t0, . + {4*randint(1, 6)}\n", #0 < pos
-                           f"bltu t3, t6, . + {4*randint(1, 6)}\n", #0 < neg_u
-                           f"bltu t0, t6, . + {4*randint(1, 6)}\n")) #pos < neg_u
+            return choice((f"bltu t3, t0, { label[backwards] }\n", #0 < pos
+                           f"bltu t3, t6, { label[backwards] }\n", #0 < neg_u
+                           f"bltu t0, t6, { label[backwards] }\n")) #pos < neg_u
         else: #not taken
-            return choice((f"bltu t0, t3, . + {4*randint(1, 6)}\n", #pos > 0
-                           f"bltu t6, t3, . + {4*randint(1, 6)}\n", #neg_u > 0
-                           f"bltu t6, t0, . + {4*randint(1, 6)}\n", #neg_u > pos
-                           f"bltu t1, t2, . + {4*randint(1, 6)}\n", #pos == pos
-                           f"bltu t4, t5, . + {4*randint(1, 6)}\n")) #neg_u == neg_u
+            return choice((f"bltu t0, t3, { label[backwards] }\n", #pos > 0
+                           f"bltu t6, t3, { label[backwards] }\n", #neg_u > 0
+                           f"bltu t6, t0, { label[backwards] }\n", #neg_u > pos
+                           f"bltu t1, t2, { label[backwards] }\n", #pos == pos
+                           f"bltu t4, t5, { label[backwards] }\n")) #neg_u == neg_u
 
     elif(instr == "bgeu"):
         if(taken):
-            return choice((f"bgeu t0, t3, . + {4*randint(1, 6)}\n", #pos > 0
-                           f"bgeu t6, t3, . + {4*randint(1, 6)}\n", #neg > 0
-                           f"bgeu t6, t0, . + {4*randint(1, 6)}\n", #neg > pos
-                           f"bgeu t1, t2, . + {4*randint(1, 6)}\n", #pos == pos
-                           f"bgeu t4, t5, . + {4*randint(1, 6)}\n")) #neg == neg
+            return choice((f"bgeu t0, t3, { label[backwards] }\n", #pos > 0
+                           f"bgeu t6, t3, { label[backwards] }\n", #neg > 0
+                           f"bgeu t6, t0, { label[backwards] }\n", #neg > pos
+                           f"bgeu t1, t2, { label[backwards] }\n", #pos == pos
+                           f"bgeu t4, t5, { label[backwards] }\n")) #neg == neg
         else: #not taken
-            return choice((f"bgeu t3, t0, . + {4*randint(1, 6)}\n", #pos < 0
-                           f"bgeu t3, t6, . + {4*randint(1, 6)}\n", #neg < 0
-                           f"bgeu t0, t6, . + {4*randint(1, 6)}\n")) #pos < neg
+            return choice((f"bgeu t3, t0, { label[backwards] }\n", #pos < 0
+                           f"bgeu t3, t6, { label[backwards] }\n", #neg < 0
+                           f"bgeu t0, t6, { label[backwards] }\n")) #pos < neg
             
     elif(instr == "jal"):
-        return f"jal ra, . + {4*randint(1, 6)}\n"
+        return f"jal ra, { label[backwards] }\n"
 
     elif(instr == "jalr"):
-        return f"jalr ra, sp, {4*(pc_offset + randint(1, 6))}\n"
-    
+        if(backwards == 0):
+            return f"jalr ra, sp, { 4*(pc_offset + randint(1, 6)) }\n"
+        else:
+            return f"jalr ra, zero, 4\n"
+
     else: # no match, for whatever reason
          return f"{instr}: THROW ERROR PLEASE :)\n"
 
@@ -186,7 +192,16 @@ def main():
     pc_offset = 0
 
     with open("temp.s", "w") as f:
+        f.write("\t.section .text\n")
+        f.write("\t.globl _start\n")
+        f.write("_start:\n")
+        f.write("j main\n")
+        f.write("\n")
+        f.write("loop_back:\n")
+        f.write("ret\n")
+        f.write("\n")
 
+        f.write("main:\n")
         f.write("li t0, 17\n")
         f.write("li t1, 32\n")
         f.write("li t2, 32\n")
@@ -247,25 +262,23 @@ def main():
             else: #branch instructions
                 if(randint(0, 99) < CHANCE_OF_COND_JMP):
                     if(randint(0, 99) < CHANCE_OF_BRANCH_TAKEN):
-
-                        f.write(gen_branch_instr(choice(cond_branch_instr), True, pc_offset))
+                        f.write(gen_branch_instr(choice(cond_branch_instr), True, pc_offset, 0))
                         pc_offset = pc_offset + 1
 
                     else:
-
-                        f.write(gen_branch_instr(choice(cond_branch_instr), False, pc_offset))
+                        f.write(gen_branch_instr(choice(cond_branch_instr), False, pc_offset, 0))
                         pc_offset = pc_offset + 1
 
                 else:
-                    if(randint(0, 99) < CHANCE_OF_JAL_VS_JALR):
-
-                        f.write(gen_branch_instr("jal", True, pc_offset))
+                    if(randint(0, 99) < CHANGE_OF_JUMP_BACKWARDS):
+                        f.write(gen_branch_instr(choice(["jal", "jalr"]), True, pc_offset, 1))
                         pc_offset = pc_offset + 1
 
                     else:
-
-                        f.write(gen_branch_instr("jalr", True, pc_offset))
+                        f.write(gen_branch_instr(choice(["jal", "jalr"]), True, pc_offset, 0))
                         pc_offset = pc_offset + 1
+
+
         f.write("\n")
 
         #end of program

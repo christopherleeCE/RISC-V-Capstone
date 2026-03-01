@@ -59,7 +59,6 @@ sw t0, 36(sp)
 sw t0, 40(sp)
 sw t0, 44(sp)
 
-
 li sp, 0x00001000
 sb a0, 0(sp)
 sb a1, 1(sp)
