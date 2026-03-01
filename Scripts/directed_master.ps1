@@ -16,7 +16,7 @@ $timer = [System.Diagnostics.Stopwatch]::StartNew()
 $diffAnyGlobalErrors = $false
 
 $ErrorActionPreference = "Stop"
-$runTime = 1000
+$runTime = 100000000
 
 if($help){
     Write-Output("

@@ -120,10 +120,15 @@ riscv64-unknown-elf-objcopy \
   -O binary \
   --only-section=.rodata \
   --only-section=.data \
-  --only-section=.bss \
   --gap-fill 0x00 \
   --pad-to 0x2000 \
   program.elf data.bin
+
+# --only-section=.bss \ was removed as it was
+# causeing an error with the obj copy, .bss is just
+# zeroing out allocated memory, so since we turncate
+# the .bin anway, the memory looks the same regardless
+# with or without it
 
 truncate -s 4096 data.bin #fills data.bin with 4kb of zeros if empty
 hexdump -v -e '1/4 "%08x\n"' data.bin > data_memory.txt #reversing display order of bytes for .txt
