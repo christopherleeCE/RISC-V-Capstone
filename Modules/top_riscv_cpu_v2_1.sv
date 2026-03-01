@@ -1158,7 +1158,7 @@ module top_riscv_cpu_v2_1();
 
     endfunction
 
-    task dut_dump;
+    task dut_dump();
         begin
             $display("================================================================================================");
             $display("Cycle @ time %0t", $time);
@@ -1166,55 +1166,60 @@ module top_riscv_cpu_v2_1();
             // --------------------------------
             // IF stage
             // --------------------------------
-            $display("[IF ] PC              = 0x%08h", cpu_dut.PC);
-            $display("[IF ] INSTR_F         = 0x%08h", cpu_dut.INSTR_F);
-            $display("[IF ] INSTR_F_FLUSH   = 0x%08h", cpu_dut.INSTR_F_FLUSH);
-            $display("[IF ] redirect_pc     = 0x%08h", cpu_dut.redirect_pc);
+            $display("[IF] PC               = 0x%08h", cpu_dut.PC);
+            $display("[IF] INSTR_F          = 0x%08h", cpu_dut.INSTR_F);
+            $display("[IF] INSTR_F_FLUSH    = 0x%08h", cpu_dut.INSTR_F_FLUSH);
+            $display("[IF] redirect_pc      = 0x%08h", cpu_dut.redirect_pc);
                         $write("\n");
 
             // --------------------------------
             // ID stage
             // --------------------------------
-            $display("[ID ] PC_D            = 0x%08h", cpu_dut.PC_D);
-            $display("[ID ] INSTR_D         = 0x%08h", cpu_dut.INSTR_D);
-            $display("[ID ] INSTR_D_FLUSH   = 0x%08h", cpu_dut.INSTR_D_FLUSH);
-            $display("[ID ] RS1=%0d RS2=%0d RD=%0d", cpu_dut.RS1, cpu_dut.RS2, cpu_dut.RD);
-            $display("[ID ] RS1_DATA    = 0x%08h", cpu_dut.RS1_DATA_FWD);
-            $display("[ID ] RS2_DATA    = 0x%08h", cpu_dut.RS2_DATA_FWD);
-            $display("[ID ] IM          = 0x%08h", cpu_dut.IM);
+            $display("[ID] PC_D             = 0x%08h", cpu_dut.PC_D);
+            $display("[ID] INSTR_D          = 0x%08h", cpu_dut.INSTR_D);
+            $display("[ID] INSTR_D_FLUSH    = 0x%08h", cpu_dut.INSTR_D_FLUSH);
+            $display("[ID] RS1=%0d RS2=%0d RD=%0d", cpu_dut.RS1, cpu_dut.RS2, cpu_dut.RD);
+            $display("[ID] RS1_DATA         = 0x%08h", cpu_dut.RS1_DATA_FWD);
+            $display("[ID] RS2_DATA         = 0x%08h", cpu_dut.RS2_DATA_FWD);
+            $display("[ID] IM               = 0x%08h", cpu_dut.IM);
                         $write("\n");
 
 
             // --------------------------------
             // EX stage
             // --------------------------------
-            $display("[EX ] PC_E        = 0x%08h", cpu_dut.PC_E);
-            $display("[EX ] RS1_E_DATA  = 0x%08h", cpu_dut.RS1_DATA_E_FWD);
-            $display("[EX ] RS2_E_DATA  = 0x%08h", cpu_dut.RS2_DATA_E_FWD);
-            $display("[EX ] ALU_OUT     = 0x%08h", cpu_dut.ALU);
-            $display("[EX ] ZERO_FLAG   = %0b",    cpu_dut.zero_flag);
-            $display("[EX ] BR_TAKEN    = %0b",    cpu_dut.branch_taken);
-            $display("[EX ] JMP_TAKEN   = %0b",    cpu_dut.jump_taken);
-            $display("[EX ] PC_TARGET   = 0x%08h", cpu_dut.PC_target);
+            $display("[EX] PC_E         = 0x%08h", cpu_dut.PC_E);
+            $display("[EX] INSTR_E      = 0x%08h", cpu_dut.INSTR_E);
+            $display("[EX] RS1_E_DATA   = 0x%08h", cpu_dut.RS1_DATA_E_FWD);
+            $display("[EX] RS2_E_DATA   = 0x%08h", cpu_dut.RS2_DATA_E_FWD);
+            $display("[EX] ALU_OUT      = 0x%08h", cpu_dut.ALU);
+            $display("[EX] ZERO_FLAG    = %0b",    cpu_dut.zero_flag);
+            $display("[EX] BR_TAKEN     = %0b",    cpu_dut.branch_taken);
+            $display("[EX] JMP_TAKEN    = %0b",    cpu_dut.jump_taken);
+            $display("[EX] PC_TARGET    = 0x%08h", cpu_dut.PC_target);
                         $write("\n");
 
 
             // --------------------------------
             // MEM stage
             // --------------------------------
+            $display("[MEM] PC_M        = 0x%08h", cpu_dut.PC_M);
+            $display("[MEM] INSTR_M     = 0x%08h", cpu_dut.INSTR_M);
             $display("[MEM] ALU_M       = 0x%08h", cpu_dut.ALU_M);
             $display("[MEM] RS2_M_DATA  = 0x%08h", cpu_dut.RS2_DATA_M);
-            $display("[MEM] DMEM_OUT   = 0x%08h", cpu_dut.DATA_MEM_OUT);
-            $display("[MEM] MEM_WR_EN  = %0b",    cpu_dut.data_mem_wr_en_M);
+            $display("[MEM] DMEM_OUT    = 0x%08h", cpu_dut.DATA_MEM_OUT);
+            $display("[MEM] MEM_WR_EN   = %0b",    cpu_dut.data_mem_wr_en_M);
                         $write("\n");
 
 
             // --------------------------------
             // WB stage
             // --------------------------------
-            $display("[WB ] ALU_W       = 0x%08h", cpu_dut.ALU_W);
-            $display("[WB ] DMEM_W     = 0x%08h", cpu_dut.DATA_MEM_OUT_W);
-            $display("[WB ] RD_W=%0d   DATA=0x%08h  WR_EN=%0b",
+            $display("[WB] PC_W         = 0x%08h", cpu_dut.PC_W);
+            $display("[WB] INSTR_W      = 0x%08h", cpu_dut.INSTR_W);
+            $display("[WB] ALU_W        = 0x%08h", cpu_dut.ALU_W);
+            $display("[WB] DMEM_W       = 0x%08h", cpu_dut.DATA_MEM_OUT_W);
+            $display("[WB] RD_W=%0d   DATA=0x%08h  WR_EN=%0b",
                     cpu_dut.RD_W,
                     cpu_dut.RD_DATA,
                     cpu_dut.reg_file_wr_en_W);
