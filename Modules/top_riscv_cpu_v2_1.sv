@@ -15,8 +15,6 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 
 TODO expand branch.s with unsigned versions when implemented, jump backwards testing
 
-TODO check divs' an rem's against rars
-
 TODO _start in library?
 
 
@@ -28,7 +26,7 @@ R-TYPE:
 I-TYPE:
 S-TYPE:
 B-TYPE: BLTU, BGEU
-M-TYPE: DIV, DIVU, REM, REMU
+M-TYPE:
 U-TYPE:
 
 SUCCESSFUL TESTS:
@@ -38,7 +36,7 @@ S-TYPE: SW, SB, SH
 B-TYPE: BEQ, BNE, BLT, BGE
 J-TYPE: JAL
 U-TYPE: LUI, AUIPC
-M-TYPE: MUL, MULH, MULHSU, MULHU
+M-TYPE: MUL, MULH, MULHSU, MULHU, DIV, DIVU, REM, REMU
 
 UNSUCCESSFUL TESTS:
 

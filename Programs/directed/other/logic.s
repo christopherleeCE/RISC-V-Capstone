@@ -5,8 +5,9 @@
 # repeat with both R and I type instructions
 
 #start the program
+.text
 .global _start
-.text 
+
 _start:
 	#AND and OR test
 	li a0, 0xffffffff #starting value

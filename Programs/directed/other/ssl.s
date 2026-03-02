@@ -8,9 +8,9 @@
 .equ MULTIPLICAND, 36
 .equ MULTIPLIER, -20
 
+.text
 .globl _start
 
-.text
 _start:
     li a0, MULTIPLICAND # prepare arguments
     li a1, MULTIPLIER

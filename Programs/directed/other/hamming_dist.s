@@ -7,8 +7,9 @@
 .equ V_1, 0x00000001 #first vector
 .equ V_2, 0x8000000f #second vector
 
-.global _start
 .text
+.global _start
+
 _start:
 	li a0, V_1 #load first vector
 	li a1, V_2 #second vector

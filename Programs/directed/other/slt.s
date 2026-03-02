@@ -1,6 +1,7 @@
 #TEST FOR SLT, SLTU - Edgar G.
-.globl _start
 .text
+.globl _start
+
 _start:
     li a0,  3
     li a1, 2

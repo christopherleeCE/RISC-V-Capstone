@@ -1,8 +1,7 @@
 # Very Simple SRA Test - Edgar G.
 # check for sign preservation with division
-.globl _start
-
 .text
+.globl _start
 
 _start:
     li a0, 32 # positive dividend 

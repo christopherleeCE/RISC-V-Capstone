@@ -2,8 +2,8 @@
 #This program takes a value and adjusts it to a target
 .eqv TARGET_VALUE, 0xaa # hex value
 
-.globl _start
 .text
+.globl _start
 
 _start: 
     # Smaller numbers
