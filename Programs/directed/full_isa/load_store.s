@@ -1,11 +1,14 @@
-#TODO, test auipc with pc > 1kb
-    .section .data
-    .word 0x00000000
-
     .section .text
     .globl _start
 
 _start:
+
+# "global stack pointer", just have this set to the bottom
+# most memory address, if its not you will get errors
+# this value gets used by all the stack pointers in the test
+# side note, gcc acutally move the stack pointer down rather
+# then up, food for thought
+li gp, 0x4000
 
 li a0, 0x00000000
 li a1, 0x55555555
@@ -44,8 +47,8 @@ li x21, 0x11223344
 li x22, 0x11223344
 li x23, 0x11223344
 
-li sp, 0x00001008 #testing if forwarding works in grabing the right sp
-li sp, 0x00001000
+li sp, 0x00000000 #testing if forwarding works in grabing the right sp
+addi sp, gp, 0
 sw t0, 0(sp)
 sw t0, 4(sp)
 sw t0, 8(sp)
@@ -59,7 +62,7 @@ sw t0, 36(sp)
 sw t0, 40(sp)
 sw t0, 44(sp)
 
-li sp, 0x00001000
+addi sp, gp, 0
 sb a0, 0(sp)
 sb a1, 1(sp)
 sb a2, 2(sp)
@@ -77,7 +80,7 @@ sb a2, 13(sp)
 sb a3, 14(sp)
 sb a0, 15(sp)
 
-li sp, 0x00001010
+addi sp, gp, 10
 sh a0, 0(sp)
 sh a1, 2(sp)
 sh a1, 4(sp)
@@ -87,7 +90,7 @@ sh a3, 10(sp)
 sh a3, 12(sp)
 sh a2, 14(sp)
 
-li sp, 0x00001020
+addi sp, gp, 20
 sw a0, 0(sp)
 sw a1, 4(sp)
 sw a2, 8(sp)
@@ -110,7 +113,7 @@ sw a3, 12(sp)
 0xFFFFFFFF
 */
 
-li sp, 0x00001000
+addi sp, gp, 0
 lb x16, 0(sp)
 lb x17, 5(sp)
 lb x18, 10(sp)

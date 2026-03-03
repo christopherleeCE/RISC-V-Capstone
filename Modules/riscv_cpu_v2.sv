@@ -16,7 +16,7 @@ module riscv_cpu_v2
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
     `include "sig_declare.inc"
 
-    parameter int LOWEST_DATA_MEM_ADDR = 32'h1000;
+    parameter int LOWEST_DATA_MEM_ADDR = 32'h4000;
 
     //new terminology:
     // f=fetch, d=decode, e=execute, m=memory, w=writeback
@@ -225,7 +225,7 @@ module riscv_cpu_v2
 
     instruction_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(1024)
+        .ENTRY_COUNT(4096)
     ) instr_mem (
         .read_address(PC),
         .read_data(INSTR_F)

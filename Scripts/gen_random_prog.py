@@ -205,12 +205,12 @@ def main():
         f.write("li t0, 17\n")
         f.write("li t1, 32\n")
         f.write("li t2, 32\n")
-        f.write("li t3, 0\n") #not used
+        f.write("li t3, 0\n")
         f.write("li t4, -13\n")
         f.write("li t5, -13\n")
         f.write("li t6, -37\n")
         f.write("\n")
-        f.write("li gp, 0x1000\n")
+        f.write("li gp, 0x4000\n")
         f.write("\n")
 
         for ii in range(64):

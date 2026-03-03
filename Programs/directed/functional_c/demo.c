@@ -24,57 +24,57 @@ int32_t compute_pi(int iterations, int32_t SCALE) {
 }
 
 //doesnt handle non negative values, trying to reduce instr_rom size
-// float my_pow(float x, int exp){
-//     float ret = 1;
+float my_pow(float x, int exp){
+    float ret = 1;
 
-//     for(int ii = 0; ii < exp; ++ii){
-//         ret *= x;
+    for(int ii = 0; ii < exp; ++ii){
+        ret *= x;
 
-//     }return ret;
-// }
+    }return ret;
+}
 
-// int my_factorial(int x){
+int my_factorial(int x){
 
-//     int ret = 1;
+    int ret = 1;
 
-//     for(int ii = 1; ii <= x; ++ii){
+    for(int ii = 1; ii <= x; ++ii){
 
-//         ret *= ii;
+        ret *= ii;
 
-//     }return ret;
-// }
+    }return ret;
+}
 
 //angle, and itrations, more increase compuational time
-// float my_sin(float rads, int itr){
+float my_sin(float rads, int itr){
 
-//     float ret = 0.0f;
-//     int temp;
+    float ret = 0.0f;
+    int temp;
 
-//     for(int ii = 0; ii < itr; ++ii){
+    for(int ii = 0; ii < itr; ++ii){
 
-//         temp = ii*2;
-//         ++temp;
+        temp = ii*2;
+        ++temp;
 
-//         ret += (1 - 2*(ii%2))*(my_pow(rads, temp) / my_factorial(temp));
-//     }
+        ret += (1 - 2*(ii%2))*(my_pow(rads, temp) / my_factorial(temp));
+    }
 
-//     return ret;
-// }
+    return ret;
+}
 
-// float my_cos(float rads, int itr){
+float my_cos(float rads, int itr){
         
-//     float ret = 0.0f;
-//     int temp;
+    float ret = 0.0f;
+    int temp;
 
-//     for(int ii = 0; ii < itr; ++ii){
+    for(int ii = 0; ii < itr; ++ii){
 
-//         temp = ii*2;
+        temp = ii*2;
 
-//         ret += (1 - 2*(ii%2))*(my_pow(rads, temp) / my_factorial(temp));
-//     }
+        ret += (1 - 2*(ii%2))*(my_pow(rads, temp) / my_factorial(temp));
+    }
 
-//     return ret;
-// }
+    return ret;
+}
 
 int main() {
     // SCALE = 1,000,000 for fixed-point precision
@@ -89,20 +89,20 @@ int main() {
     float_pi = (float)scaled_pi / (float)scale;
 
     float magnitude = 7;
-    float angle = float_pi * 1;
+    float angle = float_pi * .3;
 
-    return tb_return(angle*100);
+    //return tb_return(angle*100);
 
-    // float cos_val = my_cos(angle, 5);
-    // float sin_val = my_sin(angle, 5);
+    float cos_val = my_cos(angle, 5);
+    float sin_val = my_sin(angle, 5);
 
-    // float x_vector = cos_val * magnitude;
-    // float y_vector = sin_val * magnitude;
+    float x_vector = cos_val * magnitude;
+    float y_vector = sin_val * magnitude;
 
-    // //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
-    // //printf("in cartesian cordinates, <%.2f, %.2f>\n", x_vector, y_vector);
+    //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
+    //printf("in cartesian cordinates, <%.2f, %.2f>\n", x_vector, y_vector);
 
-    // return tb_return(y_vector);
+    return tb_return(x_vector*100);
 
 }
 

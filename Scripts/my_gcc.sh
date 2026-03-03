@@ -111,7 +111,7 @@ riscv64-unknown-elf-objdump -d program.elf
 riscv64-unknown-elf-objcopy \
   -O binary \
   --gap-fill 0x00 \
-  --pad-to 0x1000 \
+  --pad-to 0x4000 \
   -j .text program.elf instr.bin 
 hexdump -v -e '1/4 "%08x\n"' instr.bin > instruction_memory.txt #reversing display order of bytes order for .txt
 
@@ -121,7 +121,7 @@ riscv64-unknown-elf-objcopy \
   --only-section=.rodata \
   --only-section=.data \
   --gap-fill 0x00 \
-  --pad-to 0x2000 \
+  --pad-to 0x5000 \
   program.elf data.bin
 
 # --only-section=.bss \ was removed as it was

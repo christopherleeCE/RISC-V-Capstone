@@ -2,8 +2,8 @@ ENTRY(_start)
 
 MEMORY
 {
-    IMEM (rx)  : ORIGIN = 0x00000000, LENGTH = 4K
-    DMEM (rw)  : ORIGIN = 0x00001000, LENGTH = 4K
+    IMEM (rx)  : ORIGIN = 0x00000000, LENGTH = 16K
+    DMEM (rw)  : ORIGIN = 0x00004000, LENGTH = 4K
 }
 
 _estack = ORIGIN(DMEM) + LENGTH(DMEM);

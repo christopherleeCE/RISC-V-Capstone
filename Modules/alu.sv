@@ -72,8 +72,6 @@ always_comb begin
     alu_sel_mulhsu : result = product_su[2*WIDTH-1:WIDTH]; // MULHSU
     alu_sel_mulhu : result = product_uu[2*WIDTH-1:WIDTH];  // MULHU
 
-
- 
     alu_sel_div : begin // DIV
     if(signed_b == 0)                                                           result = {WIDTH{1'b1}};
     else if(signed_a == {1'b1,{(WIDTH-1){1'b0}}} && signed_b == {WIDTH{1'b1}})  result = signed_a;
@@ -95,8 +93,6 @@ always_comb begin
     if (operand_b == 0) result = operand_a;
     else result = operand_a % operand_b;
     end
-
-
 
     alu_sel_and : result = operand_a & operand_b; // AND
     alu_sel_or : result = operand_a | operand_b; // OR

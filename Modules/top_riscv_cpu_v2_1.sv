@@ -50,7 +50,7 @@ module top_riscv_cpu_v2_1();
     //declarations
     parameter int CLOCK_PERIOD = 20;
     parameter int DATA_MEM_EC = 1024;
-    parameter int LOWEST_DATA_MEM_ADDR = 32'h1000;
+    parameter int LOWEST_DATA_MEM_ADDR = 32'h4000;
 
 
     //bits for storying debug level
@@ -208,7 +208,7 @@ module top_riscv_cpu_v2_1();
     //if the DUT.sv's declaration changes, it should be mirrored here
     instruction_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(1024)
+        .ENTRY_COUNT(4096)
     ) instr_mem (
         .read_address(PC_ASYNC),
         .read_data(INSTR_ASYNC)
