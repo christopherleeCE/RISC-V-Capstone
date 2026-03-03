@@ -14,7 +14,7 @@ module riscv_cpu_v2
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
-    `include "sig_declare.inc";
+    `include "sig_declare.inc"
 
     parameter int LOWEST_DATA_MEM_ADDR = 32'h1000;
 
