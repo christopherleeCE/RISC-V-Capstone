@@ -89,15 +89,15 @@ int main() {
     float_pi = (float)scaled_pi / (float)scale;
 
     float magnitude = 7;
-    float angle = float_pi * .3;
+    float angle = float_pi * 1;
 
-    return tb_return(angle);
+    return tb_return(angle*100);
 
+    // float cos_val = my_cos(angle, 5);
     // float sin_val = my_sin(angle, 5);
-    // // float cos_val = my_cos(angle, 5);
 
+    // float x_vector = cos_val * magnitude;
     // float y_vector = sin_val * magnitude;
-    // // float y_vector = cos_val * magnitude;
 
     // //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
     // //printf("in cartesian cordinates, <%.2f, %.2f>\n", x_vector, y_vector);
