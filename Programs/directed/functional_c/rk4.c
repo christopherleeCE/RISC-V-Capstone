@@ -7,19 +7,20 @@ This is an initial value problem I used from LibreTexts:
 y'(t) = t^2 + 1
 y (1) = 4
 
-The given solution is y(t) = t^3 + t + 8/3
+The given solution is y(t) = (t^3)/3 + t + 8/3
 
-Because the CPU outputs one
-@ t = 3 : 14.667
-@ t = 5 : 49.333
-@ t = 10 : 346
-@ t = 20 : 2,689.333
+@ t = 2 : 7.333...
+@ t = 3 : 14.666...
+@ t = 4 : 28.000
+@ t = 5 : 49.333...
 
 NOTE: When reading the result, note that the rightmost values (number depends on scale)
 are the values after the decimal.
 
-VERDICT: It works!! Please be warned, even at t = 3, it takes quite a while to run (about
-8 minutes). Only choose larger values of t if you have the time to wait!
+GOAL: The CPU should estimate similar values of the solution at these values for t.
+
+VERDICT: It works!! Please be warned, it takes quite a while to run (about 8 minutes @ t = 3).
+There is room for optimization. Only choose larger values of t if you have the time to wait!
 
 */
 
