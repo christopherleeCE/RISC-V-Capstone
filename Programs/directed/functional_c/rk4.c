@@ -25,19 +25,26 @@ There is room for optimization. Only choose larger values of t if you have the t
 */
 
 #include "tb.h"
-#define SCALE 1000
 
-/*
-The scale was determined through trial and error. This value has decent precision: going higher seems
-to trigger overflow, and going lower seems to lose precision. This scale seems to produce the highest
-accuracy results for this problem.
-*/
+//USER INPUT HERE: -------------------------------------------------------------------------------
+#define SCALE 1000 //scale for fixed_point
 
-#define H 0.01 //define some constants for the ODE
-#define T_0 1 
+#define H 0.01 //step - NOTE: must be larger than 1/SCALE
+#define T_0 1 //initial condition
 #define Y_0 4
-#define T 1.01 //adjust the time value to retrieve the associated value from the solution.
-//Note: for regression testing, leave as a small value to reduce total runtime
+#define T 3 //final time
+
+//Please do not mess with the following! --------------------------------------------------------
+//Let's solve some constants now to save division and multiplication
+//The compiler will handle this constant arithmetic
+#define T_0_SCALE (T_0*SCALE)
+#define Y_0_SCALE (Y_0*SCALE)
+#define T_SCALE (T*SCALE)
+#define H_SCALE (H * SCALE)
+#define H_HALF (H/2)
+#define H_HALF_SCALE (H_HALF*SCALE)
+
+//-----------------------------------------------------------------------------------------------
 
 int dy_dt(int y, int t); //func prototypes
 int y_new(int y, int t);
@@ -45,10 +52,10 @@ int y_new(int y, int t);
 //Main body
 int main() 
 {
-    int y = Y_0*SCALE; //intial value provided
+    int y = Y_0_SCALE; //intial value provided
 
     //iterate until the desired time is reached
-    for(int t = T_0*SCALE; t <= T*SCALE; t += H*SCALE)
+    for(int t = T_0_SCALE; t <= T_SCALE; t += H_SCALE)
     {
         y = y_new(y, t);
     }
@@ -61,16 +68,24 @@ int main()
 int dy_dt(int y, int t) 
 {
     //appropiate scaling required when multiplying fixed points
-    return (t*t)/SCALE + 1*SCALE;
+    // 1*SCALE is just SCALE
+    return (t*t)/SCALE + SCALE;
 }
 
 //RK4 to estimate the next value 
 int y_new(int y, int t)
 {
-    int k1 = dy_dt(y, t); //find all the 
-    int k2 = dy_dt(y + (k1*((H*SCALE)/2))/SCALE, t + ((H*SCALE)/2));
-    int k3 = dy_dt(y + (k2*((H*SCALE)/2))/SCALE, t + ((H*SCALE)/2));
-    int k4 = dy_dt(y + (k3*(H*SCALE))/SCALE, t + (H*SCALE));
+    /*
+    Simplification of constants done where possible:
+    ex. H_HALF_SCALE = (H*SCALE / 2)
+    However, the multiplication then integer division by scale is still used in 
+    certain areas to avoid using floating point (no decimals in equation)
+    */
 
-    return y + (((k1 + 2*k2 + 2*k3 + k4)/6)*(H*SCALE))/SCALE;
+    int k1 = dy_dt(y, t); //find all the terms needed
+    int k2 = dy_dt(y + (k1*H_HALF_SCALE)/SCALE, t + H_HALF_SCALE);
+    int k3 = dy_dt(y + (k2*H_HALF_SCALE)/SCALE, t + H_HALF_SCALE);
+    int k4 = dy_dt(y + k3*H_SCALE, t + H_SCALE);
+
+    return y + (H_SCALE*(k1 + 2*k2 + 2*k3 + k4))/(6*SCALE);
 }
