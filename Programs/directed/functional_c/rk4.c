@@ -32,7 +32,7 @@ There is room for optimization. Only choose larger values of t if you have the t
 #define H 0.01 //step - NOTE: must be larger than 1/SCALE
 #define T_0 1 //initial condition
 #define Y_0 4
-#define T 3 //final time
+#define T 1.01 //final time
 
 //Please do not mess with the following! --------------------------------------------------------
 //Let's solve some constants now to save division and multiplication
