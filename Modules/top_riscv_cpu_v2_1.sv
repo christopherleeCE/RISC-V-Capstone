@@ -141,6 +141,11 @@ module top_riscv_cpu_v2_1();
         .ofinish(ofinish)
     );
 
+    initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars();
+    end
+
     //grabing vsim args
     initial begin
 
@@ -1518,8 +1523,7 @@ module top_riscv_cpu_v2_1();
                         //once that task has been built as seen at ~line 1
 
                         if(row == 5) $display(" Success: 0x%h", PC[row]);
-                        //assert() $display(" Success: 0x%h", PC[row]);
-                        //else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
+                        
 
                     end else begin
                         //$display("rd_v: ", rd_v);

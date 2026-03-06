@@ -15,6 +15,7 @@ Modules/x86.out
 Modules/temp.s
 Modules/data_memory.txt
 Modules/instruction_memory.txt
+Modules/dump.vcd
 
 Logs
 .vscode

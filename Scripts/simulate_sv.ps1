@@ -41,4 +41,19 @@ if ($continue)          { $vsimArgs += " +CONTINUE" }
 if ($verbose)           { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 if ($v)                 { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 
-vsim -c -do "file delete -force sim.log; transcript file sim.log; vlog *.sv; vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs; run ${time}us; quit -f"
+#todo add *.v in vlog
+#test if both includes are needed at some point
+$quartus = $env:QUARTUS_ROOTDIR -replace "\\","/"
+$do = @"
+
+file delete -force sim.log;
+transcript file sim.log;
+vlog $quartus/eda/sim_lib/220model.v
+vlog $quartus/eda/sim_lib/altera_mf.v
+vlog *.sv
+vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs;
+run ${time}us;
+quit -f
+"@
+
+vsim -c -do $do

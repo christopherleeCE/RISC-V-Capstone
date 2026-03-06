@@ -516,8 +516,7 @@ module riscv_cpu_v2
         .BIT_WIDTH(32),
         .ENTRY_COUNT(1024)
     ) my_data_mem (
-        .readAddr(DATA_MEM_ADDR),
-        .writeAddr(DATA_MEM_ADDR),
+        .addr(DATA_MEM_ADDR),
         .writeData(RS2_DATA_M),
         .writeEn(data_mem_wr_en_M),
         .readData(DATA_MEM_OUT),

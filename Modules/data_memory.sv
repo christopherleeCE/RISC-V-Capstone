@@ -2,6 +2,8 @@
 // This should function as a RAM due to its option to write to it
 // A similar, read-only module has been created as the instruction memory
 
+//TODO when bram gets implemented make sure that aliasing is not an issue
+
 module data_memory
   #( 
      parameter int BIT_WIDTH,
@@ -9,8 +11,7 @@ module data_memory
      parameter int ADDR_WIDTH=32 
      )
    (
-    input  logic [ADDR_WIDTH-1:0] readAddr,
-    input  logic [ADDR_WIDTH-1:0] writeAddr,
+    input  logic [ADDR_WIDTH-1:0] addr,
     input  logic [BIT_WIDTH-1:0] writeData,
     input  logic          writeEn,
     output logic [BIT_WIDTH-1:0] readData,
@@ -46,10 +47,10 @@ module data_memory
    /* < Read from MEM > */ //====================================================================================================   
 
    // read the word from memory
-   assign readWord = data_mem[readAddr[ADDR_WIDTH-1:2]];
+   assign readWord = data_mem[addr[ADDR_WIDTH-1:2]];
 
    // select the byte from the word based on the byte offset
-   assign byte_select_r = readAddr[1:0];
+   assign byte_select_r = addr[1:0];
 
    // select the appropriate byte based on the address
    always_comb begin
@@ -81,10 +82,10 @@ module data_memory
    assign data_half_w = writeData[15:0];
 
    // select the byte offset from the write address
-   assign byte_select_w = writeAddr[1:0];
+   assign byte_select_w = addr[1:0];
 
    // read the current word in memory at the write address
-   assign data_in_mem = data_mem[writeAddr[ADDR_WIDTH-1:2]];
+   assign data_in_mem = data_mem[addr[ADDR_WIDTH-1:2]];
 
    // create the new word to be written to memory by replacing the appropriate byte
    always_comb begin
@@ -104,13 +105,13 @@ module data_memory
    always @(posedge clk) begin
       if (writeEn) begin
          if (addr_byte) begin
-            data_mem[writeAddr[ADDR_WIDTH-1:2]] <= writeByte;
+            data_mem[addr[ADDR_WIDTH-1:2]] <= writeByte;
          end
          else if (addr_half) begin
-            data_mem[writeAddr[ADDR_WIDTH-1:2]] <= writeHalf;
+            data_mem[addr[ADDR_WIDTH-1:2]] <= writeHalf;
          end
          else begin
-            data_mem[writeAddr[ADDR_WIDTH-1:2]] <= writeData;
+            data_mem[addr[ADDR_WIDTH-1:2]] <= writeData;
          end
       end
    end
