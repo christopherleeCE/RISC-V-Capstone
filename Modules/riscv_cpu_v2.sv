@@ -20,6 +20,7 @@ module riscv_cpu_v2
 
     //new terminology:
     // f=fetch, d=decode, e=execute, m=memory, w=writeback
+    logic [31:0] NEXT_PC;           //the pc that will be inside pc and the interal mk9_rom reg in the next clk
     logic [31:0] PC;
     logic [31:0] PC_D;             //PC after pipeline reg
     logic [31:0] PC_E;
@@ -220,8 +221,20 @@ module riscv_cpu_v2
         .clk(clk),
         .rst(rst),
         .wr_en(redirect_pc), //normally, PC increments by 4 each cycle, but if branch/jump taken, load PC_target
+        .next_q(NEXT_PC),
         .q(PC)
     );
+
+    logic [31:0] FAKE_INSTR_F;
+    logic [31:0] FAKE_PC;
+    assign FAKE_PC = NEXT_PC>>2;
+
+    mk9_rom_mif_aclr mk9_instr_mem (
+        .address(FAKE_PC),
+        .clock(clk),
+        .q(FAKE_INSTR_F),
+        .aclr(!rst)
+	);
 
     instruction_memory #(
         .BIT_WIDTH(32),

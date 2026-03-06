@@ -938,6 +938,14 @@ module top_riscv_cpu_v2_1();
         end
     end
 
+    always @(posedge clk) begin
+
+        //$display("\n[real, fake] = [%h, %h]", cpu_dut.INSTR_F, cpu_dut.FAKE_INSTR_F);
+        
+        assert(cpu_dut.INSTR_F == cpu_dut.FAKE_INSTR_F)
+        else begin $display("fail : [real, fake] = [%h, %h]", cpu_dut.INSTR_F, cpu_dut.FAKE_INSTR_F); end
+
+    end
 
 
 

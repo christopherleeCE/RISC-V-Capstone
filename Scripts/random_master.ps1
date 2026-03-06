@@ -58,14 +58,17 @@ if(-not $no_verify){
         python3 ..\Scripts\gen_random_prog.py
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
-        Write-Host "Assembling in WSL..."
-        wsl bash -c "riscv64-unknown-elf-as -march=rv32im temp.s -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        # Write-Host "Assembling in WSL..."
+        # wsl bash -c "riscv64-unknown-elf-as -march=rv32im temp.s -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
+        # if ($LASTEXITCODE -ne 0) { exit 1 }
 
-        Write-Host "Writing instruction memory file..."
-        python3 .\load_instr_mem_file.py
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        # Write-Host "Writing instruction memory file..."
+        # python3 .\load_instr_mem_file.py
+        # if ($LASTEXITCODE -ne 0) { exit 1 }
 
+        Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
+        wsl bash -c "../Scripts/my_gcc.sh temp.s -gas"
+        if ($LASTEXITCODE -ne 0) { exit 1 }
         Write-Host "Running simulation $($ii)/$runs..." -ForegroundColor Magenta
 
         if($v){
