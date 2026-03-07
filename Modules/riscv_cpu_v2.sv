@@ -235,13 +235,13 @@ module riscv_cpu_v2
         .aclr(!rst)
 	);
 
-    instruction_memory #(
-        .BIT_WIDTH(32),
-        .ENTRY_COUNT(4096)
-    ) instr_mem (
-        .read_address(PC),
-        .read_data(FAKE_INSTR_F)
-    );
+    // instruction_memory #(
+    //     .BIT_WIDTH(32),
+    //     .ENTRY_COUNT(4096)
+    // ) instr_mem (
+    //     .read_address(PC),
+    //     .read_data(FAKE_INSTR_F)
+    // );
 
     //deciding whether to flush instruction or not
     assign INSTR_F_FLUSH = flush_FD ? 32'h00000013 : INSTR_F; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)

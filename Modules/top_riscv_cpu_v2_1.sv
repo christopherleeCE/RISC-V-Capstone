@@ -137,6 +137,8 @@ module top_riscv_cpu_v2_1();
 
     logic [63:0] cycle_count;
 
+    assign INSTR_FLUSH = INSTR_ASYNC;
+
     //DUT---------------------------------------------------------------------------------------------------------------------
     //instantiate the CPU
     riscv_cpu_v2 cpu_dut(
@@ -254,7 +256,6 @@ module top_riscv_cpu_v2_1();
         end
 
         assign dut_pc_redirected = dut_redirected();
-        assign INSTR_FLUSH = INSTR_ASYNC;
         assign opcode = INSTR_FLUSH[6:0];
 
         if(
@@ -959,8 +960,8 @@ module top_riscv_cpu_v2_1();
             */
             //$write("Checking instr allignment : ");
 
-            assert(cpu_dut.INSTR_F == cpu_dut.FAKE_INSTR_F)// $write("OK : [real, fake] = [%h, %h]", cpu_dut.INSTR_F, cpu_dut.FAKE_INSTR_F); //$write("OK");
-            else begin $error("fail : [real, fake] = [%h, %h]", cpu_dut.INSTR_F, cpu_dut.FAKE_INSTR_F); end
+            assert(cpu_dut.INSTR_F == INSTR_FLUSH/*cpu_dut.FAKE_INSTR_F*/)// $write("OK : [real, fake] = [%h, %h]", cpu_dut.INSTR_F, INSTR_FLUSH/*cpu_dut.FAKE_INSTR_F*/); //$write("OK");
+            else begin $error("fail : [real, fake] = [%h, %h]", cpu_dut.INSTR_F, INSTR_FLUSH/*cpu_dut.FAKE_INSTR_F*/); end
             //$display();
         end
     end
@@ -1267,25 +1268,26 @@ module top_riscv_cpu_v2_1();
         end
     endtask
 
-    task automatic dump_instr_mem_first32;
-        int i;
-        begin
-            $display("---- Instruction Memory Dump (first 32 words) ----");
-            for (i = 0; i < 32; i++) begin
-                $display("addr %0d (0x%08x) : %08x",
-                        i,
-                        i*4,
-                        instr_mem.instr_mem[i]);
-            end
-            for (i = 0; i < 32; i++) begin
-                $display("addr %0d (0x%08x) : %08x",
-                        i,
-                        i*4,
-                        cpu_dut.instr_mem.instr_mem[i]);
-            end
-            $display("---------------------------------------------------");
-        end
-    endtask
+    //i dont think there is a way to peek into the bram, so commented this out, lut ram is comment out in the main
+    // task automatic dump_instr_mem_first32;
+    //     int i;
+    //     begin
+    //         $display("---- Instruction Memory Dump (first 32 words) ----");
+    //         for (i = 0; i < 32; i++) begin
+    //             $display("addr %0d (0x%08x) : %08x",
+    //                     i,
+    //                     i*4,
+    //                     instr_mem.instr_mem[i]);
+    //         end
+    //         for (i = 0; i < 32; i++) begin
+    //             $display("addr %0d (0x%08x) : %08x",
+    //                     i,
+    //                     i*4,
+    //                     cpu_dut.instr_mem.instr_mem[i]);
+    //         end
+    //         $display("---------------------------------------------------");
+    //     end
+    // endtask
 
     task reg_dut_dump();
         begin
