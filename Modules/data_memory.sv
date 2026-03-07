@@ -41,7 +41,7 @@ module data_memory
 
    //Need this to initialize the memory
    initial begin
-      $readmemh("data_memory.txt", data_mem); //load the memory
+      $readmemh("data_memory.hex", data_mem); //load the memory
    end
 
    /* < Read from MEM > */ //====================================================================================================   

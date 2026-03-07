@@ -67,7 +67,13 @@ if(-not $no_verify){
         # if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
+        wsl bash -c "dos2unix ../Scripts/my_gcc.sh"
+        if ($LASTEXITCODE -ne 0) { exit 1 }
         wsl bash -c "../Scripts/my_gcc.sh temp.s -gas"
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\data_memory.hex data.mif
         if ($LASTEXITCODE -ne 0) { exit 1 }
         Write-Host "Running simulation $($ii)/$runs..." -ForegroundColor Magenta
 

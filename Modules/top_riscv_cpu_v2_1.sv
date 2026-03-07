@@ -17,6 +17,11 @@ TODO expand branch.s with unsigned versions when implemented, jump backwards tes
 
 TODO _start in library?
 
+TODO switch to bram
+TODO pc assert
+TODO instr assert
+TODO clean up compilation and address bloat
+
 
 
 --------------TEST LOG----------------------------------------------------
@@ -198,7 +203,7 @@ module top_riscv_cpu_v2_1();
 
     initial begin
 
-        $readmemh("data_memory.txt", DATA_MEM[1]); //load the memory
+        $readmemh("data_memory.hex", DATA_MEM[1]); //load the memory
 
     end
 
@@ -938,13 +943,22 @@ module top_riscv_cpu_v2_1();
         end
     end
 
-    always @(posedge clk) begin
+    always @(negedge clk) begin
 
-        //$display("\n[real, fake] = [%h, %h]", cpu_dut.INSTR_F, cpu_dut.FAKE_INSTR_F);
-        
-        assert(cpu_dut.INSTR_F == cpu_dut.FAKE_INSTR_F)
-        else begin $display("fail : [real, fake] = [%h, %h]", cpu_dut.INSTR_F, cpu_dut.FAKE_INSTR_F); end
+        if(rst) begin
+            /*
+            this is needed, if not there check fails for no reason, blame questa
+                -chris
+            
+            nvm it works now ig, this simulation was sent from hell, altera is the devil 
+                -chris literally the next day
+            */
+            //$write("Checking instr allignment : ");
 
+            assert(cpu_dut.INSTR_F == cpu_dut.FAKE_INSTR_F)// $write("OK : [real, fake] = [%h, %h]", cpu_dut.INSTR_F, cpu_dut.FAKE_INSTR_F); //$write("OK");
+            else begin $error("fail : [real, fake] = [%h, %h]", cpu_dut.INSTR_F, cpu_dut.FAKE_INSTR_F); end
+            //$display();
+        end
     end
 
 

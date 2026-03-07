@@ -128,6 +128,10 @@ if(-not $compile){
             Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
             wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas"
             if ($LASTEXITCODE -ne 0) { exit 1 }
+            python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+            python3 .\hex2mif.py .\data_memory.hex data.mif
+            if ($LASTEXITCODE -ne 0) { exit 1 }
 
             Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
 
@@ -165,6 +169,10 @@ if(-not $compile){
 
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
         wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas"
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\data_memory.hex data.mif
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         if($no_run){
@@ -250,6 +258,10 @@ if(-not $compile){
             Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
             wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc"
             if ($LASTEXITCODE -ne 0) { exit 1 }
+            python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+            python3 .\hex2mif.py .\data_memory.hex data.mif
+            if ($LASTEXITCODE -ne 0) { exit 1 }
 
             Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
 
@@ -317,6 +329,10 @@ if(-not $compile){
 
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
         wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc"
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\data_memory.hex data.mif
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         if($no_run){

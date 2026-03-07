@@ -226,11 +226,10 @@ module riscv_cpu_v2
     );
 
     logic [31:0] FAKE_INSTR_F;
-    logic [31:0] FAKE_PC;
-    assign FAKE_PC = NEXT_PC>>2;
 
+    //TODO ALIASING HERE !!!
     mk9_rom_mif_aclr mk9_instr_mem (
-        .address(FAKE_PC),
+        .address(NEXT_PC[13:2]),
         .clock(clk),
         .q(FAKE_INSTR_F),
         .aclr(!rst)

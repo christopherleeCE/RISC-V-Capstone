@@ -113,14 +113,16 @@ riscv64-unknown-elf-objcopy \
   --gap-fill 0x00 \
   --pad-to 0x4000 \
   -j .text program.elf instr.bin 
-hexdump -v -e '1/4 "%08x\n"' instr.bin > instruction_memory.txt #reversing display order of bytes order for .txt
 
-# create instruction hex file
-riscv64-unknown-elf-objcopy \
-  -O ihex \
-  --gap-fill 0x00 \
-  --pad-to 0x4000 \
-  -j .text program.elf instruction_memory.hex
+
+hexdump -v -e '1/4 "%08x\n"' instr.bin > instruction_memory.hex #reversing display order of bytes order for .txt
+
+
+# --only-section=.bss \ was removed as it was
+# causeing an error with the obj copy, .bss is just
+# zeroing out allocated memory, so since we turncate
+# the .bin anway, the memory looks the same regardless
+# with or without it
 
 #not sure if the --only-section here will always grab everythign
 riscv64-unknown-elf-objcopy \
@@ -131,23 +133,5 @@ riscv64-unknown-elf-objcopy \
   --pad-to 0x5000 \
   program.elf data.bin
 
-# --only-section=.bss \ was removed as it was
-# causeing an error with the obj copy, .bss is just
-# zeroing out allocated memory, so since we turncate
-# the .bin anway, the memory looks the same regardless
-# with or without it
-
 truncate -s 4096 data.bin #fills data.bin with 4kb of zeros if empty
-hexdump -v -e '1/4 "%08x\n"' data.bin > data_memory.txt #reversing display order of bytes for .txt
-
-# create data hex file
-riscv64-unknown-elf-objcopy \
-  -O ihex \
-  --only-section=.rodata \
-  --only-section=.data \
-  --gap-fill 0x00 \
-  --pad-to 0x5000 \
-  program.elf data_memory.hex
-
-xxd -p -c 4 instr.bin > instruction_memory.hex
-xxd -p -c 4 data.bin  > data_memory.hex
+hexdump -v -e '1/4 "%08x\n"' data.bin > data_memory.hex #reversing display order of bytes for .txt
