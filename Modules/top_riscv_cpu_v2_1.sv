@@ -1198,6 +1198,7 @@ module top_riscv_cpu_v2_1();
             // --------------------------------
             $display("[IF] PC               = 0x%08h", cpu_dut.PC);
             $display("[IF] INSTR_F          = 0x%08h", cpu_dut.INSTR_F);
+            $display("[IF] INSTR_F_MASKED   = 0x%08h", cpu_dut.INSTR_F_MASKED);
             $display("[IF] INSTR_F_FLUSH    = 0x%08h", cpu_dut.INSTR_F_FLUSH);
             $display("[IF] redirect_pc      = 0x%08h", cpu_dut.redirect_pc);
                         $write("\n");

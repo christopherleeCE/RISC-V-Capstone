@@ -31,6 +31,7 @@ module riscv_cpu_v2
     logic [31:0] PC_plus_4_M;
     logic [31:0] PC_plus_4_W;
     logic [31:0] INSTR_F;           //IF instruction from instruction memory, before flush
+    logic [31:0] INSTR_F_MASKED;    //for use in aliasing fix  
     logic [31:0] INSTR_F_FLUSH;    //IF instruction after deciding whether to flush or not
     logic [31:0] INSTR_D;           //ID instruction after pipeline reg, before flush
     logic [31:0] INSTR_D_FLUSH;     //ID instruction after pipeline reg, after flush
@@ -243,8 +244,11 @@ module riscv_cpu_v2
     //     .read_data(FAKE_INSTR_F)
     // );
 
+    //preventing aliasing
+    assign INSTR_F_MASKED = (PC[31:14] == '0) ? INSTR_F : 32'h00000000;
+
     //deciding whether to flush instruction or not
-    assign INSTR_F_FLUSH = flush_FD ? 32'h00000013 : INSTR_F; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
+    assign INSTR_F_FLUSH = flush_FD ? 32'h00000013 : INSTR_F_MASKED; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
 
     //preparing data for pipeline reg
     assign f2d_data_F = {INSTR_F_FLUSH, PC};

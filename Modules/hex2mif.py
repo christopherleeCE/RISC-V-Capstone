@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+#TODO check the params, they dont seem to work
+
 import argparse
 
 def hex_to_mif(input_file, output_file, width=32, depth=None):
