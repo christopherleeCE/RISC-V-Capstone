@@ -231,7 +231,7 @@ module riscv_cpu_v2
     mk9_rom_mif_aclr mk9_instr_mem (
         .address(NEXT_PC[13:2]),
         .clock(clk),
-        .q(FAKE_INSTR_F),
+        .q(INSTR_F),
         .aclr(!rst)
 	);
 
@@ -240,7 +240,7 @@ module riscv_cpu_v2
         .ENTRY_COUNT(4096)
     ) instr_mem (
         .read_address(PC),
-        .read_data(INSTR_F)
+        .read_data(FAKE_INSTR_F)
     );
 
     //deciding whether to flush instruction or not

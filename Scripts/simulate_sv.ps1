@@ -56,6 +56,6 @@ quit -f
 "@
 
 #gpt says this was needed for bram but quartus said it only needs altera_mf
-#vlog C:/intelFPGA_lite/24.1std/quartus/eda/sim_lib/220model.v
+#vlog $quartus/eda/sim_lib/220model.v
 
 vsim -c -do $do
