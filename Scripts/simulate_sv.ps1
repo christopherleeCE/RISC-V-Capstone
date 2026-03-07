@@ -48,12 +48,14 @@ $do = @"
 
 file delete -force sim.log;
 transcript file sim.log;
-vlog C:/intelFPGA_lite/24.1std/quartus/eda/sim_lib/220model.v
-vlog C:/intelFPGA_lite/24.1std/quartus/eda/sim_lib/altera_mf.v
+vlog $quartus/eda/sim_lib/altera_mf.v
 vlog *.sv *.v
 vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs;
 run ${time}us;
 quit -f
 "@
+
+#gpt says this was needed for bram but quartus said it only needs altera_mf
+#vlog C:/intelFPGA_lite/24.1std/quartus/eda/sim_lib/220model.v
 
 vsim -c -do $do
