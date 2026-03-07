@@ -135,7 +135,7 @@ module top_riscv_cpu_v2_1();
     logic [31:0] REG_FILE_ASYNC [31:0] = '{default: 32'b0};     //this should not be written to directly, use the writereg() task, you can read from it directly 
     logic [31:0] PC_ASYNC;                                      //simple pc reg used by golden
 
-
+    logic [63:0] cycle_count;
 
     //DUT---------------------------------------------------------------------------------------------------------------------
     //instantiate the CPU
@@ -204,12 +204,14 @@ module top_riscv_cpu_v2_1();
     initial begin
 
         $readmemh("data_memory.hex", DATA_MEM[1]); //load the memory
+        cycle_count <= '0;
 
     end
 
     final begin
         $display("Ending PC: %h", PC_ASYNC);
         if(~ofinish) $error("EBREAK was not called and the simulation did no reach the end of the program, not a PASS");
+        $display("Approximate amount of instructions executed: %0d", cycle_count);
         $display("Return value in DUT a0: %0d | 0x%h", $signed(cpu_dut.my_reg_file.regs_out[10]), cpu_dut.my_reg_file.regs_out[10]);
         $display("Return value in GOLD a0: %0d | 0x%h", $signed(REG_FILE[1][10]), REG_FILE[1][10]);
     end
@@ -234,10 +236,12 @@ module top_riscv_cpu_v2_1();
 
 
     //golden results calculated on posedge
-    always @(posedge clk) begin
+    always @(posedge clk) begin    
 
         logic [63:0] product;   //used in mul's calculations
         logic dut_pc_redirected;
+
+        cycle_count <= cycle_count + 1;
 
         if(local_instruction_failure1 || local_instruction_failure2 || local_instruction_failure3 || local_instruction_failure4 || local_instruction_failure5) begin //INSTRUCTION FAILURE----------------------------------
         
