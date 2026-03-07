@@ -10,6 +10,7 @@ param(
     [switch]$continue,
     [switch]$verbose,
     [switch]$v,
+    [switch]$wave_dump,    
     [int]$time = 100
 )
 
@@ -27,6 +28,7 @@ if ($Help) {
     -continue:          continue simulation even on instruction failure
     -verbose:           enables -golden_calc -dut_dump -golden_history -verify_output -continue
     -v:                 same as -verbose
+    -wave_dump:         include if you need a wave dump, slows down simulation
     -time <INTEGER>     sets the runtime of the questia simulation to be <INTEGER> micro seconds, default is 2us
     "
     exit 0
@@ -42,18 +44,36 @@ if ($verbose)           { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY 
 if ($v)                 { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 
 $quartus = $env:QUARTUS_ROOTDIR -replace "\\","/"
-$do = @"
-
-file delete -force sim.log;
-transcript file sim.log;
-vlog $quartus/eda/sim_lib/altera_mf.v
-vlog *.sv *.v
-vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs;
-run ${time}us;
-quit -f
-"@
 
 #gpt says this was needed for bram but quartus said it only needs altera_mf
 #vlog $quartus/eda/sim_lib/220model.v
+if($wave_dump){
 
+$do = @"
+    file delete -force sim.log;
+    transcript file sim.log;
+    vlog $quartus/eda/sim_lib/altera_mf.v
+    vlog *.sv *.v
+    vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs;
+    run ${time}us;
+    quit -f
+"@
 vsim -c -do $do
+
+}else{  #disables optimizations, and deletes waveforms, 
+        #(i think that disabled optimatitions might make
+        #the wavedump inaccurate, dont quote me on that)
+    
+$do = @"
+    file delete -force sim.log;
+    transcript file sim.log;
+    vlog $quartus/eda/sim_lib/altera_mf.v
+    vlog *.sv *.v
+    vsim work.top_riscv_cpu_v2_1 $vsimArgs;
+    run ${time}us;
+    quit -f
+"@
+vsim -c -do $do
+Remove-Item -Path dump.vcd
+
+}
