@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-#TODO check the params, they dont seem to work
 
 import argparse
 
@@ -36,8 +35,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert plain hex words to .mif")
     parser.add_argument("input", help="input hex file (one 32-bit word per line)")
     parser.add_argument("output", help="output .mif file")
-    parser.add_argument("--width", type=int, default=32, help="word width (default 32)")
-    parser.add_argument("--depth", type=int, help="memory depth (default = number of lines)")
+    parser.add_argument("--width", type=int, default=32, help="word width (default 32), only writes to .mif header, leave empty or 32")
+    parser.add_argument("--depth", type=int, help="memory depth (default = number of lines), leave empty")
 
     args = parser.parse_args()
 
