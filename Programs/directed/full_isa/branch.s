@@ -1,5 +1,3 @@
-#todo add bgeu and bltu when they get implemented
-
 
     .section .text
     .globl _start

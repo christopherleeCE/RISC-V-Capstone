@@ -13,16 +13,9 @@ will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant
 1, 2, 3, 4 no verificaitn is done, but it still progresses through all of those rows over the coarse of five(?) clks, once addi is in
 gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
 
-TODO expand branch.s with unsigned versions when implemented, jump backwards testing
-
-TODO _start in library?
-
 TODO switch to bram
-TODO pc assert
-TODO instr assert
 TODO clean up compilation and address bloat
-
-
+TODO overhaul branch.s
 
 --------------TEST LOG----------------------------------------------------
 
@@ -82,7 +75,6 @@ module top_riscv_cpu_v2_1();
         BYTE      = 3'b001
     }store_type_t;
 
-    //dumb way to get around default output of verify_row task, TODO find better way to do this, maybe switch from task to func?
     static int local_instruction_failure1;
     static int local_instruction_failure2;
     static int local_instruction_failure3;
@@ -1548,8 +1540,6 @@ module top_riscv_cpu_v2_1();
                 if(func3_v == 3'b000) begin //-------ADDI-------------------------------
                     if(imm_i_v == 32'd0 & rs1_v == 5'd0 & rd_v == 5'd0) begin
                         if(show_negedge_verify_row) $write("\tIdentified as NOP:");
-                        //TODO, do a reg by reg and data by data comparasion for validation here,
-                        //once that task has been built as seen at ~line 1
 
                         if(row == 5) $display(" Success: 0x%h", PC[row]);
                         

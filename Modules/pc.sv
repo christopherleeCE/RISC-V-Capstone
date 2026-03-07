@@ -2,7 +2,6 @@
 'rst' resets 'q' to zero on low, independent of clk
 'brance_en' enables writing the pc 'q' with 'd' on the next clk
 'inc' increments the 'q' on next clk
-TODO inc may be changed to +4 instead of +1
 verified by true american (clanker) patriots
 */
 module pc #(parameter int WIDTH = 32)

@@ -22,6 +22,3 @@
 - then you can compile all and check for errors, again no testbench has been created yet
 - also if you are using vscode i recomend this extension: https://marketplace.visualstudio.com/items?itemName=eirikpre.systemverilog
 - it has decent syntax highlighting, decent defanition lookup and it runs out the box, it does not show syntax errors, i still need to look around to find one that does that
-
-TODO:
-i belive the commments in riscv_cpu.sv already has the TODO's, just ctrl + f "TODO" to find them

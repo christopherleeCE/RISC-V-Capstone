@@ -1,9 +1,3 @@
-//TODO confirm buses are right,
-//TODO better comments for logic declarations
-
-//this makes it so that the compiler will throw an error if we try to use a signal/bus that has not been declared,
-//this will help avoid errors where an undeclared bus gets implicitly declared as a wire
-// `default_nettype none
 
 //prototype of basic pattern
 module riscv_cpu_v2
@@ -226,9 +220,6 @@ module riscv_cpu_v2
         .q(PC)
     );
 
-    logic [31:0] FAKE_INSTR_F;
-
-    //TODO ALIASING HERE !!!
     mk9_rom_mif_aclr mk9_instr_mem (
         .address(NEXT_PC[13:2]),
         .clock(clk),
@@ -236,6 +227,8 @@ module riscv_cpu_v2
         .aclr(!rst)
 	);
 
+    //logic [31:0] FAKE_INSTR_F;
+    
     // instruction_memory #(
     //     .BIT_WIDTH(32),
     //     .ENTRY_COUNT(4096)

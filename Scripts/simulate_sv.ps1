@@ -41,8 +41,6 @@ if ($continue)          { $vsimArgs += " +CONTINUE" }
 if ($verbose)           { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 if ($v)                 { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 
-#todo add *.v in vlog
-#test if both includes are needed at some point
 $quartus = $env:QUARTUS_ROOTDIR -replace "\\","/"
 $do = @"
 
