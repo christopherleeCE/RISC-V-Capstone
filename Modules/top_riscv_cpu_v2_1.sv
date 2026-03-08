@@ -16,7 +16,6 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 TODO switch to bram
 TODO optimize repeated runs in test routine to not recompile unless needed (8 -> 6:30)
 TODO fix sim args in simulate partents
-TODO overhaul branch.s
 
 --------------TEST LOG----------------------------------------------------
 
