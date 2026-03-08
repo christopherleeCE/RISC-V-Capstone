@@ -14,7 +14,8 @@ will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant
 gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
 
 TODO switch to bram
-TODO optimize repeated runs in test routine to not recompile unless needed
+TODO optimize repeated runs in test routine to not recompile unless needed (8 -> 6:30)
+TODO fix sim args in simulate partents
 TODO overhaul branch.s
 
 --------------TEST LOG----------------------------------------------------
