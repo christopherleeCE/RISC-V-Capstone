@@ -1,6 +1,11 @@
+
 param(
-    [switch]$help
+    [switch]$help,
+    [switch]$no_rand
 )
+
+$startTime = Get-Date
+$timer = [System.Diagnostics.Stopwatch]::StartNew()
 
 if($help){
     Write-Host "
@@ -18,17 +23,43 @@ if ($currentDirName -ne "Modules") {
 }
 
 ../Scripts/directed_master.ps1
+Write-Host "Finished running ../Scripts/directed_master.ps1" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
 Read-Host
 
 ../Scripts/directed_master.ps1 -directory functional_s
+Write-Host "Finished running ../Scripts/directed_master.ps1 -directory functional_s" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
 Read-Host
 
 ../Scripts/directed_master.ps1 -directory functional_c -compile
+Write-Host "Finished running ../Scripts/directed_master.ps1 -directory functional_c -compile" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
 Read-Host
 
-../Scripts/random_master.ps1 -runs 100
-Write-Host "Press Enter to finish" -ForegroundColor Yellow
+../Scripts/directed_master.ps1 -directory opt
+Write-Host "Finished running ../Scripts/directed_master.ps1 -directory opt" -ForegroundColor Blue
+Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
 Read-Host
+
+../Scripts/directed_master.ps1 -directory opt -compile
+Write-Host "Finished running ../Scripts/directed_master.ps1 -directory opt -compile" -ForegroundColor Blue
+Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
+Read-Host
+
+if(-not $no_rand){
+    ../Scripts/random_master.ps1 -runs 100
+    Write-Host "Finished running ../Scripts/random_master.ps1 -runs 100" -ForegroundColor Blue
+    Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
+    Read-Host
+}
+
+Write-Host "Regresssion testing complete, press Enter to finish..." -ForegroundColor Magenta
+Read-Host
+
+
+$timer.Stop()
+$endTime = Get-Date
+Write-Host "Verification Started: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+Write-Host "Verification Finished: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+Write-Host "Verification Time: $($timer.Elapsed.ToString('hh\:mm\:ss\.ff'))"
