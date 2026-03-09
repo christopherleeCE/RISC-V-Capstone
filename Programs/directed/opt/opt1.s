@@ -1,5 +1,5 @@
 .section .data
-num: .word 7
+num: .word 1
 
 .section .text
 .globl _start
@@ -12,4 +12,14 @@ _start:
     mul  a0, t1, t2   # a0 = num * 10
 
 end:
-    j end
+    nop
+    nop
+    nop
+    nop
+    nop
+    ebreak
+    nop
+    nop
+    nop
+    nop
+    nop

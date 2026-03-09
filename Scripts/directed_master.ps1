@@ -22,7 +22,7 @@ $timer = [System.Diagnostics.Stopwatch]::StartNew()
 $diffAnyGlobalErrors = $false
 
 $ErrorActionPreference = "Stop"
-$runTime = 100000000
+$runTime = 5000000
 
 if($help){
     Write-Output("
@@ -60,7 +60,8 @@ if($help){
 }
 
 $simScriptArgs = @{
-    continue = $true
+    continue = $true;
+    no_compile = $false
 }
 
 if ($golden_calc)       { $simScriptArgs.golden_calc = $true }
@@ -163,6 +164,7 @@ if(-not $compile){
 
             & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
             if ($LASTEXITCODE -ne 0) { exit 1 }
+            $simScriptArgs.no_compile = $true
 
             Write-Host "Moving results..."
             Copy-Item $wslPath -Destination (Join-Path $logFolder $file.name) -Force
@@ -205,6 +207,7 @@ if(-not $compile){
         
         & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
         if ($LASTEXITCODE -ne 0) { exit 1 }
+        $simScriptArgs.no_compile = $true
 
         Write-Host "Moving results..."
         Copy-Item $wslPath -Destination (Join-Path $logFolder $file.name) -Force
@@ -285,6 +288,7 @@ if(-not $compile){
 
             & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
             if ($LASTEXITCODE -ne 0) { exit 1 }
+            $simScriptArgs.no_compile = $true
 
             #creating log
             $diffLog = ".\diff.log"
@@ -357,6 +361,7 @@ if(-not $compile){
         
         & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
         if ($LASTEXITCODE -ne 0) { exit 1 }
+        $simScriptArgs.no_compile = $true
 
         #creating log
         $diffLog = ".\diff.log"
