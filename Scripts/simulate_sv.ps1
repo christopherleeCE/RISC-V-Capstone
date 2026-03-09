@@ -8,7 +8,6 @@ param(
     [switch]$verify_output,
     [switch]$no_verify,
     [switch]$continue,
-    [switch]$verbose,
     [switch]$v,
     [switch]$wave_dump,    
     [int]$time = 100
@@ -26,8 +25,7 @@ if ($Help) {
     -verify_output:     shows debug info of verify_row()'s
     -no_verify:         disable verification, script will verify if this argument is NOT given
     -continue:          continue simulation even on instruction failure
-    -verbose:           enables -golden_calc -dut_dump -golden_history -verify_output -continue
-    -v:                 same as -verbose
+    -v:                 enables -golden_calc -dut_dump -golden_history -verify_output -continue
     -wave_dump:         include if you need a wave dump, slows down simulation
     -time <INTEGER>     sets the runtime of the questia simulation to be <INTEGER> micro seconds, default is 2us
     "
@@ -40,7 +38,6 @@ if ($golden_history)    { $vsimArgs += " +GOLDEN_HISTORY" }
 if ($verify_output)     { $vsimArgs += " +VERIFY_OUTPUT"}
 if ($no_verify)         { $vsimArgs += " +NO_VERIFY" }
 if ($continue)          { $vsimArgs += " +CONTINUE" }
-if ($verbose)           { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 if ($v)                 { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 
 $quartus = $env:QUARTUS_ROOTDIR -replace "\\","/"
@@ -74,6 +71,6 @@ $do = @"
     quit -f
 "@
 vsim -c -do $do
-Remove-Item -Path dump.vcd
+Remove-Item -Path dump.vcd -ErrorAction SilentlyContinue
 
 }

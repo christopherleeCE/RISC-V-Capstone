@@ -3,7 +3,7 @@
 param(
     [int]$runs = 1,
     [switch]$help,
-    [switch]$no_verify,
+    [switch]$only_gen_master_log,
     [switch]$v
 )
 
@@ -17,7 +17,7 @@ if($help){
     Write-Output("
     -help: brings up this dialog
     -runs NUM:  sets the randomized testing to run NUM tests
-    -no_verify: doesnt run any verification only generates a masterlog with the current contents of raw_random dirctory
+    -only_gen_master_log: doesnt run any verification only generates a masterlog with the current contents of raw_random dirctory
 
     For refrence my home computer (kinda beefy but not really) takes 4:30 minutes for 100 runs, 1000 took about 45 minutes
     
@@ -44,14 +44,14 @@ $masterLog = Join-Path $logFolder "_master.log"
 if (-not (Test-Path $logFolder)) {
     New-Item -ItemType Directory -Path $logFolder | Out-Null
 } else {
-    if(-not $no_verify){
+    if(-not $only_gen_master_log){
     # Remove all files in the folder
     Get-ChildItem $logFolder -File | Remove-Item -Force
     }
 }
 
 Write-Host "Running from Modules folder, continuing..."
-if(-not $no_verify){
+if(-not $only_gen_master_log){
     for($ii = 1; $ii -le $runs; $ii++){
 
         Write-Host "Generating random assembly..."
@@ -165,7 +165,7 @@ Add-Content -Path $masterLog "Verification Started: $($startTime.ToString('yyyy-
 Add-Content -Path $masterLog "Verification Finished: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 Add-Content -Path $masterLog "Verification Time: $($timer.Elapsed.ToString('hh\:mm\:ss\.ff'))"
 
-if($no_verify){
+if($only_gen_master_log){
     Add-Content -Path $masterLog "`n`n<<<* WARNING *>>> No verification was done, only a masterlog was generated based on the leftover files in the raw_random directory"
 }
 
