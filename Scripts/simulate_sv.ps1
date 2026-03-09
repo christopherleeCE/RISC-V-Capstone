@@ -9,11 +9,18 @@ param(
     [switch]$no_verify,
     [switch]$continue,
     [switch]$v,
-    [switch]$wave_dump,    
+    [switch]$wave_dump,
+    [switch]$no_compile,    
     [int]$time = 100
 )
 
 $vsimArgs = ""
+$compileCmd = ""
+$quartus = $env:QUARTUS_ROOTDIR -replace "\\","/"
+
+if(-not $no_compile){
+    $compileCmd = "vlog $quartus/eda/sim_lib/altera_mf.v *.sv *.v"
+}
 
 if ($Help) {
     # You can put your usage message here
@@ -40,8 +47,6 @@ if ($no_verify)         { $vsimArgs += " +NO_VERIFY" }
 if ($continue)          { $vsimArgs += " +CONTINUE" }
 if ($v)                 { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 
-$quartus = $env:QUARTUS_ROOTDIR -replace "\\","/"
-
 #gpt says this was needed for bram but quartus said it only needs altera_mf
 #vlog $quartus/eda/sim_lib/220model.v
 if($wave_dump){
@@ -49,8 +54,7 @@ if($wave_dump){
 $do = @"
     file delete -force sim.log;
     transcript file sim.log;
-    vlog $quartus/eda/sim_lib/altera_mf.v
-    vlog *.sv *.v
+    $compileCmd;
     vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs;
     run ${time}us;
     quit -f
@@ -64,8 +68,7 @@ vsim -c -do $do
 $do = @"
     file delete -force sim.log;
     transcript file sim.log;
-    vlog $quartus/eda/sim_lib/altera_mf.v
-    vlog *.sv *.v
+    $compileCmd;
     vsim work.top_riscv_cpu_v2_1 $vsimArgs;
     run ${time}us;
     quit -f
