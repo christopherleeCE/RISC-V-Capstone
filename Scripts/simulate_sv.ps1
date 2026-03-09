@@ -46,6 +46,7 @@ if ($verify_output)     { $vsimArgs += " +VERIFY_OUTPUT"}
 if ($no_verify)         { $vsimArgs += " +NO_VERIFY" }
 if ($continue)          { $vsimArgs += " +CONTINUE" }
 if ($v)                 { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
+if ($wave_dump)         { $vsimArgs += " +WAVE_DUMP" }
 
 #gpt says this was needed for bram but quartus said it only needs altera_mf
 #vlog $quartus/eda/sim_lib/220model.v

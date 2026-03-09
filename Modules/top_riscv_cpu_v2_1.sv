@@ -56,6 +56,7 @@ module top_riscv_cpu_v2_1();
     bit show_negedge_verify_row;
     bit verify_row_flag;
     bit stop_at_instr_failure;
+    bit dump_waves;
 
     //used for debug output of reg dumps
     string reg_name [32] = '{
@@ -138,11 +139,6 @@ module top_riscv_cpu_v2_1();
         .ofinish(ofinish)
     );
 
-    initial begin
-    $dumpfile("dump.vcd");
-    $dumpvars();
-    end
-
     //grabing vsim args
     initial begin
 
@@ -169,8 +165,20 @@ module top_riscv_cpu_v2_1();
         show_negedge_verify_row = $test$plusargs("VERIFY_OUTPUT");
         verify_row_flag = ~$test$plusargs("NO_VERIFY");
         stop_at_instr_failure = ~$test$plusargs("CONTINUE");
+        dump_waves = $test$plusargs("WAVE_DUMP");
 
-        $display("Flags: %b %b %b %b %b %b", show_posedge_golden_calc, show_negedge_dut_dump, show_negedge_golden_history, show_negedge_verify_row, verify_row_flag, stop_at_instr_failure);
+        if(dump_waves) begin
+            $dumpfile("dump.vcd");
+            $dumpvars();
+        end
+
+        $display("Flags: %b %b %b %b %b %b %b", show_posedge_golden_calc,
+                                                show_negedge_dut_dump,
+                                                show_negedge_golden_history,
+                                                show_negedge_verify_row,
+                                                verify_row_flag,
+                                                stop_at_instr_failure,
+                                                dump_waves);
 
     end
 
