@@ -35,8 +35,7 @@ if($help){
     -v:                 enables -golden_calc -dut_dump -golden_history -verify_output -continue
     -wave_dump:         include if you need a wave dump, slows down simulation 
 
-    For refrence my home computer (kinda beefy but not really) takes 4:30 minutes for 100 runs, 1000 took about 45 minutes
-    
+    For refrence my home computer (kinda beefy but not really) takes 7 minutes for 100 runs, 1000 took about 75
     This Script will generate a random .s file, simulate and validate it, and store the results
     in the <GITHOME/Logs/raw_random/> directory, along with a _master.log file that sumaraizes the
     results of all the iterations of the test
