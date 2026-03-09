@@ -4,20 +4,36 @@ param(
     [int]$runs = 1,
     [switch]$help,
     [switch]$only_gen_master_log,
-    [switch]$v
+
+    [switch]$golden_calc,
+    [switch]$dut_dump,
+    [switch]$golden_history,
+    [switch]$verify_output,
+    [switch]$no_verify,
+    [switch]$v,
+    [switch]$wave_dump
 )
 
 $startTime = Get-Date
 $timer = [System.Diagnostics.Stopwatch]::StartNew()
 
 $ErrorActionPreference = "Stop"
-$runTime = 1000
+$runTime = 5000
 
 if($help){
     Write-Output("
     -help: brings up this dialog
     -runs NUM:  sets the randomized testing to run NUM tests
     -only_gen_master_log: doesnt run any verification only generates a masterlog with the current contents of raw_random dirctory
+
+    simulate.ps1 flags:
+    -golden_calc:       shows the debug info for the golden values calculated on every posedge
+    -dut_dump:          shows a dump of all dut on every negedge
+    -golden_history:    shows dump of golden_history[] on every negedge
+    -verify_output:     shows debug info of verify_row()'s
+    -no_verify:         disable verification, script will verify if this argument is NOT given
+    -v:                 enables -golden_calc -dut_dump -golden_history -verify_output -continue
+    -wave_dump:         include if you need a wave dump, slows down simulation 
 
     For refrence my home computer (kinda beefy but not really) takes 4:30 minutes for 100 runs, 1000 took about 45 minutes
     
@@ -28,6 +44,18 @@ if($help){
 
     exit(0)
 }
+
+$simScriptArgs = @{
+    continue = $true
+}
+
+if ($golden_calc)       { $simScriptArgs.golden_calc = $true }
+if ($dut_dump)          { $simScriptArgs.dut_dump = $true }
+if ($golden_history)    { $simScriptArgs.golden_history = $true }
+if ($verify_output)     { $simScriptArgs.verify_output = $true }
+if ($no_verify)         { $simScriptArgs.no_verify = $true }
+if ($v)                 { $simScriptArgs.v = $true }
+if ($wave_dump)         { $simScriptArgs.wave_dump = $true }
 
 # Get the current directory name
 $currentDirName = Split-Path -Leaf (Get-Location)
@@ -77,11 +105,7 @@ if(-not $only_gen_master_log){
         if ($LASTEXITCODE -ne 0) { exit 1 }
         Write-Host "Running simulation $($ii)/$runs..." -ForegroundColor Magenta
 
-        if($v){
-            & ..\Scripts\simulate_sv.ps1 -v -time $runTime
-        }else{
-            & ..\Scripts\simulate_sv.ps1 -continue -time $runTime
-        }
+        & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Flow complete."
