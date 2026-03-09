@@ -9,10 +9,12 @@ $timer = [System.Diagnostics.Stopwatch]::StartNew()
 
 if($help){
     Write-Host "
-    -help:  brings up this dialog
+    -help:      brings up this dialog
+    -no_rand:   skips the randomized testing at the end, use if you only need the directed testing
 
-    run this b4 any commit, do not push without getting a pass from all 4 of the tests
+    run this b4 any commit, do not push without getting a pass from all of the tests
     "
+    exit 0
 }
 
 #check if we are in /modules/
