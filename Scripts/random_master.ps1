@@ -46,7 +46,8 @@ if($help){
 }
 
 $simScriptArgs = @{
-    continue = $true
+    continue = $true;
+    no_compile = $false
 }
 
 if ($golden_calc)       { $simScriptArgs.golden_calc = $true }
@@ -107,6 +108,8 @@ if(-not $only_gen_master_log){
 
         & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
         if ($LASTEXITCODE -ne 0) { exit 1 }
+
+        $simScriptArgs.no_compile = $true
 
         Write-Host "Flow complete."
 
