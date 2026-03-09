@@ -17,6 +17,8 @@ TODO switch to bram
 TODO optimize repeated runs in test routine to not recompile unless needed (8 -> 6:30)
 TODO fix sim args in simulate partents
 
+TODO make sure that datamem gets initalzied without compilation
+
 --------------TEST LOG----------------------------------------------------
 
 WAITING LIST: ...
