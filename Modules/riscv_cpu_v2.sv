@@ -56,7 +56,7 @@ module riscv_cpu_v2
     logic [31:0] ALU;               //output of alu
     logic [31:0] ALU_M;   
     logic [31:0] ALU_W;
-    logic [31:0] DATA_MEM_OUT;
+    // logic [31:0] DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_W;
     logic [31:0] DATA_MEM_ADDR;
 
@@ -80,9 +80,9 @@ module riscv_cpu_v2
     logic [164:0] e2m_data_M;     //execute to memory post pipeline
     logic [8:0] e2m_control_M;    //execute to memory control signals post pipeline  
 
-    logic [164:0] m2w_data_M;         //memory to writeback data signals
+    logic [132:0] m2w_data_M;         //memory to writeback data signals
     logic [4:0] m2w_control_M;       //memory to writeback control signals
-    logic [164:0] m2w_data_W;       //memory to writeback post pipeline
+    logic [132:0] m2w_data_W;       //memory to writeback post pipeline
     logic [4:0] m2w_control_W;   //memory to writeback control signals post pipeline    
 
     //control signals after 1 pipeline reg
@@ -523,30 +523,20 @@ module riscv_cpu_v2
 
     data_memory #(
         .BIT_WIDTH(32),
-        .ENTRY_COUNT(1024)
     ) my_data_mem (
         .addr(DATA_MEM_ADDR),
         .writeData(RS2_DATA_M),
         .writeEn(data_mem_wr_en_M),
-        .readData(DATA_MEM_OUT),
+        .readData(DATA_MEM_OUT_W), //synchronous read, so goes straight to WB stage
         .clk(clk),
+        .rst(rst),
         .addr_byte(addr_byte_M),
         .addr_half(addr_half_M),
         .zero_extend(zero_extend_mem_M)
-    );
-
-    mk9_ram_mif_aclr	mk9_ram_mif_aclr_inst (
-        .aclr ( aclr_sig ),
-        .address ( address_sig ),
-        .byteena ( byteena_sig ),
-        .clock ( clock_sig ),
-        .data ( data_sig ),
-        .wren ( wren_sig ),
-        .q ( q_sig )
-	);
+    ); 
 
     //preparing data and control signals for pipeline reg
-    assign m2w_data_M = {ALU_M, DATA_MEM_OUT, RD_M, PC_plus_4_M, PC_M, INSTR_M};
+    assign m2w_data_M = {ALU_M, RD_M, PC_plus_4_M, PC_M, INSTR_M};
     assign m2w_control_M = {
         dbus_sel_alu_M,
         dbus_sel_data_mem_M,
@@ -558,7 +548,7 @@ module riscv_cpu_v2
 /* < MEM/WB > */ //====================================================================================================
 
     dff_async_reset #(
-        .WIDTH(165)
+        .WIDTH(133)
     ) mem_wb_reg (
         .d(m2w_data_M),
         .clk(clk),
@@ -580,7 +570,7 @@ module riscv_cpu_v2
 //====================================================================================================================     
 
     //unpacking data and control signals from pipeline reg
-    assign {ALU_W, DATA_MEM_OUT_W, RD_W, PC_plus_4_W, PC_W, INSTR_W} = m2w_data_W;
+    assign {ALU_W, RD_W, PC_plus_4_W, PC_W, INSTR_W} = m2w_data_W;
     assign {
         dbus_sel_alu_W,
         dbus_sel_data_mem_W,
