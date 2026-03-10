@@ -535,6 +535,16 @@ module riscv_cpu_v2
         .zero_extend(zero_extend_mem_M)
     );
 
+    mk9_ram_mif_aclr	mk9_ram_mif_aclr_inst (
+        .aclr ( aclr_sig ),
+        .address ( address_sig ),
+        .byteena ( byteena_sig ),
+        .clock ( clock_sig ),
+        .data ( data_sig ),
+        .wren ( wren_sig ),
+        .q ( q_sig )
+	);
+
     //preparing data and control signals for pipeline reg
     assign m2w_data_M = {ALU_M, DATA_MEM_OUT, RD_M, PC_plus_4_M, PC_M, INSTR_M};
     assign m2w_control_M = {
