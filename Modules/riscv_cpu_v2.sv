@@ -56,7 +56,7 @@ module riscv_cpu_v2
     logic [31:0] ALU;               //output of alu
     logic [31:0] ALU_M;   
     logic [31:0] ALU_W;
-    // logic [31:0] DATA_MEM_OUT;
+    logic [31:0] DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_W;
     logic [31:0] DATA_MEM_ADDR;
 
@@ -80,9 +80,9 @@ module riscv_cpu_v2
     logic [164:0] e2m_data_M;     //execute to memory post pipeline
     logic [8:0] e2m_control_M;    //execute to memory control signals post pipeline  
 
-    logic [132:0] m2w_data_M;         //memory to writeback data signals
+    logic [164:0] m2w_data_M;         //memory to writeback data signals
     logic [4:0] m2w_control_M;       //memory to writeback control signals
-    logic [132:0] m2w_data_W;       //memory to writeback post pipeline
+    logic [164:0] m2w_data_W;       //memory to writeback post pipeline
     logic [4:0] m2w_control_W;   //memory to writeback control signals post pipeline    
 
     //control signals after 1 pipeline reg
@@ -118,7 +118,6 @@ module riscv_cpu_v2
     logic dbus_sel_alu_E;
     logic dbus_sel_data_mem_E;
     logic dbus_sel_pc_plus_4_E;
-    logic rs1_2_pc_E;
 
     //control signals after 2 pipeline regs
     logic data_mem_wr_en_M;
@@ -156,25 +155,11 @@ module riscv_cpu_v2
     logic pipeline_advance_EM;
     logic pipeline_advance_MW;
 
-    // for data memory data hazards
-    logic halt_dm_p1, halt_dm_p2;
-
-    always_comb begin
-        priority case (1'b1)
-            (R1_case_rf2alu || R2_case_rf2alu)                          :   halt_dm_p1 = 1'b0;
-            ((R1_case_dm2alu || R2_case_dm2alu) && dbus_sel_data_mem_M) :   halt_dm_p1 = 1'b1;
-            default                                                     :   halt_dm_p1 = 1'b0;
-        endcase
-    end
-
-    assign halt_dm_p2 = ((R1_case_dm2alu || R2_case_dm2alu) && dbus_sel_data_mem_M) &&
-                          ( (R1_case_rf2alu || R2_case_rf2alu) );
-
     //gradually stop pipeline advance as halt moves through pipeline
-    assign pipeline_advance_FD = !(halt_D || halt_dm_p1);
-    assign pipeline_advance_DE = !(halt_E || halt_dm_p1);
+    assign pipeline_advance_FD = !halt_D;
+    assign pipeline_advance_DE = !halt_E;
     assign pipeline_advance_EM = !halt_M;
-    assign pipeline_advance_MW = !(halt_W || halt_dm_p2);
+    assign pipeline_advance_MW = !halt_W;
 
     // Before the first clock, halt is asserted by default since no valid OPCODE has come from the fetch pipeline yet
     // Thus we have to wait for the first clock
@@ -424,6 +409,7 @@ module riscv_cpu_v2
         priority case (1'b1)
 
         (R1_case_dm2alu && dbus_sel_alu_M) : RS1_DATA_E_FWD = ALU_M;         //Take from ALU_M if needed in EX stage and was gotten from ALU
+        (R1_case_dm2alu && dbus_sel_data_mem_M)  : RS1_DATA_E_FWD = DATA_MEM_OUT;  //Take from DATA_MEM_OUT if needed in EX stage and was gotten from Data Memory
         (R1_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS1_DATA_E_FWD = PC_plus_4_M;  //Take from PC_plus_4_M if needed in EX stage and was gotten from PC+4
         R1_case_rf2alu : RS1_DATA_E_FWD = RD_DATA;                                //Take from RD_DATA if needed in EX stage and was about to be written in WB stage
 
@@ -436,6 +422,7 @@ module riscv_cpu_v2
         priority case (1'b1)
 
         (R2_case_dm2alu && dbus_sel_alu_M) : RS2_DATA_E_FWD = ALU_M;
+        (R2_case_dm2alu && dbus_sel_data_mem_M)  : RS2_DATA_E_FWD = DATA_MEM_OUT; 
         (R2_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS2_DATA_E_FWD = PC_plus_4_M;       
         R2_case_rf2alu : RS2_DATA_E_FWD = RD_DATA;
 
@@ -535,12 +522,12 @@ module riscv_cpu_v2
     assign DATA_MEM_ADDR = ALU_M - LOWEST_DATA_MEM_ADDR;
 
     data_memory #(
-        .BIT_WIDTH(32)
+        .BIT_WIDTH(32),
     ) my_data_mem (
         .addr(DATA_MEM_ADDR),
         .writeData(RS2_DATA_M),
         .writeEn(data_mem_wr_en_M),
-        .readData(DATA_MEM_OUT_W), //synchronous read, so goes straight to WB stage
+        .readData(DATA_MEM_OUT),
         .clk(clk),
         .rst(rst),
         .addr_byte(addr_byte_M),
@@ -549,7 +536,7 @@ module riscv_cpu_v2
     ); 
 
     //preparing data and control signals for pipeline reg
-    assign m2w_data_M = {ALU_M, RD_M, PC_plus_4_M, PC_M, INSTR_M};
+    assign m2w_data_M = {ALU_M, DATA_MEM_OUT, RD_M, PC_plus_4_M, PC_M, INSTR_M};
     assign m2w_control_M = {
         dbus_sel_alu_M,
         dbus_sel_data_mem_M,
@@ -561,7 +548,7 @@ module riscv_cpu_v2
 /* < MEM/WB > */ //====================================================================================================
 
     dff_async_reset #(
-        .WIDTH(133)
+        .WIDTH(165)
     ) mem_wb_reg (
         .d(m2w_data_M),
         .clk(clk),
@@ -583,7 +570,7 @@ module riscv_cpu_v2
 //====================================================================================================================     
 
     //unpacking data and control signals from pipeline reg
-    assign {ALU_W, RD_W, PC_plus_4_W, PC_W, INSTR_W} = m2w_data_W;
+    assign {ALU_W, DATA_MEM_OUT_W, RD_W, PC_plus_4_W, PC_W, INSTR_W} = m2w_data_W;
     assign {
         dbus_sel_alu_W,
         dbus_sel_data_mem_W,
