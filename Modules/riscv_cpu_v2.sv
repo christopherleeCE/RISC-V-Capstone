@@ -56,7 +56,7 @@ module riscv_cpu_v2
     logic [31:0] ALU;               //output of alu
     logic [31:0] ALU_M;   
     logic [31:0] ALU_W;
-    logic [31:0] DATA_MEM_OUT;
+    logic [31:0] DATA_MEM_OUT, OLD_DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_W;
     logic [31:0] DATA_MEM_ADDR;
 
@@ -75,10 +75,10 @@ module riscv_cpu_v2
     logic [174:0] d2e_data_E;       //decode to execute post pipeline
     logic [33:0] d2e_control_E;    //decode to execute control signals post pipeline
 
-    logic [132:0] e2m_data_E;          //execute to memory data signals
-    logic [4:0] e2m_control_E;       //execute to memory control signals
-    logic [132:0] e2m_data_M;     //execute to memory post pipeline
-    logic [4:0] e2m_control_M;    //execute to memory control signals post pipeline  
+    logic [164:0] e2m_data_E;          //execute to memory data signals
+    logic [8:0] e2m_control_E;       //execute to memory control signals
+    logic [164:0] e2m_data_M;     //execute to memory post pipeline
+    logic [8:0] e2m_control_M;    //execute to memory control signals post pipeline  
 
     logic [164:0] m2w_data_M;         //memory to writeback data signals
     logic [4:0] m2w_control_M;       //memory to writeback control signals
@@ -121,10 +121,10 @@ module riscv_cpu_v2
     logic rs1_2_pc_E;
 
     //control signals after 2 pipeline regs
-    // logic data_mem_wr_en_M;
-    // logic addr_byte_M;
-    // logic addr_half_M;
-    // logic zero_extend_mem_M;
+    logic data_mem_wr_en_M;
+    logic addr_byte_M;
+    logic addr_half_M;
+    logic zero_extend_mem_M;
     logic dbus_sel_alu_M;
     logic dbus_sel_data_mem_M;
     logic dbus_sel_pc_plus_4_M;
@@ -468,12 +468,12 @@ module riscv_cpu_v2
     assign PC_target = (alu_sel_add_E) ? ALU : PC_E + IM_E; //left is for JALR, right for branches and JAL
 
     //preparing data and control signals for pipeline reg
-    assign e2m_data_E = {ALU, RD_E, PC_plus_4_E, PC_E, INSTR_E};
+    assign e2m_data_E = {ALU, RS2_DATA_E_FWD, RD_E, PC_plus_4_E, PC_E, INSTR_E};
     assign e2m_control_E = {
-        // data_mem_wr_en_E,
-        // addr_byte_E,
-        // addr_half_E,
-        // zero_extend_mem_E,
+        data_mem_wr_en_E,
+        addr_byte_E,
+        addr_half_E,
+        zero_extend_mem_E,
         dbus_sel_alu_E,
         dbus_sel_data_mem_E,
         dbus_sel_pc_plus_4_E,
@@ -485,7 +485,7 @@ module riscv_cpu_v2
 
     //not sure but i think we may not need a pipeline reg here because of the nature of the data_mem
     dff_async_reset #(
-        .WIDTH(133)
+        .WIDTH(165)
     ) ex_mem_reg (
         .d(e2m_data_E),       
         .clk(clk),                   
@@ -495,7 +495,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(5)
+        .WIDTH(9)
     ) ex_mem_control_reg (
         .d(e2m_control_E),      // Include control signals in pipeline
         .clk(clk),
@@ -507,12 +507,12 @@ module riscv_cpu_v2
 //==================================================================================================================== 
 
     //unpacking data and control signals from pipeline reg
-    assign {ALU_M, RD_M, PC_plus_4_M, PC_M, INSTR_M} = e2m_data_M;
+    assign {ALU_M, RS2_DATA_M, RD_M, PC_plus_4_M, PC_M, INSTR_M} = e2m_data_M;
     assign {
-        // data_mem_wr_en_M,
-        // addr_byte_M,
-        // addr_half_M,
-        // zero_extend_mem_M,
+        data_mem_wr_en_M,
+        addr_byte_M,
+        addr_half_M,
+        zero_extend_mem_M,
         dbus_sel_alu_M,
         dbus_sel_data_mem_M,
         dbus_sel_pc_plus_4_M,
@@ -536,6 +536,20 @@ module riscv_cpu_v2
         .addr_half(addr_half_E),
         .zero_extend(zero_extend_mem_E)
     ); 
+
+    old_data_memory #(
+        .BIT_WIDTH(32),
+        .ENTRY_COUNT(1024)
+    ) my_old_data_mem (
+        .addr(ALU_M - LOWEST_DATA_MEM_ADDR),
+        .writeData(RS2_DATA_M),
+        .writeEn(data_mem_wr_en_M),
+        .readData(OLD_DATA_MEM_OUT),
+        .clk(clk),
+        .addr_byte(addr_byte_M),
+        .addr_half(addr_half_M),
+        .zero_extend(zero_extend_mem_M)
+    );
 
     //preparing data and control signals for pipeline reg
     assign m2w_data_M = {ALU_M, DATA_MEM_OUT, RD_M, PC_plus_4_M, PC_M, INSTR_M};
