@@ -4,7 +4,7 @@
 // MODULE: altsyncram 
 
 // ============================================================
-// File Name: mk9_ram_mif_aclr.v
+// File Name: mk9_ram_mif.v
 // Megafunction Name(s):
 // 			altsyncram
 //
@@ -37,7 +37,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module mk9_ram_mif_aclr (
+module mk9_ram_mif (
 	aclr,
 	address,
 	byteena,
@@ -104,7 +104,7 @@ module mk9_ram_mif_aclr (
 		altsyncram_component.outdata_reg_a = "UNREGISTERED",
 		altsyncram_component.power_up_uninitialized = "FALSE",
 		altsyncram_component.ram_block_type = "M9K",
-		altsyncram_component.read_during_write_mode_port_a = "DONT_CARE",
+		altsyncram_component.read_during_write_mode_port_a = "NEW_DATA_WITH_NBE_READ",
 		altsyncram_component.widthad_a = 10,
 		altsyncram_component.width_a = 32,
 		altsyncram_component.width_byteena_a = 4;
@@ -137,7 +137,7 @@ endmodule
 // Retrieval info: PRIVATE: MIFfilename STRING "./Modules/data.mif"
 // Retrieval info: PRIVATE: NUMWORDS_A NUMERIC "1024"
 // Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "2"
-// Retrieval info: PRIVATE: READ_DURING_WRITE_MODE_PORT_A NUMERIC "2"
+// Retrieval info: PRIVATE: READ_DURING_WRITE_MODE_PORT_A NUMERIC "4"
 // Retrieval info: PRIVATE: RegAddr NUMERIC "1"
 // Retrieval info: PRIVATE: RegData NUMERIC "1"
 // Retrieval info: PRIVATE: RegOutput NUMERIC "0"
@@ -162,7 +162,7 @@ endmodule
 // Retrieval info: CONSTANT: OUTDATA_REG_A STRING "UNREGISTERED"
 // Retrieval info: CONSTANT: POWER_UP_UNINITIALIZED STRING "FALSE"
 // Retrieval info: CONSTANT: RAM_BLOCK_TYPE STRING "M9K"
-// Retrieval info: CONSTANT: READ_DURING_WRITE_MODE_PORT_A STRING "DONT_CARE"
+// Retrieval info: CONSTANT: READ_DURING_WRITE_MODE_PORT_A STRING "NEW_DATA_WITH_NBE_READ"
 // Retrieval info: CONSTANT: WIDTHAD_A NUMERIC "10"
 // Retrieval info: CONSTANT: WIDTH_A NUMERIC "32"
 // Retrieval info: CONSTANT: WIDTH_BYTEENA_A NUMERIC "4"
@@ -180,10 +180,10 @@ endmodule
 // Retrieval info: CONNECT: @data_a 0 0 32 0 data 0 0 32 0
 // Retrieval info: CONNECT: @wren_a 0 0 0 0 wren 0 0 0 0
 // Retrieval info: CONNECT: q 0 0 32 0 @q_a 0 0 32 0
-// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif_aclr.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif_aclr.inc FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif_aclr.cmp FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif_aclr.bsf FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif_aclr_inst.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif_aclr_bb.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif.inc FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif.cmp FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif.bsf FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif_inst.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL mk9_ram_mif_bb.v FALSE
 // Retrieval info: LIB_FILE: altera_mf

@@ -56,7 +56,17 @@ module data_memory
 
    /* < BRAM MEM > */ //====================================================================================================
    
-   mk9_ram_mif_aclr	mk9_ram_mif_aclr_inst (
+   // mk9_ram_mif_aclr	mk9_ram_mif_aclr_inst (
+   //    .aclr ( !rst ),
+   //    .address ( addr[11:2] ),
+   //    .byteena ( byteena_sig ),
+   //    .clock ( clk ),
+   //    .data ( writeData ),
+   //    .wren ( writeEn ),
+   //    .q ( data_out_mem )
+   // );
+
+   mk9_ram_mif	mk9_ram_mif_inst (
       .aclr ( !rst ),
       .address ( addr[11:2] ),
       .byteena ( byteena_sig ),
