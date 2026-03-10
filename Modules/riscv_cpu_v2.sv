@@ -45,7 +45,7 @@ module riscv_cpu_v2
     logic [31:0] RS2_DATA_FWD;      //read2 from regfile after data hazard forwarding
     logic [31:0] RS2_DATA_E;       //read2 from regfile after pipeline reg
     logic [31:0] RS2_DATA_E_FWD;   //read2 from regfile after data hazard forwarding
-    // logic [31:0] RS2_DATA_M;    //read2 from regfile after 2pipeline reg
+    logic [31:0] RS2_DATA_M;    //read2 from regfile after 2pipeline reg
     logic [4:0] RD;                //write addr of regfile
     logic [4:0] RD_E;             //write addr of regfile after pipeline reg
     logic [4:0] RD_M;          //write addr of regfile after 2pipeline reg
@@ -56,7 +56,7 @@ module riscv_cpu_v2
     logic [31:0] ALU;               //output of alu
     logic [31:0] ALU_M;   
     logic [31:0] ALU_W;
-    logic [31:0] DATA_MEM_OUT, OLD_DATA_MEM_OUT;
+    logic [31:0] DATA_MEM_OUT, NEW_DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_W;
     logic [31:0] DATA_MEM_ADDR;
 
@@ -525,11 +525,11 @@ module riscv_cpu_v2
 
     data_memory #(
         .BIT_WIDTH(32)
-    ) my_data_mem (
+    ) my_new_data_mem (
         .addr(DATA_MEM_ADDR),
         .writeData(RS2_DATA_E_FWD),
         .writeEn(data_mem_wr_en_E),
-        .readData(DATA_MEM_OUT),
+        .readData(NEW_DATA_MEM_OUT),
         .clk(clk),
         .rst(rst),
         .addr_byte(addr_byte_E),
@@ -540,11 +540,11 @@ module riscv_cpu_v2
     old_data_memory #(
         .BIT_WIDTH(32),
         .ENTRY_COUNT(1024)
-    ) my_old_data_mem (
+    ) my_data_mem (
         .addr(ALU_M - LOWEST_DATA_MEM_ADDR),
         .writeData(RS2_DATA_M),
         .writeEn(data_mem_wr_en_M),
-        .readData(OLD_DATA_MEM_OUT),
+        .readData(DATA_MEM_OUT),
         .clk(clk),
         .addr_byte(addr_byte_M),
         .addr_half(addr_half_M),
@@ -552,7 +552,7 @@ module riscv_cpu_v2
     );
 
     //preparing data and control signals for pipeline reg
-    assign m2w_data_M = {ALU_M, DATA_MEM_OUT, RD_M, PC_plus_4_M, PC_M, INSTR_M};
+    assign m2w_data_M = {ALU_M, NEW_DATA_MEM_OUT, RD_M, PC_plus_4_M, PC_M, INSTR_M};
     assign m2w_control_M = {
         dbus_sel_alu_M,
         dbus_sel_data_mem_M,
