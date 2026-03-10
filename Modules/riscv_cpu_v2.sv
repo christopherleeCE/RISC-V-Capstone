@@ -118,6 +118,7 @@ module riscv_cpu_v2
     logic dbus_sel_alu_E;
     logic dbus_sel_data_mem_E;
     logic dbus_sel_pc_plus_4_E;
+    logic rs1_2_pc_E;
 
     //control signals after 2 pipeline regs
     logic data_mem_wr_en_M;
@@ -155,11 +156,25 @@ module riscv_cpu_v2
     logic pipeline_advance_EM;
     logic pipeline_advance_MW;
 
+    // for data memory data hazards
+    logic halt_dm_p1, halt_dm_p2;
+
+    always_comb begin
+        priority case (1'b1)
+            (R1_case_rf2alu || R2_case_rf2alu)                          :   halt_dm_p1 = 1'b0;
+            ((R1_case_dm2alu || R2_case_dm2alu) && dbus_sel_data_mem_M) :   halt_dm_p1 = 1'b1;
+            default                                                     :   halt_dm_p1 = 1'b0;
+        endcase
+    end
+
+    assign halt_dm_p2 = ((R1_case_dm2alu || R2_case_dm2alu) && dbus_sel_data_mem_M) &&
+                          ( (R1_case_rf2alu || R2_case_rf2alu) );
+
     //gradually stop pipeline advance as halt moves through pipeline
-    assign pipeline_advance_FD = !halt_D;
-    assign pipeline_advance_DE = !halt_E;
+    assign pipeline_advance_FD = !(halt_D || halt_dm_p1);
+    assign pipeline_advance_DE = !(halt_E || halt_dm_p1);
     assign pipeline_advance_EM = !halt_M;
-    assign pipeline_advance_MW = !halt_W;
+    assign pipeline_advance_MW = !(halt_W || halt_dm_p2);
 
     // Before the first clock, halt is asserted by default since no valid OPCODE has come from the fetch pipeline yet
     // Thus we have to wait for the first clock
@@ -409,7 +424,6 @@ module riscv_cpu_v2
         priority case (1'b1)
 
         (R1_case_dm2alu && dbus_sel_alu_M) : RS1_DATA_E_FWD = ALU_M;         //Take from ALU_M if needed in EX stage and was gotten from ALU
-        (R1_case_dm2alu && dbus_sel_data_mem_M)  : RS1_DATA_E_FWD = DATA_MEM_OUT;  //Take from DATA_MEM_OUT if needed in EX stage and was gotten from Data Memory
         (R1_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS1_DATA_E_FWD = PC_plus_4_M;  //Take from PC_plus_4_M if needed in EX stage and was gotten from PC+4
         R1_case_rf2alu : RS1_DATA_E_FWD = RD_DATA;                                //Take from RD_DATA if needed in EX stage and was about to be written in WB stage
 
@@ -422,7 +436,6 @@ module riscv_cpu_v2
         priority case (1'b1)
 
         (R2_case_dm2alu && dbus_sel_alu_M) : RS2_DATA_E_FWD = ALU_M;
-        (R2_case_dm2alu && dbus_sel_data_mem_M)  : RS2_DATA_E_FWD = DATA_MEM_OUT; 
         (R2_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS2_DATA_E_FWD = PC_plus_4_M;       
         R2_case_rf2alu : RS2_DATA_E_FWD = RD_DATA;
 
@@ -522,7 +535,7 @@ module riscv_cpu_v2
     assign DATA_MEM_ADDR = ALU_M - LOWEST_DATA_MEM_ADDR;
 
     data_memory #(
-        .BIT_WIDTH(32),
+        .BIT_WIDTH(32)
     ) my_data_mem (
         .addr(DATA_MEM_ADDR),
         .writeData(RS2_DATA_M),
