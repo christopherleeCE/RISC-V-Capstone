@@ -29,6 +29,13 @@ module data_memory
    // half-word read from memory
    logic [15:0] data_half_r;                         
 
+   logic [ADDR_WIDTH-1:0] addr_internal_mirror;
+   // logic [ADDR_WIDTH-1:0] write_data_internal_mirror;
+   // logic [3:0] byteena_sig_internal_mirror;
+   logic addr_byte_internal_mirror;
+   logic addr_half_internal_mirror;
+   logic zero_extend_mirror;
+
    /* < Writing to MEM > */ //====================================================================================================
 
    // select the appropriate byte based on the address
@@ -66,6 +73,46 @@ module data_memory
    //    .q ( data_out_mem )
    // );
 
+   dff_async_reset #(
+      .WIDTH(32)
+   )addr_mirror(
+      .d(addr),
+      .clk(clk),
+      .rst(rst),
+      .wr_en(1'b1),
+      .q(addr_internal_mirror)
+   );
+
+   // dff_async_reset #(
+   //    .WIDTH(32)
+   // )write_data_mirror(
+   //    .d(writeData),
+   //    .clk(clk),
+   //    .rst(rst),
+   //    .wr_en(1'b1),
+   //    .q(write_data_internal_mirror)
+   // );
+
+   // dff_async_reset #(
+   //    .WIDTH(4)
+   // )byte_en_mirror(
+   //    .d(byteena_sig),
+   //    .clk(clk),
+   //    .rst(rst),
+   //    .wr_en(1'b1),
+   //    .q(byteena_sig_internal_mirror)
+   // );
+
+   dff_async_reset #(
+      .WIDTH(3)
+   )addr_bye_half_mirror(
+      .d({{addr_byte, addr_half, zero_extend}}),
+      .clk(clk),
+      .rst(rst),
+      .wr_en(1'b1),
+      .q({addr_byte_internal_mirror, addr_half_internal_mirror, zero_extend_mirror})
+   );
+
    mk9_ram_mif	mk9_ram_mif_inst (
       .aclr ( !rst ),
       .address ( addr[11:2] ),
@@ -79,11 +126,11 @@ module data_memory
    /* < Read from MEM > */ //==================================================================================================== 
 
    //preventing aliasing
-   assign readWord = (addr[31:12] == '0) ? data_out_mem : '0;     
+   assign readWord = (addr_internal_mirror[31:12] == '0) ? data_out_mem : '0;     
 
    // select the appropriate byte based on the address
    always_comb begin
-      unique case (addr[1:0])
+      unique case (addr_internal_mirror[1:0])
             2'b00	:	data_byte_r = readWord[7:0];
             2'b01	:	data_byte_r = readWord[15:8];
             2'b10	:	data_byte_r = readWord[23:16];
@@ -93,13 +140,13 @@ module data_memory
    end
 
    // select the appropriate half-word based on the address
-   assign data_half_r = addr[1] ? readWord[31:16] : readWord[15:0];
+   assign data_half_r = addr_internal_mirror[1] ? readWord[31:16] : readWord[15:0];
 
    // are we reading a byte, half-word, or word?
    always_comb begin
-      unique case ({addr_byte, addr_half})
-            2'b10	:	readData = zero_extend ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
-            2'b01	:	readData = zero_extend ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
+      unique case ({addr_byte_internal_mirror, addr_half_internal_mirror})
+            2'b10	:	readData = zero_extend_mirror ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
+            2'b01	:	readData = zero_extend_mirror ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
             default	:	readData = readWord;
       endcase
    end      
