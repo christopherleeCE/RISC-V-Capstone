@@ -3,16 +3,32 @@
 
 _start:
     /* Test ADDI */
-    		lb x1, 4(x0)
-            lb x2, 5(x0)
-            lb x3, 6(x0)
-            lb x4, 7(x0)
+            nop
+            nop
+            nop
+            nop
+            nop
+            li gp, 0x4000
+    		lb a1, 4(gp)
+            lb a2, 5(gp)
+            lb a3, 6(gp)
+            lb a4, 7(gp)
             
-            lh x5, 4(x0)
-            lh x6, 6(x0)
+            lh a5, 4(gp)
+            lh a6, 6(gp)
             
-            lw x7, 4(x0)
+            lw a7, 4(gp)
+            nop
+            nop
+            nop
+            nop
+            nop
 			ebreak  
+            nop
+            nop
+            nop
+            nop
+            nop
 
 .section .data
     .word 0x00004000

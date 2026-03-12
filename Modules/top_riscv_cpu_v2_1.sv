@@ -14,6 +14,12 @@ will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant
 gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
 
 TODO switch to bram
+TODO remove old datamemfrom mainsv
+TODO clean up data mem signals
+TODO negative testing
+TODO clean up top file debug output
+
+
 
 --------------TEST LOG----------------------------------------------------
 
