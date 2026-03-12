@@ -27,7 +27,13 @@ module data_memory
    logic [7:0] data_byte_r;                              
 
    // half-word read from memory
-   logic [15:0] data_half_r;                         
+   logic [15:0] data_half_r;             
+
+   // new word written to memory
+   logic [BIT_WIDTH-1:0] writeByte, writeHalf;   
+
+   // the word written to memory
+   logic [BIT_WIDTH-1:0] writeWord;  
 
    logic [ADDR_WIDTH-1:0] addr_internal_mirror;
    // logic [ADDR_WIDTH-1:0] write_data_internal_mirror;
@@ -59,7 +65,30 @@ module data_memory
             2'b01	:	byteena_sig = halfena_temp;
             default	:	byteena_sig = 4'b1111;
       endcase
+   end  
+
+   // create the new word to be written to memory by replacing the appropriate byte
+   always_comb begin
+      unique case (addr[1:0])
+         2'b00	:	writeByte = writeData;
+         2'b01	:	writeByte = writeData << 8;
+         2'b10	:	writeByte = writeData << 16;
+         2'b11	:	writeByte = writeData << 24;
+         default	:	writeByte = writeData;
+      endcase
    end   
+
+   // create the new word to be written to memory by replacing the appropriate half-word
+   assign writeHalf = addr[1] ? ( writeData << 16 ) : writeData;
+
+   always_comb begin
+      unique case ({addr_byte, addr_half})
+            2'b10	:	writeWord = writeByte;
+            2'b01	:	writeWord = writeHalf;
+            default	:	writeWord = writeData;
+      endcase
+   end  
+
 
    /* < BRAM MEM > */ //====================================================================================================
    
@@ -118,7 +147,7 @@ module data_memory
       .address ( addr[11:2] ),
       .byteena ( byteena_sig ),
       .clock ( clk ),
-      .data ( writeData ),
+      .data ( writeWord ),
       .wren ( writeEn ),
       .q ( data_out_mem )
    );
