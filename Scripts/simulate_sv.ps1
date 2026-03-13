@@ -56,7 +56,7 @@ $do = @"
     file delete -force sim.log;
     transcript file sim.log;
     $compileCmd;
-    vsim -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs;
+    vsim -sv_seed random -voptargs=+acc work.top_riscv_cpu_v2_1 $vsimArgs;
     run ${time}us;
     quit -f
 "@
@@ -70,7 +70,7 @@ $do = @"
     file delete -force sim.log;
     transcript file sim.log;
     $compileCmd;
-    vsim work.top_riscv_cpu_v2_1 $vsimArgs;
+    vsim -sv_seed random work.top_riscv_cpu_v2_1 $vsimArgs;
     run ${time}us;
     quit -f
 "@

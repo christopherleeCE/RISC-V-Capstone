@@ -56,6 +56,7 @@ module top_riscv_cpu_v2_1();
     parameter int DATA_MEM_EC = 1024;
     parameter int LOWEST_DATA_MEM_ADDR = 32'h4000;
 
+    int rand_delay;
 
     //bits for storying debug level
     bit show_posedge_golden_calc;
@@ -201,12 +202,16 @@ module top_riscv_cpu_v2_1();
 
     //RESET/MEMORY SETUP ------------------------------------------------------------------------------------------------------
     initial begin
+
         repeat(3) begin     //arbitrarily hold reset for 3 clks
             user_rst = 1'b0;
             @(posedge clk);
         end
 
-        #1
+        rand_delay = $urandom_range(0, 19);
+        $display("rand_delay: %0d", rand_delay);
+        #(rand_delay)
+
         user_rst = 1'b1; //disable the reset
     end
 
