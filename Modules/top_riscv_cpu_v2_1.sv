@@ -18,6 +18,8 @@ TODO remove old datamemfrom mainsv
 TODO clean up data mem signals
 TODO negative testing
 TODO clean up top file debug output
+TODO randomize rst offset
+TODO change dff rst to double rst dff
 
 
 
@@ -87,7 +89,7 @@ module top_riscv_cpu_v2_1();
     static int local_instruction_failure5;
 
     //cpu ports
-    logic clk, rst, ohalt, ofinish;
+    logic clk, rst, user_rst, ohalt, ofinish;
 
     //golden instruction decoded declarations
     logic [6:0] func7;
@@ -200,13 +202,19 @@ module top_riscv_cpu_v2_1();
     //RESET/MEMORY SETUP ------------------------------------------------------------------------------------------------------
     initial begin
         repeat(3) begin     //arbitrarily hold reset for 3 clks
-            rst = 1'b0;
+            user_rst = 1'b0;
             @(posedge clk);
         end
-   
-        rst = 1'b1; //disable the reset
+
+        #1
+        user_rst = 1'b1; //disable the reset
     end
 
+    //assign rst = user_rst;
+    always_ff @(posedge clk) begin
+        rst <= user_rst;
+    end
+    
     initial begin
 
         $readmemh("data_memory.hex", DATA_MEM[1]); //load the memory
