@@ -1,4 +1,3 @@
-//TODO when bram gets implemented make sure that aliasing is not an issue
 
 module data_memory
   #( 
@@ -21,7 +20,7 @@ module data_memory
    logic [3:0] byteena_temp, halfena_temp, byteena_sig;
 
    // the word read from memory
-   logic [BIT_WIDTH-1:0] readWord, data_out_mem;          
+   logic [BIT_WIDTH-1:0] readWord, data_out_mem, readDataPreMask;          
 
    // byte read from memory         
    logic [7:0] data_byte_r;                              
@@ -155,7 +154,8 @@ module data_memory
    /* < Read from MEM > */ //==================================================================================================== 
 
    //preventing aliasing
-   assign readWord = (addr_internal_mirror[31:12] == '0) ? data_out_mem : '0;     
+   // assign readWord = (addr_internal_mirror[31:12] == '0) ? data_out_mem : 32'h0;
+   assign readWord = data_out_mem;     
 
    // select the appropriate byte based on the address
    always_comb begin
@@ -172,13 +172,24 @@ module data_memory
    assign data_half_r = addr_internal_mirror[1] ? readWord[31:16] : readWord[15:0];
 
    // are we reading a byte, half-word, or word?
+   // always_comb begin
+   //    unique case ({addr_byte_internal_mirror, addr_half_internal_mirror})
+   //          2'b10	:	readData = zero_extend_mirror ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
+   //          2'b01	:	readData = zero_extend_mirror ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
+   //          default	:	readData = readWord;
+   //    endcase
+   // end
+
    always_comb begin
       unique case ({addr_byte_internal_mirror, addr_half_internal_mirror})
-            2'b10	:	readData = zero_extend_mirror ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
-            2'b01	:	readData = zero_extend_mirror ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
-            default	:	readData = readWord;
+            2'b10	:	readDataPreMask = zero_extend_mirror ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
+            2'b01	:	readDataPreMask = zero_extend_mirror ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
+            default	:	readDataPreMask = readWord;
       endcase
-   end      
+   end
+
+   assign readData = (addr_internal_mirror[31:12] == '0) ? readDataPreMask : 32'h0;
+
 
    
 endmodule 

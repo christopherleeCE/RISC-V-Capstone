@@ -14,6 +14,8 @@ will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant
 gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
 
 TODO clean up data mem signals
+TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
+TODO build skeleton fpga top file
 
 --------------TEST LOG----------------------------------------------------
 
