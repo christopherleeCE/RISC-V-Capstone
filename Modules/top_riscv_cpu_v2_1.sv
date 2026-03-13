@@ -13,15 +13,7 @@ will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant
 1, 2, 3, 4 no verificaitn is done, but it still progresses through all of those rows over the coarse of five(?) clks, once addi is in
 gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
 
-TODO switch to bram
-TODO remove old datamemfrom mainsv
 TODO clean up data mem signals
-TODO negative testing
-TODO clean up top file debug output
-TODO randomize rst offset
-TODO change dff rst to double rst dff
-
-
 
 --------------TEST LOG----------------------------------------------------
 
@@ -90,7 +82,8 @@ module top_riscv_cpu_v2_1();
     static int local_instruction_failure5;
 
     //cpu ports
-    logic clk, rst, user_rst, ohalt, ofinish;
+    logic clk, rst, ohalt, ofinish;
+    logic global_rst, middle_rst;
 
     //golden instruction decoded declarations
     logic [6:0] func7;
@@ -203,8 +196,8 @@ module top_riscv_cpu_v2_1();
     //RESET/MEMORY SETUP ------------------------------------------------------------------------------------------------------
     initial begin
 
-        repeat(3) begin     //arbitrarily hold reset for 3 clks
-            user_rst = 1'b0;
+        repeat(5) begin     //arbitrarily hold reset for 3 clks
+            global_rst = 1'b0;
             @(posedge clk);
         end
 
@@ -212,12 +205,20 @@ module top_riscv_cpu_v2_1();
         $display("rand_delay: %0d", rand_delay);
         #(rand_delay)
 
-        user_rst = 1'b1; //disable the reset
+        global_rst = 1'b1; //disable the reset
+
     end
 
-    //assign rst = user_rst;
-    always_ff @(posedge clk) begin
-        rst <= user_rst;
+    //assign rst = global_rst;
+    always_ff @(posedge clk or negedge global_rst) begin
+        if (!global_rst) begin
+            middle_rst <= 1'b0;
+            rst <= 1'b0;
+        end
+        else begin
+            middle_rst <= 1'b1;
+            rst <= middle_rst;
+        end
     end
     
     initial begin
@@ -709,7 +710,7 @@ module top_riscv_cpu_v2_1();
                 if(func3 == 3'b001) begin //----SH-------------------------------------
                     if(show_posedge_golden_calc) $display("\tIdentified as SH.");
 
-                    $display("%h : %h",  REG_FILE[1][rs2], (REG_FILE[1][rs1] + imm_s));
+                    // $display("%h : %h",  REG_FILE[1][rs2], (REG_FILE[1][rs1] + imm_s));
                     write_data_mem(REG_FILE[1][rs2], (REG_FILE[1][rs1] + imm_s), HALF_WORD);
                     PC_ASYNC <= PC_ASYNC + 32'h4;
 
@@ -1001,7 +1002,7 @@ module top_riscv_cpu_v2_1();
 
             dut_dump();
             reg_dut_dump();
-            data_mem_dut_dump();
+            //data_mem_dut_dump();
 
         end
 
@@ -1332,17 +1333,18 @@ module top_riscv_cpu_v2_1();
         end
     endtask
 
-    task data_mem_dut_dump();
-        begin
-            $write("\n\tDATA_MEM_DUT Dump\n\t");
-            for(int ii = 255; ii >= 0; ii--) begin
-                $write("\t%2d: 0x%8h", ii, cpu_dut.my_data_mem.data_mem[ii]);
-                if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
-                    $write("\n\t");
-                end
-            end
-        end
-    endtask
+    //depreciated, datamem is now in bram, and cannot be dumped this way
+    // task data_mem_dut_dump();
+    //     begin
+    //         $write("\n\tDATA_MEM_DUT Dump\n\t");
+    //         for(int ii = 255; ii >= 0; ii--) begin
+    //             $write("\t%2d: 0x%8h", ii, cpu_dut.my_data_mem_old.data_mem[ii]);
+    //             if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up
+    //                 $write("\n\t");
+    //             end
+    //         end
+    //     end
+    // endtask
 
     task data_mem_gold_ii_dump(int c);
         begin
@@ -1763,17 +1765,17 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SW:");
 
                     if(row == 3) begin
-                        $display("data [dut, gold] = [%h, %h]", cpu_dut.my_new_data_mem.data_out_mem, DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
-                        $display("addr [dut, gold] = [%h, %h]", cpu_dut.my_new_data_mem.addr_internal_mirror, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
-                        assert(cpu_dut.my_new_data_mem.data_out_mem == DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
+                        // $display("data [dut, gold] = [%h, %h]", cpu_dut.my_data_mem.data_out_mem, DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+//                         $display("addr [dut, gold] = [%h, %h]", cpu_dut.my_data_mem.addr_internal_mirror, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
+                        assert(cpu_dut.my_data_mem.data_out_mem == DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         
                     end
 
                     // if(row == 4) begin
-                    //     // $display("dut: %h, gold: %h", cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                    //     // $display("dut: %h, gold: %h", cpu_dut.my_data_mem_old.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
                     //     // $display("addr: %h, %h", ((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2, ((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
-                    //     assert(cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
+                    //     assert(cpu_dut.my_data_mem_old.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                     //     else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         
                     // end
@@ -1783,18 +1785,18 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SH:");
 
                     if(row == 3) begin
-                        $display("%h, %h, %h, %h, %h",REG_FILE[3][rs1_v], imm_s_v, REG_FILE[3][rs1_v] + imm_s_v, (REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
-                        $display("data [dut, gold] = [%h, %h]", cpu_dut.my_new_data_mem.data_out_mem, DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
-                        $display("addr [dut, gold] = [%h, %h]", cpu_dut.my_new_data_mem.addr_internal_mirror, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
-                        assert(cpu_dut.my_new_data_mem.data_out_mem == DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
+                        // $display("%h, %h, %h, %h, %h",REG_FILE[3][rs1_v], imm_s_v, REG_FILE[3][rs1_v] + imm_s_v, (REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
+                        // $display("data [dut, gold] = [%h, %h]", cpu_dut.my_data_mem.data_out_mem, DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                        // $display("addr [dut, gold] = [%h, %h]", cpu_dut.my_data_mem.addr_internal_mirror, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
+                        assert(cpu_dut.my_data_mem.data_out_mem == DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         
                     end
 
                     // if(row == 4) begin
-                    //     // $display("dut: %h, gold: %h", cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                    //     // $display("dut: %h, gold: %h", cpu_dut.my_data_mem_old.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
                     //     // $display("addr: %h, %h", ((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2, ((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
-                    //     assert(cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
+                    //     assert(cpu_dut.my_data_mem_old.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                     //     else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         
                     // end
@@ -1804,17 +1806,17 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as SB:");
 
                     if(row == 3) begin
-                        $display("data [dut, gold] = [%h, %h]", cpu_dut.my_new_data_mem.data_out_mem, DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
-                        $display("addr [dut, gold] = [%h, %h]", cpu_dut.my_new_data_mem.addr_internal_mirror, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
-                        assert(cpu_dut.my_new_data_mem.data_out_mem == DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
+                        // $display("data [dut, gold] = [%h, %h]", cpu_dut.my_data_mem.data_out_mem, DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                        // $display("addr [dut, gold] = [%h, %h]", cpu_dut.my_data_mem.addr_internal_mirror, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
+                        assert(cpu_dut.my_data_mem.data_out_mem == DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         
                     end
 
                     // if(row == 4) begin
-                    //     // $display("dut: %h, gold: %h", cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
+                    //     // $display("dut: %h, gold: %h", cpu_dut.my_data_mem_old.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2], DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
                     //     // $display("addr: %h, %h", ((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2, ((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
-                    //     assert(cpu_dut.my_data_mem.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
+                    //     assert(cpu_dut.my_data_mem_old.data_mem[((cpu_dut.my_reg_file.regs_out[rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2] == DATA_MEM[4][((REG_FILE[4][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                     //     else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         
                     // end

@@ -2,8 +2,6 @@
 // This should function as a RAM due to its option to write to it
 // A similar, read-only module has been created as the instruction memory
 
-//TODO when bram gets implemented make sure that aliasing is not an issue
-
 module old_data_memory
   #( 
      parameter int BIT_WIDTH,

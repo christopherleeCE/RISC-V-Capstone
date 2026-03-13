@@ -228,8 +228,8 @@ module riscv_cpu_v2
         .aclr(!rst)
 	);
 
+    //leaving this here in case we need to compare old vs new instr me behavior at some point in the future
     //logic [31:0] FAKE_INSTR_F;
-    
     // instruction_memory #(
     //     .BIT_WIDTH(32),
     //     .ENTRY_COUNT(4096)
@@ -525,7 +525,7 @@ module riscv_cpu_v2
 
     data_memory #(
         .BIT_WIDTH(32)
-    ) my_new_data_mem (
+    ) my_data_mem (
         .addr(DATA_MEM_ADDR),
         .writeData(RS2_DATA_E_FWD),
         .writeEn(data_mem_wr_en_E),
@@ -537,24 +537,24 @@ module riscv_cpu_v2
         .zero_extend(zero_extend_mem_E)
     ); 
 
-    //TODO comment this out l8r
-    logic [31:0] OLD_DATA_MEM_ADDR;
-    logic [31:0] OLD_DATA_MEM_OUT;
-    assign OLD_DATA_MEM_ADDR = ALU_M - LOWEST_DATA_MEM_ADDR; 
+    //leaving this here in case we need to compare the bram to the lutram behavior at any point
+    // logic [31:0] OLD_DATA_MEM_ADDR;
+    // logic [31:0] OLD_DATA_MEM_OUT;
+    // assign OLD_DATA_MEM_ADDR = ALU_M - LOWEST_DATA_MEM_ADDR; 
 
-    old_data_memory #(
-        .BIT_WIDTH(32),
-        .ENTRY_COUNT(1024)
-    ) my_data_mem (
-        .addr(OLD_DATA_MEM_ADDR),
-        .writeData(RS2_DATA_M),
-        .writeEn(data_mem_wr_en_M),
-        .readData(OLD_DATA_MEM_OUT),
-        .clk(clk),
-        .addr_byte(addr_byte_M),
-        .addr_half(addr_half_M),
-        .zero_extend(zero_extend_mem_M)
-    );
+    // old_data_memory #(
+    //     .BIT_WIDTH(32),
+    //     .ENTRY_COUNT(1024)
+    // ) my_data_mem_old (
+    //     .addr(OLD_DATA_MEM_ADDR),
+    //     .writeData(RS2_DATA_M),
+    //     .writeEn(data_mem_wr_en_M),
+    //     .readData(OLD_DATA_MEM_OUT),
+    //     .clk(clk),
+    //     .addr_byte(addr_byte_M),
+    //     .addr_half(addr_half_M),
+    //     .zero_extend(zero_extend_mem_M)
+    // );
 
     assign DATA_MEM_OUT = NEW_DATA_MEM_OUT;
 
