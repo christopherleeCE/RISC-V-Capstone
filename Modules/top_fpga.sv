@@ -66,7 +66,8 @@ logic [9:0] dbswitches; //debounced switches
         end
     end
 
-    //switching between these at runtime could introduce mechanical noise into the clk and violate hold and setup times, be just something to note
+    //passing the clk to combinational logic is a big nono, and can cause major issues, especially
+    //if we are switching the mux at run time
     always_comb begin
         priority case(1'b1)
 
@@ -76,6 +77,9 @@ logic [9:0] dbswitches; //debounced switches
 
         endcase
     end
+
+    //this is the "correct" way we should be assigning the clk
+    //assign local_clk = divided_clk;
 
     riscv_cpu_v2 cpu_dut(
         .clk(local_clk),
