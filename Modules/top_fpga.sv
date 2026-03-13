@@ -66,9 +66,7 @@ logic [9:0] dbswitches; //debounced switches
         end
     end
 
-    //is probably very noisy transition, and likely unefined behavior if switched at runtime
-    //this is a non issue because the divided_clk is 5mhz, so this isnt something
-    //were we can keep track of a 5hmz cpu and stop at a specific pc on reaction
+    //switching between these at runtime could introduce mechanical noise into the clk and violate hold and setup times, be just something to note
     always_comb begin
         priority case(1'b1)
 
@@ -86,16 +84,7 @@ logic [9:0] dbswitches; //debounced switches
         .ofinish(ofinish)
     );
 
-
-
-
-
-
-
-
-
-
-
-
+    assign debug_leds[0] = ohalt;
+    assign debug_leds[1] = ofinish;
 
 endmodule
