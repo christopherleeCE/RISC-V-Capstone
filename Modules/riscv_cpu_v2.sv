@@ -1,9 +1,3 @@
-//TODO confirm buses are right,
-//TODO better comments for logic declarations
-
-//this makes it so that the compiler will throw an error if we try to use a signal/bus that has not been declared,
-//this will help avoid errors where an undeclared bus gets implicitly declared as a wire
-// `default_nettype none
 
 //prototype of basic pattern
 module riscv_cpu_v2
@@ -20,6 +14,7 @@ module riscv_cpu_v2
 
     //new terminology:
     // f=fetch, d=decode, e=execute, m=memory, w=writeback
+    logic [31:0] NEXT_PC;           //the pc that will be inside pc and the interal mk9_rom reg in the next clk
     logic [31:0] PC;
     logic [31:0] PC_D;             //PC after pipeline reg
     logic [31:0] PC_E;
@@ -30,6 +25,7 @@ module riscv_cpu_v2
     logic [31:0] PC_plus_4_M;
     logic [31:0] PC_plus_4_W;
     logic [31:0] INSTR_F;           //IF instruction from instruction memory, before flush
+    logic [31:0] INSTR_F_MASKED;    //for use in aliasing fix  
     logic [31:0] INSTR_F_FLUSH;    //IF instruction after deciding whether to flush or not
     logic [31:0] INSTR_D;           //ID instruction after pipeline reg, before flush
     logic [31:0] INSTR_D_FLUSH;     //ID instruction after pipeline reg, after flush
@@ -60,7 +56,7 @@ module riscv_cpu_v2
     logic [31:0] ALU;               //output of alu
     logic [31:0] ALU_M;   
     logic [31:0] ALU_W;
-    logic [31:0] DATA_MEM_OUT;
+    logic [31:0] DATA_MEM_OUT, NEW_DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_W;
     logic [31:0] DATA_MEM_ADDR;
 
@@ -122,6 +118,7 @@ module riscv_cpu_v2
     logic dbus_sel_alu_E;
     logic dbus_sel_data_mem_E;
     logic dbus_sel_pc_plus_4_E;
+    logic rs1_2_pc_E;
 
     //control signals after 2 pipeline regs
     logic data_mem_wr_en_M;
@@ -220,19 +217,32 @@ module riscv_cpu_v2
         .clk(clk),
         .rst(rst),
         .wr_en(redirect_pc), //normally, PC increments by 4 each cycle, but if branch/jump taken, load PC_target
+        .next_q(NEXT_PC),
         .q(PC)
     );
 
-    instruction_memory #(
-        .BIT_WIDTH(32),
-        .ENTRY_COUNT(4096)
-    ) instr_mem (
-        .read_address(PC),
-        .read_data(INSTR_F)
-    );
+    mk9_rom_mif_aclr mk9_instr_mem (
+        .address(NEXT_PC[13:2]),
+        .clock(clk),
+        .q(INSTR_F),
+        .aclr(!rst)
+	);
+
+    //leaving this here in case we need to compare old vs new instr me behavior at some point in the future
+    //logic [31:0] FAKE_INSTR_F;
+    // instruction_memory #(
+    //     .BIT_WIDTH(32),
+    //     .ENTRY_COUNT(4096)
+    // ) instr_mem (
+    //     .read_address(PC),
+    //     .read_data(FAKE_INSTR_F)
+    // );
+
+    //preventing aliasing
+    assign INSTR_F_MASKED = (PC[31:14] == '0) ? INSTR_F : 32'h00000000;
 
     //deciding whether to flush instruction or not
-    assign INSTR_F_FLUSH = flush_FD ? 32'h00000013 : INSTR_F; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
+    assign INSTR_F_FLUSH = flush_FD ? 32'h00000013 : INSTR_F_MASKED; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
 
     //preparing data for pipeline reg
     assign f2d_data_F = {INSTR_F_FLUSH, PC};
@@ -510,21 +520,43 @@ module riscv_cpu_v2
         halt_M
     } = e2m_control_M;     
 
-    assign DATA_MEM_ADDR = ALU_M - LOWEST_DATA_MEM_ADDR;
+    // synchronous-read data mem, so inputs come straight from EX stage
+    assign DATA_MEM_ADDR = ALU - LOWEST_DATA_MEM_ADDR;
 
     data_memory #(
-        .BIT_WIDTH(32),
-        .ENTRY_COUNT(1024)
+        .BIT_WIDTH(32)
     ) my_data_mem (
         .addr(DATA_MEM_ADDR),
-        .writeData(RS2_DATA_M),
-        .writeEn(data_mem_wr_en_M),
-        .readData(DATA_MEM_OUT),
+        .writeData(RS2_DATA_E_FWD),
+        .writeEn(data_mem_wr_en_E),
+        .readData(NEW_DATA_MEM_OUT),
         .clk(clk),
-        .addr_byte(addr_byte_M),
-        .addr_half(addr_half_M),
-        .zero_extend(zero_extend_mem_M)
-    );
+        .rst(rst),
+        .addr_byte(addr_byte_E),
+        .addr_half(addr_half_E),
+        .zero_extend(zero_extend_mem_E)
+    ); 
+
+    //leaving this here in case we need to compare the bram to the lutram behavior at any point
+    // logic [31:0] OLD_DATA_MEM_ADDR;
+    // logic [31:0] OLD_DATA_MEM_OUT;
+    // assign OLD_DATA_MEM_ADDR = ALU_M - LOWEST_DATA_MEM_ADDR; 
+
+    // old_data_memory #(
+    //     .BIT_WIDTH(32),
+    //     .ENTRY_COUNT(1024)
+    // ) my_data_mem_old (
+    //     .addr(OLD_DATA_MEM_ADDR),
+    //     .writeData(RS2_DATA_M),
+    //     .writeEn(data_mem_wr_en_M),
+    //     .readData(OLD_DATA_MEM_OUT),
+    //     .clk(clk),
+    //     .addr_byte(addr_byte_M),
+    //     .addr_half(addr_half_M),
+    //     .zero_extend(zero_extend_mem_M)
+    // );
+
+    assign DATA_MEM_OUT = NEW_DATA_MEM_OUT;
 
     //preparing data and control signals for pipeline reg
     assign m2w_data_M = {ALU_M, DATA_MEM_OUT, RD_M, PC_plus_4_M, PC_M, INSTR_M};

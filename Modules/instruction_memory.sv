@@ -12,7 +12,7 @@ module instruction_memory
 logic [BIT_WIDTH-1:0] instr_mem [0:ENTRY_COUNT-1]; //instantiate the instruction memory
 
 initial begin
-    $readmemh("instruction_memory.txt", instr_mem); //load the memory
+    $readmemh("instruction_memory.hex", instr_mem); //load the memory
 end
 
 assign read_data = instr_mem[read_address[ADDR_WIDTH-1:2]];//read every group of four bytes

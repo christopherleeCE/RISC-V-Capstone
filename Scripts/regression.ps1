@@ -1,13 +1,22 @@
+
 param(
-    [switch]$help
+    [switch]$help,
+    [switch]$no_rand
 )
+
+$startTime = Get-Date
+$timer = [System.Diagnostics.Stopwatch]::StartNew()
 
 if($help){
     Write-Host "
-    -help:  brings up this dialog
+    -help:      brings up this dialog
+    -no_rand:   skips the randomized testing at the end, use if you only need the directed testing
 
-    run this b4 any commit, do not push without getting a pass from all 4 of the tests
+    run this before any commit, do not push without getting a pass from all of the tests (including random).
+    The script will run a test, display the results, and prompt you to press ENTER to continue onto the next test,
+    on my home desktop it takes about 10 minutes, (2 if you exclude random)
     "
+    exit 0
 }
 
 #check if we are in /modules/
@@ -18,17 +27,43 @@ if ($currentDirName -ne "Modules") {
 }
 
 ../Scripts/directed_master.ps1
+Write-Host "Finished running ../Scripts/directed_master.ps1" -ForegroundColor Blue
+Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
+Read-Host
+
+../Scripts/directed_master.ps1 -directory opt
+Write-Host "Finished running ../Scripts/directed_master.ps1 -directory opt" -ForegroundColor Blue
+Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
+Read-Host
+
+../Scripts/directed_master.ps1 -directory opt -compile
+Write-Host "Finished running ../Scripts/directed_master.ps1 -directory opt -compile" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
 Read-Host
 
 ../Scripts/directed_master.ps1 -directory functional_s
+Write-Host "Finished running ../Scripts/directed_master.ps1 -directory functional_s" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
 Read-Host
 
 ../Scripts/directed_master.ps1 -directory functional_c -compile
+Write-Host "Finished running ../Scripts/directed_master.ps1 -directory functional_c -compile" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
 Read-Host
 
-../Scripts/random_master.ps1 -runs 100
-Write-Host "Press Enter to finish" -ForegroundColor Yellow
+if(-not $no_rand){
+    ../Scripts/random_master.ps1 -runs 100
+    Write-Host "Finished running ../Scripts/random_master.ps1 -runs 100" -ForegroundColor Blue
+    Write-Host "Press Enter to continue to the next test" -ForegroundColor Yellow
+    Read-Host
+}
+
+Write-Host "Regresssion testing complete, press Enter to finish..." -ForegroundColor Magenta
 Read-Host
+
+
+$timer.Stop()
+$endTime = Get-Date
+Write-Host "Verification Started: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+Write-Host "Verification Finished: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+Write-Host "Verification Time: $($timer.Elapsed.ToString('hh\:mm\:ss\.ff'))"
