@@ -40,7 +40,7 @@ that come after the decimal (as set by the conversion function at the bottom).
 
 #define T_0 1 //initial condition
 #define Y_0 4
-#define T (T_0+H) //final time
+#define T (T_0 + H)//final time
 //NOTE - Would recommended leaving this as a small value (t = t0 + H) to reduce runtime for
 //regression testing
 
@@ -88,6 +88,7 @@ int y_new(int y, int t)
 {
     //Simplification of constants done where possible:
     //ex. H_HALF_SCALE = (H*SCALE / 2)
+    //When divisors and multipliers are powers of two, should become shifts
 
     int k1 = dy_dt(y, t); //find all the terms needed
     int k2 = dy_dt(y + (k1*H_HALF_SCALE)/SCALE, t + H_HALF_SCALE);
@@ -95,7 +96,7 @@ int y_new(int y, int t)
     int k4 = dy_dt(y + k3*H_SCALE, t + H_SCALE);
 
     //A bit of redundancy to not multiply by a decimal (no floats!)
-    return y + (H_SCALE*(k1 + 2*k2 + 2*k3 + k4))/(6*SCALE);
+    return y + (((H_SCALE*(k1 + 2*k2 + 2*k3 + k4)) / 6 ) / SCALE);
 }
 
 /*
