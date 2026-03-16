@@ -4,6 +4,10 @@ Modules/sim.log
 Modules/diff.log
 Modules/data.bin
 Modules/instr.bin
+Modules/data.mif
+Modules/instr.mif
+Modules/data.ver
+Modules/instr.ver
 Modules/program_asm.o
 Modules/program_c.o
 Modules/program.o
@@ -15,6 +19,8 @@ Modules/x86.out
 Modules/temp.s
 Modules/data_memory.txt
 Modules/instruction_memory.txt
+Modules/data_memory.hex
+Modules/instruction_memory.hex
 Modules/dump.vcd
 
 Logs

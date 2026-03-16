@@ -3,24 +3,40 @@
 param(
     [int]$runs = 1,
     [switch]$help,
+    [switch]$only_gen_master_log,
+
+    [switch]$golden_calc,
+    [switch]$dut_dump,
+    [switch]$golden_history,
+    [switch]$verify_output,
     [switch]$no_verify,
-    [switch]$v
+    [switch]$v,
+    [switch]$wave_dump
 )
 
 $startTime = Get-Date
 $timer = [System.Diagnostics.Stopwatch]::StartNew()
 
 $ErrorActionPreference = "Stop"
-$runTime = 1000
+$runTime = 5000
 
 if($help){
     Write-Output("
     -help: brings up this dialog
     -runs NUM:  sets the randomized testing to run NUM tests
-    -no_verify: doesnt run any verification only generates a masterlog with the current contents of raw_random dirctory
+    -only_gen_master_log: doesnt run any verification only generates a masterlog with the current contents of raw_random dirctory
 
-    For refrence my home computer (kinda beefy but not really) takes 4:30 minutes for 100 runs, 1000 took about 45 minutes
-    
+    simulate.ps1 flags:
+    -golden_calc:       shows the debug info for the golden values calculated on every posedge
+    -dut_dump:          shows a dump of all dut on every negedge
+    -golden_history:    shows dump of golden_history[] on every negedge
+    -verify_output:     shows debug info of verify_row()'s
+    -no_verify:         disable verification, script will verify if this argument is NOT given
+    -v:                 enables -golden_calc -dut_dump -golden_history -verify_output -continue
+    -wave_dump:         include if you need a wave dump, slows down simulation 
+
+    For refrence my home computer (kinda beefy but not really) takes 7 minutes for 100 runs, 1000 took about 75
+    on my latop it was it takes 8:50 and 90 minutes respectively
     This Script will generate a random .s file, simulate and validate it, and store the results
     in the <GITHOME/Logs/raw_random/> directory, along with a _master.log file that sumaraizes the
     results of all the iterations of the test
@@ -28,6 +44,19 @@ if($help){
 
     exit(0)
 }
+
+$simScriptArgs = @{
+    continue = $true;
+    no_compile = $false
+}
+
+if ($golden_calc)       { $simScriptArgs.golden_calc = $true }
+if ($dut_dump)          { $simScriptArgs.dut_dump = $true }
+if ($golden_history)    { $simScriptArgs.golden_history = $true }
+if ($verify_output)     { $simScriptArgs.verify_output = $true }
+if ($no_verify)         { $simScriptArgs.no_verify = $true }
+if ($v)                 { $simScriptArgs.v = $true }
+if ($wave_dump)         { $simScriptArgs.wave_dump = $true }
 
 # Get the current directory name
 $currentDirName = Split-Path -Leaf (Get-Location)
@@ -44,36 +73,42 @@ $masterLog = Join-Path $logFolder "_master.log"
 if (-not (Test-Path $logFolder)) {
     New-Item -ItemType Directory -Path $logFolder | Out-Null
 } else {
-    if(-not $no_verify){
+    if(-not $only_gen_master_log){
     # Remove all files in the folder
     Get-ChildItem $logFolder -File | Remove-Item -Force
     }
 }
 
 Write-Host "Running from Modules folder, continuing..."
-if(-not $no_verify){
+if(-not $only_gen_master_log){
     for($ii = 1; $ii -le $runs; $ii++){
 
         Write-Host "Generating random assembly..."
         python3 ..\Scripts\gen_random_prog.py
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
-        Write-Host "Assembling in WSL..."
-        wsl bash -c "riscv64-unknown-elf-as -march=rv32im temp.s -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        # Write-Host "Assembling in WSL..."
+        # wsl bash -c "riscv64-unknown-elf-as -march=rv32im temp.s -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
+        # if ($LASTEXITCODE -ne 0) { exit 1 }
 
-        Write-Host "Writing instruction memory file..."
-        python3 .\load_instr_mem_file.py
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        # Write-Host "Writing instruction memory file..."
+        # python3 .\load_instr_mem_file.py
+        # if ($LASTEXITCODE -ne 0) { exit 1 }
 
+        Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
+        wsl bash -c "dos2unix ../Scripts/my_gcc.sh"
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        wsl bash -c "../Scripts/my_gcc.sh temp.s -gas"
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\data_memory.hex data.mif
+        if ($LASTEXITCODE -ne 0) { exit 1 }
         Write-Host "Running simulation $($ii)/$runs..." -ForegroundColor Magenta
 
-        if($v){
-            & ..\Scripts\simulate_sv.ps1 -v -time $runTime
-        }else{
-            & ..\Scripts\simulate_sv.ps1 -continue -time $runTime
-        }
+        & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
         if ($LASTEXITCODE -ne 0) { exit 1 }
+        $simScriptArgs.no_compile = $true
 
         Write-Host "Flow complete."
 
@@ -156,7 +191,7 @@ Add-Content -Path $masterLog "Verification Started: $($startTime.ToString('yyyy-
 Add-Content -Path $masterLog "Verification Finished: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 Add-Content -Path $masterLog "Verification Time: $($timer.Elapsed.ToString('hh\:mm\:ss\.ff'))"
 
-if($no_verify){
+if($only_gen_master_log){
     Add-Content -Path $masterLog "`n`n<<<* WARNING *>>> No verification was done, only a masterlog was generated based on the leftover files in the raw_random directory"
 }
 
@@ -174,3 +209,6 @@ if ($globalAnyErrors) {
 } else {
     Write-Host "CLEAN PASS: No warnings or errors`n" -ForegroundColor Green
 }
+
+Write-Host ""
+exit 0

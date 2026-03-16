@@ -16,9 +16,13 @@ ebreak #supposedly we should only see the regs s0 -> s5 changed
 #up to i think about s10 gets written to in the golden, which is fine, i dont exactly see that causing
 #any issues with validation 
 # -chris
-li x16, 16
-li x17, 17
-li x18, 18 #this is the last guy that sees results reflected in the golden
+
+#replace with nops as not the topfile does a regfile wide check on $finish, the 3 instrs
+#after ebreak do get exected by the gold but not the dut, these three instr must be 
+#nops to pass the top file
+nop #li x16, 16
+nop #li x17, 17
+nop #li x18, 18
 li x19, 19
 li x20, 20
 li x21, 21

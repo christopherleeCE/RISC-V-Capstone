@@ -8,7 +8,13 @@ param(
     [switch]$help,
     [switch]$compile,
 
-    [switch]$v
+    [switch]$golden_calc,
+    [switch]$dut_dump,
+    [switch]$golden_history,
+    [switch]$verify_output,
+    [switch]$no_verify,
+    [switch]$v,
+    [switch]$wave_dump
 )
 
 $startTime = Get-Date
@@ -16,7 +22,7 @@ $timer = [System.Diagnostics.Stopwatch]::StartNew()
 $diffAnyGlobalErrors = $false
 
 $ErrorActionPreference = "Stop"
-$runTime = 100000000
+$runTime = 5000000
 
 if($help){
     Write-Output("
@@ -39,11 +45,32 @@ if($help){
     -directory: lets you specify the <SUBDIRECTORY>, usage example
                 ..\Scripts\directed_master.ps1 retep.c -directory full_isa -compile                                            
                 'full_isa' being the <SUBDIRECTORY>, if none is given the default is 'full_isa'
-    
+
+    simulate.ps1 flags:
+    -golden_calc:       shows the debug info for the golden values calculated on every posedge
+    -dut_dump:          shows a dump of all dut on every negedge
+    -golden_history:    shows dump of golden_history[] on every negedge
+    -verify_output:     shows debug info of verify_row()'s
+    -no_verify:         disable verification, script will verify if this argument is NOT given
+    -v:                 enables -golden_calc -dut_dump -golden_history -verify_output -continue
+    -wave_dump:         include if you need a wave dump, slows down simulation   
     ")
 
     exit(0)
 }
+
+$simScriptArgs = @{
+    continue = $true;
+    no_compile = $false
+}
+
+if ($golden_calc)       { $simScriptArgs.golden_calc = $true }
+if ($dut_dump)          { $simScriptArgs.dut_dump = $true }
+if ($golden_history)    { $simScriptArgs.golden_history = $true }
+if ($verify_output)     { $simScriptArgs.verify_output = $true }
+if ($no_verify)         { $simScriptArgs.no_verify = $true }
+if ($v)                 { $simScriptArgs.v = $true }
+if ($wave_dump)         { $simScriptArgs.wave_dump = $true }
 
 #check if we are in /modules/
 $currentDirName = Split-Path -Leaf (Get-Location)
@@ -128,15 +155,16 @@ if(-not $compile){
             Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
             wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas"
             if ($LASTEXITCODE -ne 0) { exit 1 }
+            python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+            python3 .\hex2mif.py .\data_memory.hex data.mif
+            if ($LASTEXITCODE -ne 0) { exit 1 }
 
             Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
 
-            if($v){
-            & ..\Scripts\simulate_sv.ps1 -v -time $runTime #most likely long enuf, will give error if not
-            }else{
-            & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
-            }
+            & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
             if ($LASTEXITCODE -ne 0) { exit 1 }
+            $simScriptArgs.no_compile = $true
 
             Write-Host "Moving results..."
             Copy-Item $wslPath -Destination (Join-Path $logFolder $file.name) -Force
@@ -166,6 +194,10 @@ if(-not $compile){
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
         wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas"
         if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\data_memory.hex data.mif
+        if ($LASTEXITCODE -ne 0) { exit 1 }
 
         if($no_run){
             exit 0
@@ -173,12 +205,9 @@ if(-not $compile){
 
         Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
         
-        if($v){
-        & ..\Scripts\simulate_sv.ps1 -v -time $runTime #most likely long enuf, will give error if not
-        }else{
-        & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
-        }
+        & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
         if ($LASTEXITCODE -ne 0) { exit 1 }
+        $simScriptArgs.no_compile = $true
 
         Write-Host "Moving results..."
         Copy-Item $wslPath -Destination (Join-Path $logFolder $file.name) -Force
@@ -250,15 +279,16 @@ if(-not $compile){
             Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
             wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc"
             if ($LASTEXITCODE -ne 0) { exit 1 }
+            python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+            python3 .\hex2mif.py .\data_memory.hex data.mif
+            if ($LASTEXITCODE -ne 0) { exit 1 }
 
             Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
 
-            if($v){
-            & ..\Scripts\simulate_sv.ps1 -v -time $runTime #most likely long enuf, will give error if not
-            }else{
-            & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
-            }
+            & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
             if ($LASTEXITCODE -ne 0) { exit 1 }
+            $simScriptArgs.no_compile = $true
 
             #creating log
             $diffLog = ".\diff.log"
@@ -318,6 +348,10 @@ if(-not $compile){
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
         wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc"
         if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\instruction_memory.hex instr.mif
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+        python3 .\hex2mif.py .\data_memory.hex data.mif
+        if ($LASTEXITCODE -ne 0) { exit 1 }
 
         if($no_run){
             exit 0
@@ -325,12 +359,9 @@ if(-not $compile){
 
         Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
         
-        if($v){
-        & ..\Scripts\simulate_sv.ps1 -v -time $runTime #most likely long enuf, will give error if not
-        }else{
-        & ..\Scripts\simulate_sv.ps1 -continue -time $runTime #most likely long enuf, will give error if not
-        }
+        & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
         if ($LASTEXITCODE -ne 0) { exit 1 }
+        $simScriptArgs.no_compile = $true
 
         #creating log
         $diffLog = ".\diff.log"
@@ -502,3 +533,4 @@ if($compile){
 }
 
 Write-Host ""
+exit 0
