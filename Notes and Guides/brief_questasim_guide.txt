@@ -2,6 +2,9 @@ Here are some shortcuts I've used when working with QuestaSim. These are only a 
 the functions Questa offers. I try to include only what has worked for me so far, please feel free
 to modify/erase/expand as needed!
 
+video guide:
+https://www.youtube.com/watch?v=yOSu6zMbNHI
+
 INSTALLATION
 1. Download and setup Quartus Prime
     -QuestaSim should be included with your Quartus Download.
