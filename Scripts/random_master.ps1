@@ -209,3 +209,6 @@ if ($globalAnyErrors) {
 } else {
     Write-Host "CLEAN PASS: No warnings or errors`n" -ForegroundColor Green
 }
+
+Write-Host ""
+exit 0

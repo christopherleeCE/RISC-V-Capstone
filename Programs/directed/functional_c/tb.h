@@ -19,6 +19,13 @@
                 "nop\n"
                 "nop\n"
                 "ebreak\n"
+                "nop\n"
+                "nop\n"
+                "nop\n"
+                "nop\n"
+                "nop\n"
+                "nop\n"
+                "nop\n"
             );
         }
 

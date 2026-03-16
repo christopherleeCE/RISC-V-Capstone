@@ -132,6 +132,9 @@ module top_riscv_cpu_v2_1();
 
     logic [63:0] cycle_count;
 
+    bit mismatched;
+    bit [31:0] mismatched_regs = '{default: 0};
+
     assign INSTR_FLUSH = INSTR_ASYNC;
 
     //DUT---------------------------------------------------------------------------------------------------------------------
@@ -231,6 +234,38 @@ module top_riscv_cpu_v2_1();
     end
 
     final begin
+
+        $display("$finish() called... comparing entire dut with gold regfile\n");
+
+        mismatched = 0;
+
+        $display("Reg Name: [DUT, Gold]");
+        for (int ii = 0; ii < 32; ii++) begin
+            $write("%s\t[%h, %h] ", reg_name[ii], cpu_dut.my_reg_file.regs_out[ii], REG_FILE[1][ii]);
+            if(cpu_dut.my_reg_file.regs_out[ii] != REG_FILE[1][ii]) begin
+                mismatched = 1;
+                mismatched_regs[ii] = 1;
+                $display("BAD");
+
+            end else begin
+                $display("OK");
+
+            end
+        end
+
+        $write("\n");
+        assert(mismatched == 0) $display("Regfiles are matched");
+        else begin $error("Regfiles are mismatched"); end
+
+        if(mismatched) begin
+            $display("\nMismatched regs...");
+            for (int ii = 0; ii < 32; ii++) begin
+                if(mismatched_regs[ii])
+                    $display("x%0d : %s", ii, reg_name[ii]);
+            end
+            $write("\n");
+        end
+
         $display("Ending PC: %h", PC_ASYNC);
         if(~ofinish) $error("EBREAK was not called and the simulation did no reach the end of the program, not a PASS");
         $display("Approximate amount of instructions executed: %0d", cycle_count);

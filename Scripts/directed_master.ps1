@@ -533,3 +533,4 @@ if($compile){
 }
 
 Write-Host ""
+exit 0
