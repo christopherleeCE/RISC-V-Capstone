@@ -16,6 +16,7 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 TODO clean up data mem signals
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO build skeleton fpga top file
+TODO bin the randomints in gen_rand_prog.py
 
 --------------TEST LOG----------------------------------------------------
 
