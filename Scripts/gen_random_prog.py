@@ -4,13 +4,15 @@ from random import randint, choice
 
 INT32_MIN = -2**31
 INT32_MAX = 2**31 - 1
+INT16_MIN = -2**15
+INT16_MAX = 2**15 - 1
 INT12_MIN = -2**11
 INT12_MAX = 2**11 - 1
 INT20_MIN = -2**19
 INT20_MAX = 2**19 - 1
 UINT20_MIN = 0
 UINT20_MAX = 2**20 - 1
-RAND_SECTION_LENGTH = 3800
+RAND_SECTION_LENGTH = 3750
 CHANCE_OF_NON_BRANCH_INSTR = 80
 CHANCE_OF_STORE_LOAD_INSTR = 20
 CHANCE_OF_STORE_VS_LOAD = 50
@@ -29,9 +31,10 @@ cond_branch_instr = ["beq", "bne", "blt", "bge", "bltu", "bgeu"]
 a_regs = ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"]
 t_regs = ["t0", "t1", "t2", "t3", "t4", "t5", "t6"]
 s_regs = ["s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11"]
+rand_regs = [*a_regs, *t_regs, *s_regs]
 
 R_TYPE  = ["add", "sub", "xor", "or", "and", "sll", "srl", "sra", "slt", "sltu",
-        "mul", "mulh", "mulhsu", "mulhu", "div", "divu", "rem", "remu"]
+            "mul", "mulh", "mulhsu", "mulhu", "div", "divu", "rem", "remu"]
 I_TYPE_ARITH = ["addi", "xori", "ori", "andi", "slli", "srli", "srai", "slti", "sltiu"]
 U_TYPE = ["lui", "auipc"]
 
@@ -152,7 +155,7 @@ def gen_arth_instr(instr:str, dest_reg:int, src_reg1:int, src_reg2:int) -> str:
     else: # no match, for whatever reason
          return f"{instr}: THROW ERROR PLEASE :)\n"
     
-def gen_load_instr(instr:str, dest_reg:int):
+def gen_load_instr(instr:str, dest_reg:str):
 
     if(instr == "lw"):
         return f"{instr} {dest_reg}, {4*randint(0, 63)}(gp)\n"
@@ -172,7 +175,7 @@ def gen_load_instr(instr:str, dest_reg:int):
     else:
         return f"{instr}: THROW ERROR PLEASE :)\n"
 
-def gen_store_instr(instr:str, dest_reg:int):
+def gen_store_instr(instr:str, dest_reg:str):
 
     if(instr == "sw"):
         return f"{instr} {dest_reg}, {4*randint(0, 63)}(gp)\n"
@@ -202,6 +205,14 @@ def main():
         f.write("\n")
 
         f.write("main:\n")
+        f.write("li gp, 0x4000\n")
+        f.write("\n")
+
+        for ii in range(64):
+            f.write(f"li s0, {randint(INT32_MIN, INT32_MAX)}\n")
+            f.write(f"sw s0, {4*ii}(gp)\n")
+        f.write("\n")
+
         f.write("li t0, 17\n")
         f.write("li t1, 32\n")
         f.write("li t2, 32\n")
@@ -210,20 +221,18 @@ def main():
         f.write("li t5, -13\n")
         f.write("li t6, -37\n")
         f.write("\n")
-        f.write("li gp, 0x4000\n")
-        f.write("\n")
-
-        for ii in range(64):
-            f.write(f"li s0, {randint(-100, 100)}\n")
-            f.write(f"sw s0, {4*ii}(gp)\n")
-        f.write("\n")
-
-        for reg in s_regs:
-            f.write(f"li {reg}, {randint(INT32_MIN, INT32_MAX)}\n")
-        f.write("\n")
 
         for reg in a_regs:
             f.write(f"li {reg}, {randint(INT12_MIN, INT12_MAX)}\n")
+        f.write("\n")
+
+        ii = 0 # <- stupid
+        for reg in s_regs:
+            if(ii < 6):
+                f.write(f"li {reg}, {randint(INT16_MIN, INT16_MAX)}\n")
+            else:
+                f.write(f"li {reg}, {randint(INT32_MIN, INT32_MAX)}\n")
+            ii = ii + 1
         f.write("\n")
 
         #genarate random instructions either branching or nonbranching
@@ -247,16 +256,16 @@ def main():
 
                 if(randint(0, 99) < CHANCE_OF_STORE_LOAD_INSTR):
                     if(randint(0, 99) < CHANCE_OF_STORE_VS_LOAD):
-                        f.write(gen_store_instr(choice(store_instr), choice(s_regs)))
+                        f.write(gen_store_instr(choice(store_instr), "ra"))
                         pc_offset = pc_offset + 1
 
                     else:
-                        f.write(gen_load_instr(choice(load_instr), choice(s_regs)))
+                        f.write(gen_load_instr(choice(load_instr), "ra"))
                         pc_offset = pc_offset + 1
 
                 else:
                     f.write(gen_arth_instr(choice(arth_instr), "ra",
-                                                    choice(s_regs), choice(s_regs)))
+                                                    choice(rand_regs), choice(rand_regs)))
                     pc_offset = pc_offset + 1
 
             else: #branch instructions
