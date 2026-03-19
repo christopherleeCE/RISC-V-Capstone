@@ -227,6 +227,21 @@ module top_riscv_cpu_v2_1();
             rst <= middle_rst;
         end
     end
+
+    //this may have a more preferable rst timing depending
+    //on how the other solution gets synthesised, but idk
+    // always_ff @(posedge clk) begin
+    //     if (!global_rst) begin
+    //         middle_rst <= 1'b0;
+    //         pre_rst <= 1'b0;
+    //     end
+    //     else begin
+    //         middle_rst <= 1'b1;
+    //         pre_rst <= middle_rst;
+    //     end
+    // end
+
+    // assign rst = pre_rst && global_rst;
     
     initial begin
 
