@@ -137,6 +137,14 @@ module top_riscv_cpu_v2_1();
     bit mismatched;
     bit [31:0] mismatched_regs = '{default: 0};
 
+    logic [31:0] ret_val;
+    logic [31:0] curr_pc;
+    logic [31:0] instr_f_out;
+    logic [31:0] instr_d_out;
+    logic [31:0] instr_e_out;
+    logic [31:0] instr_m_out;
+    logic [31:0] instr_w_out;
+
     assign INSTR_FLUSH = INSTR_ASYNC;
 
     //DUT---------------------------------------------------------------------------------------------------------------------
@@ -145,7 +153,14 @@ module top_riscv_cpu_v2_1();
         .clk(clk),
         .rst(rst),
         .ohalt(ohalt),
-        .ofinish(ofinish)
+        .ofinish(ofinish),
+        .a0(ret_val),
+        .pc_out(curr_pc),
+        .instr_f_out(instr_f_out),
+        .instr_d_out(instr_d_out),
+        .instr_e_out(instr_e_out),
+        .instr_m_out(instr_m_out),
+        .instr_w_out(instr_w_out)
     );
 
     //grabing vsim args

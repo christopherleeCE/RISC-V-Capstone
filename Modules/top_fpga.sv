@@ -1,4 +1,6 @@
 
+//alt pll in ip catalogcheckch
+
 module top_fpga(
     input logic global_clk,
     input logic [9:0] switches,
@@ -38,24 +40,17 @@ logic [9:0] dbswitches; //debounced switches
     //debounces the comically noisy fpga buttons and switches, uses 50mhz clock, not the reduced 5mhz clk
     debounce mydb0(.pb_1(buttons[0]), .clk(global_clk), .pb_out(dbuttons[0]));
     debounce mydb1(.pb_1(buttons[1]), .clk(global_clk), .pb_out(dbuttons[1]));
-    debounce mydbs0(.pb_1(switches[0]), .clk(global_clk), .pb_out(dbswitches[0]));
-    debounce mydbs1(.pb_1(switches[1]), .clk(global_clk), .pb_out(dbswitches[1]));
-    debounce mydbs2(.pb_1(switches[2]), .clk(global_clk), .pb_out(dbswitches[2]));
-    debounce mydbs3(.pb_1(switches[3]), .clk(global_clk), .pb_out(dbswitches[3]));
-    debounce mydbs4(.pb_1(switches[4]), .clk(global_clk), .pb_out(dbswitches[4]));
-    debounce mydbs5(.pb_1(switches[5]), .clk(global_clk), .pb_out(dbswitches[5]));
-    debounce mydbs6(.pb_1(switches[6]), .clk(global_clk), .pb_out(dbswitches[6]));
-    debounce mydbs7(.pb_1(switches[7]), .clk(global_clk), .pb_out(dbswitches[7]));
-    debounce mydbs8(.pb_1(switches[8]), .clk(global_clk), .pb_out(dbswitches[8]));
-    debounce mydbs9(.pb_1(switches[9]), .clk(global_clk), .pb_out(dbswitches[9]));
+
+    //this is the "correct" way we should be assigning the clk
+    assign local_clk = dbuttons[0];
 
     assign manual_clk_button = dbuttons[0]; //left button
     assign debug_clk_en = dbuttons[1]; //right button
-    assign divided_clk_en = dbswitches[0]; //sw closest to buttons
-    assign global_rst = dbswitches[9]; //sw farthest from buttons
+    assign divided_clk_en = switches[0]; //sw closest to buttons
+    assign global_rst = switches[9]; //sw farthest from buttons
 
     //makes local_rst allign to posedge divided_clk
-    always_ff @(posedge divided_clk or negedge global_rst) begin
+    always_ff @(posedge local_clk or negedge global_rst) begin
         if (!global_rst) begin
             middle_rst <= 1'b0;
             local_rst <= 1'b0;
@@ -68,27 +63,75 @@ logic [9:0] dbswitches; //debounced switches
 
     //passing the clk to combinational logic is a big nono, and can cause major issues, especially
     //if we are switching the mux at run time
-    always_comb begin
-        priority case(1'b1)
+    // always_comb begin
+    //     priority case(1'b1)
 
-        divided_clk_en  : local_clk = divided_clk;
-        debug_clk_en    : local_clk = debug_clk;
-        default         : local_clk = manual_clk;
+    //     divided_clk_en  : local_clk = divided_clk;
+    //     debug_clk_en    : local_clk = debug_clk;
+    //     default         : local_clk = manual_clk;
 
-        endcase
-    end
+    //     endcase
+    // end
 
-    //this is the "correct" way we should be assigning the clk
-    //assign local_clk = divided_clk;
+
+    logic [31:0] ret_val;
+    logic [31:0] curr_pc;
+    logic [31:0] instr_f_out;
+    logic [31:0] instr_d_out;
+    logic [31:0] instr_e_out;
+    logic [31:0] instr_m_out;
+    logic [31:0] instr_w_out;
 
     riscv_cpu_v2 cpu_dut(
         .clk(local_clk),
         .rst(local_rst),
         .ohalt(ohalt),
-        .ofinish(ofinish)
+        .ofinish(ofinish),
+        .a0(ret_val),
+        .pc_out(curr_pc),
+        .instr_f_out(instr_f_out),
+        .instr_d_out(instr_d_out),
+        .instr_e_out(instr_e_out),
+        .instr_m_out(instr_m_out),
+        .instr_w_out(instr_w_out)
     );
 
-    assign debug_leds[0] = ohalt;
-    assign debug_leds[1] = ofinish;
+    logic [3:0] pre_hex0;
+    logic [3:0] pre_hex1;
+    logic [3:0] pre_hex2;
+    logic [3:0] pre_hex3;
+    logic [3:0] pre_hex4;
+    logic [3:0] pre_hex5;
+
+    logic [2:0] hex_sel;
+    assign hex_sel = switches[2:0];
+
+    always_comb begin
+        case(hex_sel)
+
+            3'd0 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = curr_pc;
+            3'd1 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = ret_val;
+            3'd2 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_f_out;
+            3'd3 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_d_out;
+            3'd4 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_e_out;
+            3'd5 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_m_out;
+            3'd6 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_w_out;
+            default: {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = 32'd0;
+
+        endcase
+    end
+
+    hex_display my_hex0(.SEL(pre_hex0), .ZOUT(hex0));
+    hex_display my_hex1(.SEL(pre_hex1), .ZOUT(hex1));
+    hex_display my_hex2(.SEL(pre_hex2), .ZOUT(hex2));
+    hex_display my_hex3(.SEL(pre_hex3), .ZOUT(hex3));
+    hex_display my_hex4(.SEL(pre_hex4), .ZOUT(hex4));
+    hex_display my_hex5(.SEL(pre_hex5), .ZOUT(hex5));
+
+    assign debug_leds[9] = ohalt;
+    assign debug_leds[8] = ofinish;
+    assign debug_leds[0] = local_rst;
+    assign debug_leds[1] = global_rst;
+    assign debug_leds[2] = local_clk;
 
 endmodule

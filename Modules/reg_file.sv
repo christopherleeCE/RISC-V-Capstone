@@ -51,6 +51,7 @@ module reg_file #(
     input logic     [REG_ENCODE_WIDTH-1:0] rs2_addr,
     output logic    [REG_BIT_WIDTH-1:0] rs1_data,
     output logic    [REG_BIT_WIDTH-1:0] rs2_data,
+    output logic    [REG_BIT_WIDTH-1:0] a0,
     input logic            rd_wr_en,
     input logic     [REG_ENCODE_WIDTH-1:0] rd_addr,
     input logic     [REG_BIT_WIDTH-1:0] rd_data,

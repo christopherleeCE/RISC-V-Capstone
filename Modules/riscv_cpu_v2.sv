@@ -4,7 +4,14 @@ module riscv_cpu_v2
 (
     input logic clk, rst, //This has to be a wire for explicit net type declaration (according to Questa)
     output logic ohalt, //when this is asserted, CPU should stop execution. Please implement in testbench
-    output logic ofinish
+    output logic ofinish,
+    output logic [31:0] a0,
+    output logic [31:0] pc_out,
+    output logic [31:0] instr_f_out,
+    output logic [31:0] instr_d_out,
+    output logic [31:0] instr_e_out,
+    output logic [31:0] instr_m_out,
+    output logic [31:0] instr_w_out
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
@@ -221,6 +228,8 @@ module riscv_cpu_v2
         .q(PC)
     );
 
+    assign pc_out = PC;
+
     mk9_rom_mif_aclr mk9_instr_mem (
         .address(NEXT_PC[13:2]),
         .clock(clk),
@@ -291,6 +300,7 @@ module riscv_cpu_v2
         .rs2_addr(RS2),
         .rs1_data(RS1_DATA),
         .rs2_data(RS2_DATA),
+        .a0(a0),
         .rd_wr_en(reg_file_wr_en_W),
         .rd_addr(RD_W),
         .rd_data(RD_DATA), 
@@ -613,5 +623,11 @@ module riscv_cpu_v2
         default : RD_DATA = '0;
         endcase
     end
+    
+    assign instr_f_out = INSTR_F;
+    assign instr_d_out = INSTR_D;
+    assign instr_e_out = INSTR_E;
+    assign instr_m_out = INSTR_M;
+    assign instr_w_out = INSTR_W;
 
 endmodule
