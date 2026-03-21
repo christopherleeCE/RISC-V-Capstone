@@ -8,7 +8,7 @@ module pc #(parameter int WIDTH = 32)
 
 (
     input logic [WIDTH-1:0] d,
-    input logic clk, rst, wr_en,
+    input logic clk, rst, wr_en, nop,
     output logic [WIDTH-1:0] next_q,
     output logic [WIDTH-1:0] q
 );
@@ -18,9 +18,9 @@ module pc #(parameter int WIDTH = 32)
     always_comb begin
         priority case(1'b1)
 
-        wr_en    : ff_d = d;
-        !rst    : ff_d = 0;
-        default : ff_d = (ff_q + 4);
+        wr_en               : ff_d = d;
+        ((!rst) || nop)     : ff_d = 0;
+        default             : ff_d = (ff_q + 4);
 
         endcase
     end

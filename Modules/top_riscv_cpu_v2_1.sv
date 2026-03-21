@@ -15,9 +15,8 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 
 TODO clean up data mem signals
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
-TODO build skeleton fpga top file
-TODO bin the randomints in gen_rand_prog.py, reajust the lw,lh,lb locations
 TODO code coverage
+TODO clk delay on the enable of the first pipeline reg, based on rst
 
 --------------TEST LOG----------------------------------------------------
 
@@ -145,7 +144,7 @@ module top_riscv_cpu_v2_1();
     logic [31:0] instr_m_out;
     logic [31:0] instr_w_out;
 
-    assign INSTR_FLUSH = INSTR_ASYNC;
+    assign INSTR_FLUSH = cpu_dut.stall ? 32'h00000013 :  INSTR_ASYNC;
 
     //DUT---------------------------------------------------------------------------------------------------------------------
     //instantiate the CPU
@@ -223,25 +222,25 @@ module top_riscv_cpu_v2_1();
             @(posedge clk);
         end
 
-        rand_delay = $urandom_range(0, 19);
+        rand_delay = $urandom_range(0, 20);
         $display("rand_delay: %0d", rand_delay);
-        #(rand_delay)
+        #(22) //TODO was rand_delay
 
         global_rst = 1'b1; //disable the reset
 
     end
 
-    //assign rst = global_rst;
-    always_ff @(posedge clk or negedge global_rst) begin
-        if (!global_rst) begin
-            middle_rst <= 1'b0;
-            rst <= 1'b0;
-        end
-        else begin
-            middle_rst <= 1'b1;
-            rst <= middle_rst;
-        end
-    end
+    assign rst = global_rst;
+    // always_ff @(posedge clk or negedge global_rst) begin
+    //     if (!global_rst) begin
+    //         middle_rst <= 1'b0;
+    //         rst <= 1'b0;
+    //     end
+    //     else begin
+    //         middle_rst <= 1'b1;
+    //         rst <= middle_rst;
+    //     end
+    // end
 
     //this may have a more preferable rst timing depending
     //on how the other solution gets synthesised, but idk
@@ -374,7 +373,9 @@ module top_riscv_cpu_v2_1();
             //     DATA_MEM[1][ii] <= 32'h0;
             // end
 
+        end else if(cpu_dut.stall)begin
 
+            if(show_posedge_golden_calc) $display("\n\n\n<pipeline stalled>");            
 
         //if the pc is not being redirected in the dut, and rst is not low, gold calculations are made
         //pc_async, isntr_async, and instr_flush (at this point they are always the same) are looked at

@@ -31,6 +31,7 @@ module riscv_cpu_v2
     logic [31:0] PC_plus_4_E;      //PC + 4 (needed for JAL)
     logic [31:0] PC_plus_4_M;
     logic [31:0] PC_plus_4_W;
+    logic [31:0] INSTR_MEM_OUT;
     logic [31:0] INSTR_F;           //IF instruction from instruction memory, before flush
     logic [31:0] INSTR_F_MASKED;    //for use in aliasing fix  
     logic [31:0] INSTR_F_FLUSH;    //IF instruction after deciding whether to flush or not
@@ -163,11 +164,13 @@ module riscv_cpu_v2
     logic pipeline_advance_EM;
     logic pipeline_advance_MW;
 
+    logic pre_stall_1, pre_stall_2, pre_stall_3, stall;
+
     //gradually stop pipeline advance as halt moves through pipeline
-    assign pipeline_advance_FD = !halt_D;
-    assign pipeline_advance_DE = !halt_E;
-    assign pipeline_advance_EM = !halt_M;
-    assign pipeline_advance_MW = !halt_W;
+    assign pipeline_advance_FD = !(halt_D || stall);
+    assign pipeline_advance_DE = !(halt_E || stall);
+    assign pipeline_advance_EM = !(halt_M || stall);
+    assign pipeline_advance_MW = !(halt_W || stall);
 
     // Before the first clock, halt is asserted by default since no valid OPCODE has come from the fetch pipeline yet
     // Thus we have to wait for the first clock
@@ -216,6 +219,21 @@ module riscv_cpu_v2
     //==================================================================================================================== 
     // < IF STARTS HERE >
 
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            pre_stall_1 <= 1;
+            pre_stall_2 <= 1;
+            pre_stall_3 <= 1;
+        end
+        else begin
+            pre_stall_1 <= 0;
+            pre_stall_2 <= pre_stall_1;
+            pre_stall_3 <= pre_stall_2;
+        end
+    end
+
+    assign stall = pre_stall_3;
+
     //next pc logic
     pc #(
         .WIDTH(32)
@@ -223,6 +241,7 @@ module riscv_cpu_v2
         .d(PC_target),
         .clk(clk),
         .rst(rst),
+        .nop(stall),
         .wr_en(redirect_pc), //normally, PC increments by 4 each cycle, but if branch/jump taken, load PC_target
         .next_q(NEXT_PC),
         .q(PC)
@@ -233,7 +252,7 @@ module riscv_cpu_v2
     mk9_rom_mif_aclr mk9_instr_mem (
         .address(NEXT_PC[13:2]),
         .clock(clk),
-        .q(INSTR_F),
+        .q(INSTR_MEM_OUT),
         .aclr(!rst)
 	);
 
@@ -246,6 +265,10 @@ module riscv_cpu_v2
     //     .read_address(PC),
     //     .read_data(FAKE_INSTR_F)
     // );
+
+
+    //under stall or rst asserted be force the output of instrmem to a nop, prevents
+    assign INSTR_F = ((!rst) || stall) ? 32'h00000013 : INSTR_MEM_OUT;
 
     //preventing aliasing
     assign INSTR_F_MASKED = (PC[31:14] == '0) ? INSTR_F : 32'h00000000;

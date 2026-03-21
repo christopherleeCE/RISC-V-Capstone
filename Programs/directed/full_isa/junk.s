@@ -3,10 +3,13 @@
 
 _start:
     /* Test ADDI */
-            nop
-            nop
-            nop
-            li a0, 7
+
+            li x10, 10
+            li x11, 11
+            li x12, 12
+            li x13, 13
+            li x14, 14
+            li x15, 15
             nop
             nop
             nop
