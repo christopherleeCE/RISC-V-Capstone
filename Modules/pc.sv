@@ -13,12 +13,12 @@ module pc #(parameter int WIDTH = 32)
     output logic [WIDTH-1:0] q
 );
 
-    logic [WIDTH-1:0] ff_d, ff_q;
+    logic [WIDTH-1:0] ff_d, ff_q, ff_mid;
 
     always_comb begin
         priority case(1'b1)
 
-        wr_en    : ff_d = d;
+        // wr_en    : ff_d = d;
         !rst    : ff_d = 0;
         default : ff_d = (next_q + 4);
 
@@ -27,6 +27,7 @@ module pc #(parameter int WIDTH = 32)
 
     //assign ff_d = wr_en ? d : (ff_q + 4);
     // assign next_q = ff_d;
+    assign next_q = wr_en ? d : ff_mid;
 
     dff_async_reset #(
         .WIDTH(WIDTH),
@@ -36,14 +37,14 @@ module pc #(parameter int WIDTH = 32)
         .clk(clk),
         .rst(rst),
         .wr_en(1'b1),
-        .q(next_q)
+        .q(ff_mid)
     );
 
     dff_async_reset #(
         .WIDTH(WIDTH),
         .RESET_VALUE('0)
     ) pc_dff (
-        .d(next_q),
+        .d(ff_mid),
         .clk(clk),
         .rst(rst),
         .wr_en(1'b1),
