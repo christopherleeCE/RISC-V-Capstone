@@ -68,6 +68,7 @@ module reg_file #(
 
     assign rs1_data = regs_out[rs1_addr];
     assign rs2_data = regs_out[rs2_addr];
+    assign a0 = regs_out[10]; //a0 is x10, the 11th reg, so index 10
 
     //this is a genvar loop, its a tool in sv to use a forloop to generate modules (in this case to generate 31 regs)
     

@@ -30,10 +30,10 @@ logic [9:0] dbswitches; //debounced switches
     );
 
     clk_divider #(
-        .DIVIDE(5000000)
+        .DIVIDE(50000000)
     )my_clock_debug(
         .clk_in(global_clk),
-        .rst_n(local_rst),
+        .rst_n(1'b1),
         .clk_out(debug_clk) //should be 10hz, should be posedge alligned with 5mhz i think
     );
 
@@ -42,7 +42,8 @@ logic [9:0] dbswitches; //debounced switches
     debounce mydb1(.pb_1(buttons[1]), .clk(global_clk), .pb_out(dbuttons[1]));
 
     //this is the "correct" way we should be assigning the clk
-    assign local_clk = dbuttons[0];
+    // assign local_clk = dbuttons[0];
+    assign local_clk = debug_clk;
 
     assign manual_clk_button = dbuttons[0]; //left button
     assign debug_clk_en = dbuttons[1]; //right button
@@ -50,16 +51,16 @@ logic [9:0] dbswitches; //debounced switches
     assign global_rst = switches[9]; //sw farthest from buttons
 
     //makes local_rst allign to posedge divided_clk
-    always_ff @(posedge local_clk or negedge global_rst) begin
-        if (!global_rst) begin
-            middle_rst <= 1'b0;
-            local_rst <= 1'b0;
-        end
-        else begin
-            middle_rst <= 1'b1;
-            local_rst <= middle_rst;
-        end
-    end
+    // always_ff @(posedge local_clk or negedge global_rst) begin
+    //     if (!global_rst) begin
+    //         middle_rst <= 1'b0;
+    //         local_rst <= 1'b0;
+    //     end
+    //     else begin
+    //         middle_rst <= 1'b1;
+    //         local_rst <= middle_rst;
+    //     end
+    // end
 
     //passing the clk to combinational logic is a big nono, and can cause major issues, especially
     //if we are switching the mux at run time
@@ -84,7 +85,7 @@ logic [9:0] dbswitches; //debounced switches
 
     riscv_cpu_v2 cpu_dut(
         .clk(local_clk),
-        .rst(local_rst),
+        .rst(global_rst),
         .ohalt(ohalt),
         .ofinish(ofinish),
         .a0(ret_val),
