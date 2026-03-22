@@ -20,6 +20,7 @@ TODO use halt and finish in the nop of the pc
 TODO make the decimals of the hex flash on completion, and tripple flash on halt
 TODO ticcle scripts
 TODO move hex bitswitch to 4
+TODO quartus issues warning on compilation, maybe worth looking into
 
 --------------TEST LOG----------------------------------------------------
 

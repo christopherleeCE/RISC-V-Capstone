@@ -56,7 +56,7 @@ assign my_buttons = ~buttons;
     assign divided_clk_en = switches[8]; //sw closest to buttons
     assign global_rst = switches[9]; //sw farthest from buttons
 
-    //makes local_rst allign to posedge divided_clk
+    //makes local_rst allign to posedge divided_clk, may no longer be needed tbh
     always_ff @(posedge local_clk or negedge global_rst) begin
         if (!global_rst) begin
             middle_rst <= 1'b0;
@@ -140,12 +140,12 @@ assign my_buttons = ~buttons;
     logic [3:0] hex_in4;
     logic [3:0] hex_in5;
 
-    assign hex_in0 = switches[7] ? pre_hex2 : pre_hex0;
-    assign hex_in1 = switches[7] ? pre_hex3 : pre_hex1;
-    assign hex_in2 = switches[7] ? pre_hex4 : pre_hex2;
-    assign hex_in3 = switches[7] ? pre_hex5 : pre_hex3;
-    assign hex_in4 = switches[7] ? pre_hex6 : pre_hex4;
-    assign hex_in5 = switches[7] ? pre_hex7 : pre_hex5;
+    assign hex_in0 = switches[3] ? pre_hex2 : pre_hex0;
+    assign hex_in1 = switches[3] ? pre_hex3 : pre_hex1;
+    assign hex_in2 = switches[3] ? pre_hex4 : pre_hex2;
+    assign hex_in3 = switches[3] ? pre_hex5 : pre_hex3;
+    assign hex_in4 = switches[3] ? pre_hex6 : pre_hex4;
+    assign hex_in5 = switches[3] ? pre_hex7 : pre_hex5;
 
     hex_display my_hex0(.SEL(hex_in0), .ZOUT(hex0));
     hex_display my_hex1(.SEL(hex_in1), .ZOUT(hex1));
@@ -156,6 +156,7 @@ assign my_buttons = ~buttons;
 
 
     logic slow_flash, fast_flash, staggered_fast_flash;
+    logic status_light;
     logic [1:0] cnt;
 
     clk_divider #(
@@ -187,15 +188,25 @@ assign my_buttons = ~buttons;
 
     assign staggered_fast_flash = (cnt != 0) && fast_flash;
 
+    always_comb begin
+        priority case(1'b1)
+
+        ohalt   :   status_light = ohalt && staggered_fast_flash;
+        ofinish :   status_light = ofinish && slow_flash;
+        default :   status_light = 1'b0;
+
+        endcase
+    end
+
     assign debug_leds[0] = local_rst;
     assign debug_leds[1] = global_rst;
     assign debug_leds[2] = local_clk;
     assign debug_leds[3] = debug_clk;
     assign debug_leds[4] = global_clk;
     assign debug_leds[5] = 1'b1;
-    assign debug_leds[6] = dbuttons[1];
-    assign debug_leds[7] = dbuttons[0];
-    assign debug_leds[8] = ofinish && slow_flash;
-    assign debug_leds[9] = ohalt && staggered_fast_flash;
+    assign debug_leds[6] = dbuttons[1]; //non needed
+    assign debug_leds[7] = dbuttons[0]; //non needed
+    assign debug_leds[8] = 1'b1;
+    assign debug_leds[9] = status_light;
 
 endmodule

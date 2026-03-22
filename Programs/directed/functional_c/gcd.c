@@ -8,7 +8,7 @@ int findGCD(int a, int b) {
 
 int main() {
     int num1 = 27;
-    int num2 = 91;
+    int num2 = 81;
 
     int result = findGCD(num1 < 0 ? -num1 : num1, num2 < 0 ? -num2 : num2);
 
