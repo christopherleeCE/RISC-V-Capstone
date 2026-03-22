@@ -23,9 +23,21 @@ int32_t compute_pi(int iterations, int32_t SCALE) {
     return 4 * sum;
 }
 
+/*
+1mil,   bb40e194 : 3141591444 (5.5 seconds)
+10mil,  bb40e4fc : 3141592316 (1 minute)
+100mil, bb40e554 : 3141592404 (~9 minutes)
+*/
+
 int main() {
-    // SCALE = 1,000,000 for fixed-point precision
-    return tb_return(compute_pi(1000, 1000000));
+
+    int MILLION = 1000000;
+    int scale = 1000000000;
+    int interations_fpga = 1*MILLION;
+    int interations_sim = 1000;
+
+
+    return tb_return(compute_pi(interations_sim, scale));
 
 }
 
