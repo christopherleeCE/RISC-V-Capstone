@@ -59,6 +59,7 @@ module reg_file #(
 );
 
     logic [REG_BIT_WIDTH-1:0] regs_out [0:NUM_OF_REGS-1];
+    assign a0 = regs_out[10];
     //array of REG_BIT_WIDTH busses with NUM_OF_REGS busses in the array
     //addressing this array works as follows 
     //

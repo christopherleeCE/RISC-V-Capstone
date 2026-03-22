@@ -14,39 +14,45 @@ module top_fpga(
     output logic [6:0] hex5
 );
 
+localparam int BASE_CLK_FREQ = 50000000;
+localparam int OPERATING_CLK_FREQ = 5000000;
+localparam int DEBUG_CLK_FREQ = 10;
+localparam int FLASHING_LIGHT_FREQ = 1;
+
 logic ohalt, ofinish;
 logic local_clk, divided_clk, debug_clk, manual_clk, manual_clk_button;
 logic debug_clk_en, divided_clk_en; 
 logic global_rst, middle_rst, local_rst;
 logic [1:0] dbuttons; //debounced buttons
+logic [1:0] my_buttons; //inverted buttons so press is 1
 logic [9:0] dbswitches; //debounced switches
 
+assign my_buttons = ~buttons;
+
     clk_divider #(
-        .DIVIDE(10)
+        .DIVIDE(BASE_CLK_FREQ/OPERATING_CLK_FREQ)
     )my_clock(
         .clk_in(global_clk),
-        .rst_n(local_rst),
+        .rst_n(1'b1),
         .clk_out(divided_clk) //should be 5mhz
     );
 
     clk_divider #(
-        .DIVIDE(5000000)
+        .DIVIDE(BASE_CLK_FREQ/DEBUG_CLK_FREQ)
     )my_clock_debug(
         .clk_in(global_clk),
-        .rst_n(local_rst),
+        .rst_n(1'b1),
         .clk_out(debug_clk) //should be 10hz, should be posedge alligned with 5mhz i think
     );
 
     //debounces the comically noisy fpga buttons and switches, uses 50mhz clock, not the reduced 5mhz clk
-    debounce mydb0(.pb_1(buttons[0]), .clk(global_clk), .pb_out(dbuttons[0]));
-    debounce mydb1(.pb_1(buttons[1]), .clk(global_clk), .pb_out(dbuttons[1]));
+    debounce mydb0(.pb_1(my_buttons[0]), .clk(global_clk), .pb_out(dbuttons[0]));
+    debounce mydb1(.pb_1(my_buttons[1]), .clk(global_clk), .pb_out(dbuttons[1]));
 
-    //this is the "correct" way we should be assigning the clk
-    assign local_clk = dbuttons[0];
-
-    assign manual_clk_button = dbuttons[0]; //left button
-    assign debug_clk_en = dbuttons[1]; //right button
-    assign divided_clk_en = switches[0]; //sw closest to buttons
+    assign manual_clk_button = dbuttons[1]; //left button
+    assign manual_clk = manual_clk_button;
+    assign debug_clk_en = my_buttons[0]; //right button
+    assign divided_clk_en = switches[8]; //sw closest to buttons
     assign global_rst = switches[9]; //sw farthest from buttons
 
     //makes local_rst allign to posedge divided_clk
@@ -63,15 +69,18 @@ logic [9:0] dbswitches; //debounced switches
 
     //passing the clk to combinational logic is a big nono, and can cause major issues, especially
     //if we are switching the mux at run time
-    // always_comb begin
-    //     priority case(1'b1)
+    always_comb begin
+        priority case(1'b1)
 
-    //     divided_clk_en  : local_clk = divided_clk;
-    //     debug_clk_en    : local_clk = debug_clk;
-    //     default         : local_clk = manual_clk;
+        divided_clk_en  : local_clk = divided_clk;
+        debug_clk_en    : local_clk = debug_clk;
+        default         : local_clk = manual_clk;
 
-    //     endcase
-    // end
+        endcase
+    end
+
+    // //this is the "correct" way we should be assigning the clk
+    // assign local_clk = debug_clk;
 
 
     logic [31:0] ret_val;
@@ -109,13 +118,13 @@ logic [9:0] dbswitches; //debounced switches
     always_comb begin
         case(hex_sel)
 
-            3'd0 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = curr_pc;
-            3'd1 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = ret_val;
-            3'd2 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_f_out;
-            3'd3 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_d_out;
-            3'd4 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_e_out;
-            3'd5 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_m_out;
-            3'd6 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_w_out;
+            3'd0 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_f_out;
+            3'd1 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_d_out;
+            3'd2 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_e_out;
+            3'd3 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_m_out;
+            3'd4 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_w_out;
+            3'd6 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = curr_pc;
+            3'd7 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = ret_val;
             default: {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = 32'd0;
 
         endcase
@@ -128,10 +137,25 @@ logic [9:0] dbswitches; //debounced switches
     hex_display my_hex4(.SEL(pre_hex4), .ZOUT(hex4));
     hex_display my_hex5(.SEL(pre_hex5), .ZOUT(hex5));
 
-    assign debug_leds[9] = ohalt;
-    assign debug_leds[8] = ofinish;
+
+    logic flashing;
+    clk_divider #(
+        .DIVIDE(BASE_CLK_FREQ/FLASHING_LIGHT_FREQ)
+    )slow_flash_generator(
+        .clk_in(global_clk),
+        .rst_n(1'b1),
+        .clk_out(flashing) //should be 5mhz
+    );
+
     assign debug_leds[0] = local_rst;
     assign debug_leds[1] = global_rst;
     assign debug_leds[2] = local_clk;
+    assign debug_leds[3] = debug_clk;
+    assign debug_leds[4] = global_clk;
+    assign debug_leds[5] = 1'b1;
+    assign debug_leds[6] = dbuttons[1];
+    assign debug_leds[7] = dbuttons[0];
+    assign debug_leds[8] = ofinish;
+    assign debug_leds[9] = (ohalt && flashing);
 
 endmodule

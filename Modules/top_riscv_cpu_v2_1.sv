@@ -16,7 +16,7 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 TODO clean up data mem signals
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
-TODO clk delay on the enable of the first pipeline reg, based on rst
+TODO use halt and finish in the nop of the pc
 
 --------------TEST LOG----------------------------------------------------
 
