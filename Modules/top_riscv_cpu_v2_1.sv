@@ -19,6 +19,7 @@ TODO code coverage
 TODO use halt and finish in the nop of the pc
 TODO make the decimals of the hex flash on completion, and tripple flash on halt
 TODO ticcle scripts
+TODO move hex bitswitch to 4
 
 --------------TEST LOG----------------------------------------------------
 
@@ -224,9 +225,9 @@ module top_riscv_cpu_v2_1();
             @(posedge clk);
         end
 
-        rand_delay = $urandom_range(0, 20);
+        rand_delay = $urandom_range(0, 40);
         $display("rand_delay: %0d", rand_delay);
-        #(22) //TODO was rand_delay
+        #(rand_delay)
 
         global_rst = 1'b1; //disable the reset
 
