@@ -33,7 +33,7 @@ int main() {
 
     int MILLION = 1000000;
     int scale = 1000000000;
-    int interations_fpga = 1*MILLION;
+    int interations_fpga = 100*MILLION;
     int interations_sim = 1000;
 
 

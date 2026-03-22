@@ -18,6 +18,7 @@ TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
 TODO use halt and finish in the nop of the pc
 TODO make the decimals of the hex flash on completion, and tripple flash on halt
+TODO ticcle scripts
 
 --------------TEST LOG----------------------------------------------------
 
