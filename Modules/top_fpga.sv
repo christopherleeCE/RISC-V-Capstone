@@ -17,7 +17,8 @@ module top_fpga(
 localparam int BASE_CLK_FREQ = 50000000;
 localparam int OPERATING_CLK_FREQ = 5000000;
 localparam int DEBUG_CLK_FREQ = 10;
-localparam int FLASHING_LIGHT_FREQ = 1;
+localparam int SLOW_FLASHING_LIGHT_FREQ = 1;
+localparam int FAST_FLASHING_LIGHT_FREQ = 5;
 
 logic ohalt, ofinish;
 logic local_clk, divided_clk, debug_clk, manual_clk, manual_clk_button;
@@ -154,14 +155,37 @@ assign my_buttons = ~buttons;
     hex_display my_hex5(.SEL(hex_in5), .ZOUT(hex5));
 
 
-    logic flashing;
+    logic slow_flash, fast_flash, staggered_fast_flash;
+    logic [1:0] cnt;
+
     clk_divider #(
-        .DIVIDE(BASE_CLK_FREQ/FLASHING_LIGHT_FREQ)
+        .DIVIDE(BASE_CLK_FREQ/SLOW_FLASHING_LIGHT_FREQ)
     )slow_flash_generator(
         .clk_in(global_clk),
         .rst_n(1'b1),
-        .clk_out(flashing) //should be 5mhz
+        .clk_out(slow_flash)
     );
+
+    clk_divider #(
+        .DIVIDE(BASE_CLK_FREQ/FAST_FLASHING_LIGHT_FREQ)
+    )fast_flash_generator(
+        .clk_in(global_clk),
+        .rst_n(1'b1),
+        .clk_out(fast_flash)
+    );
+
+    //cnt goes 0, 1, 2, 3, 0, 1, etc.
+    counter #(
+        .m(4),
+        .bw(2)
+    )my_counter2(
+        .inc(1'b1),
+        .clk(fast_flash),
+        .rst(1'b1),
+        .cnt(cnt)
+    );
+
+    assign staggered_fast_flash = (cnt != 0) && fast_flash;
 
     assign debug_leds[0] = local_rst;
     assign debug_leds[1] = global_rst;
@@ -171,7 +195,7 @@ assign my_buttons = ~buttons;
     assign debug_leds[5] = 1'b1;
     assign debug_leds[6] = dbuttons[1];
     assign debug_leds[7] = dbuttons[0];
-    assign debug_leds[8] = ofinish;
-    assign debug_leds[9] = (ohalt && flashing);
+    assign debug_leds[8] = ofinish && slow_flash;
+    assign debug_leds[9] = ohalt && staggered_fast_flash;
 
 endmodule
