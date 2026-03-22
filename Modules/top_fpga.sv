@@ -111,6 +111,8 @@ assign my_buttons = ~buttons;
     logic [3:0] pre_hex3;
     logic [3:0] pre_hex4;
     logic [3:0] pre_hex5;
+    logic [3:0] pre_hex6;
+    logic [3:0] pre_hex7;
 
     logic [2:0] hex_sel;
     assign hex_sel = switches[2:0];
@@ -118,24 +120,38 @@ assign my_buttons = ~buttons;
     always_comb begin
         case(hex_sel)
 
-            3'd0 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_f_out;
-            3'd1 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_d_out;
-            3'd2 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_e_out;
-            3'd3 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_m_out;
-            3'd4 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_w_out;
-            3'd6 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = curr_pc;
-            3'd7 : {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = ret_val;
-            default: {pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = 32'd0;
+            3'd0 : {pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_f_out;
+            3'd1 : {pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_d_out;
+            3'd2 : {pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_e_out;
+            3'd3 : {pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_m_out;
+            3'd4 : {pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = instr_w_out;
+            3'd6 : {pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = curr_pc;
+            3'd7 : {pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = ret_val;
+            default: {pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = 32'hDEADBEEF;
 
         endcase
     end
 
-    hex_display my_hex0(.SEL(pre_hex0), .ZOUT(hex0));
-    hex_display my_hex1(.SEL(pre_hex1), .ZOUT(hex1));
-    hex_display my_hex2(.SEL(pre_hex2), .ZOUT(hex2));
-    hex_display my_hex3(.SEL(pre_hex3), .ZOUT(hex3));
-    hex_display my_hex4(.SEL(pre_hex4), .ZOUT(hex4));
-    hex_display my_hex5(.SEL(pre_hex5), .ZOUT(hex5));
+    logic [3:0] hex_in0;
+    logic [3:0] hex_in1;
+    logic [3:0] hex_in2;
+    logic [3:0] hex_in3;
+    logic [3:0] hex_in4;
+    logic [3:0] hex_in5;
+
+    assign hex_in0 = switches[7] ? pre_hex2 : pre_hex0;
+    assign hex_in1 = switches[7] ? pre_hex3 : pre_hex1;
+    assign hex_in2 = switches[7] ? pre_hex4 : pre_hex2;
+    assign hex_in3 = switches[7] ? pre_hex5 : pre_hex3;
+    assign hex_in4 = switches[7] ? pre_hex6 : pre_hex4;
+    assign hex_in5 = switches[7] ? pre_hex7 : pre_hex5;
+
+    hex_display my_hex0(.SEL(hex_in0), .ZOUT(hex0));
+    hex_display my_hex1(.SEL(hex_in1), .ZOUT(hex1));
+    hex_display my_hex2(.SEL(hex_in2), .ZOUT(hex2));
+    hex_display my_hex3(.SEL(hex_in3), .ZOUT(hex3));
+    hex_display my_hex4(.SEL(hex_in4), .ZOUT(hex4));
+    hex_display my_hex5(.SEL(hex_in5), .ZOUT(hex5));
 
 
     logic flashing;
