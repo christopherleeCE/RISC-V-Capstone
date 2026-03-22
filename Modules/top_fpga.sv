@@ -50,9 +50,9 @@ assign my_buttons = ~buttons;
     debounce mydb0(.pb_1(my_buttons[0]), .clk(global_clk), .pb_out(dbuttons[0]));
     debounce mydb1(.pb_1(my_buttons[1]), .clk(global_clk), .pb_out(dbuttons[1]));
 
-    assign manual_clk_button = dbuttons[1]; //left button
+    assign manual_clk_button = dbuttons[1]; //bottom button
     assign manual_clk = manual_clk_button;
-    assign debug_clk_en = my_buttons[0]; //right button
+    assign debug_clk_en = my_buttons[0]; //top button, intentionally not debounced wont work if it is
     assign divided_clk_en = switches[8]; //sw closest to buttons
     assign global_rst = switches[9]; //sw farthest from buttons
 
@@ -204,8 +204,8 @@ assign my_buttons = ~buttons;
     assign debug_leds[3] = debug_clk;
     assign debug_leds[4] = global_clk;
     assign debug_leds[5] = 1'b1;
-    assign debug_leds[6] = dbuttons[1]; //non needed
-    assign debug_leds[7] = dbuttons[0]; //non needed
+    assign debug_leds[6] = manual_clk;
+    assign debug_leds[7] = debug_clk_en;
     assign debug_leds[8] = 1'b1;
     assign debug_leds[9] = status_light;
 
