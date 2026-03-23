@@ -25,6 +25,7 @@ TODO clean up layout of top_fpga
 TODO maybe experement with removing the rst allignment in the topfpga, its not needed to pass the sim, it may not be needed in the fpga
 TODO rn there is a stall and a rst, stall follows the rst, its possible if the rst is alligned we can remove the stall,
     and replace all uses of stall with rst (like in the pc.nop, and the pipeline reg pauses)
+TODO randomize t regs in gen_rand.py
 
 --------------TEST LOG----------------------------------------------------
 
