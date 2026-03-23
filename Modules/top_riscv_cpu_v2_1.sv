@@ -1843,7 +1843,7 @@ module top_riscv_cpu_v2_1();
 
                     if(row == 3) begin
                         // $display("data [dut, gold] = [%h, %h]", cpu_dut.my_data_mem.data_out_mem, DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]);
-//                         $display("addr [dut, gold] = [%h, %h]", cpu_dut.my_data_mem.addr_internal_mirror, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
+                        //$display("addr [dut, gold] = [%h, %h]", cpu_dut.my_data_mem.addr_internal_mirror, ((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2);
                         assert(cpu_dut.my_data_mem.data_out_mem == DATA_MEM[3][((REG_FILE[3][rs1_v] + imm_s_v) - LOWEST_DATA_MEM_ADDR)>>2]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
                         
