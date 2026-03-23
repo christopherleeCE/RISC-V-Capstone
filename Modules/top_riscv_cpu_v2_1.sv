@@ -29,6 +29,7 @@ TODO randomize t regs in gen_rand.py
 TODO update dut dump
 TODO add signed output (at least in decimal) to topfpga
 TODO add float decoding
+TODO test float returns, see https://chatgpt.com/share/69c1cf61-b50c-8006-b547-a7d69a43d8f8
 
 --------------TEST LOG----------------------------------------------------
 
