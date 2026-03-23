@@ -26,6 +26,9 @@ TODO maybe experement with removing the rst allignment in the topfpga, its not n
 TODO rn there is a stall and a rst, stall follows the rst, its possible if the rst is alligned we can remove the stall,
     and replace all uses of stall with rst (like in the pc.nop, and the pipeline reg pauses)
 TODO randomize t regs in gen_rand.py
+TODO update dut dump
+TODO add signed output (at least in decimal) to topfpga
+TODO add float decoding
 
 --------------TEST LOG----------------------------------------------------
 
