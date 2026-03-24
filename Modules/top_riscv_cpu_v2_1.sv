@@ -33,6 +33,9 @@ TODO add signed output (at least in decimal) to topfpga
 TODO add float decoding to ret_val in fpgatop
 TODO test float returns, see https://chatgpt.com/share/69c1cf61-b50c-8006-b547-a7d69a43d8f8
 TODO contact abrams, maybe invite him to see the demo on demo day
+TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
+    maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
+    status reg could contain some more info like the element size mayhaps :)
 
 Out of Semester
 ===============
