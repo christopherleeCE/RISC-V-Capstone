@@ -18,8 +18,8 @@ Current semester
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
 TODO ticcle scripts
-TODO quartus issues warning on compilation, maybe worth looking into
-TODO impelment bcd of the hex displays (signed switch)
+TODO work on .sdc file, does quit work, but works well enuf
+TODO impelment bcd of the hex displays (signed switch, switch determines if its interpreted as a signed or unsigned decimal)
 TODO randomize t regs in gen_rand.py
 chris TODO add float decoding to ret_val in fpgatop
 TODO test float returns, see https://chatgpt.com/share/69c1cf61-b50c-8006-b547-a7d69a43d8f8
@@ -158,6 +158,11 @@ module top_riscv_cpu_v2_1();
     logic [31:0] instr_e_out;
     logic [31:0] instr_m_out;
     logic [31:0] instr_w_out;
+    logic [31:0] pc_f_out;
+    logic [31:0] pc_d_out;
+    logic [31:0] pc_e_out;
+    logic [31:0] pc_m_out;
+    logic [31:0] pc_w_out;
 
     assign INSTR_FLUSH = cpu_dut.stall ? 32'h00000013 :  INSTR_ASYNC;
 
@@ -174,7 +179,12 @@ module top_riscv_cpu_v2_1();
         .instr_d_out(instr_d_out),
         .instr_e_out(instr_e_out),
         .instr_m_out(instr_m_out),
-        .instr_w_out(instr_w_out)
+        .instr_w_out(instr_w_out),
+        .pc_f_out(pc_f_out),
+        .pc_d_out(pc_d_out),
+        .pc_e_out(pc_e_out),
+        .pc_m_out(pc_m_out),
+        .pc_w_out(pc_w_out)
     );
 
     //grabing vsim args

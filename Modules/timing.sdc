@@ -7,7 +7,7 @@
 create_clock -name global_clk -period 20 [get_ports global_clk]
 
 create_generated_clock \
-    -name cpu_clk \
+    -name divided_clk \
     -source [get_ports global_clk] \
     -divide_by 10 \
     [get_pins {top_fpga|my_clock|clk_out}]

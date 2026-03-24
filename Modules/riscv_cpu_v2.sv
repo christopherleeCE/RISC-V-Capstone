@@ -11,7 +11,12 @@ module riscv_cpu_v2
     output logic [31:0] instr_d_out,
     output logic [31:0] instr_e_out,
     output logic [31:0] instr_m_out,
-    output logic [31:0] instr_w_out
+    output logic [31:0] instr_w_out,
+    output logic [31:0] pc_f_out,
+    output logic [31:0] pc_d_out,
+    output logic [31:0] pc_e_out,
+    output logic [31:0] pc_m_out,
+    output logic [31:0] pc_w_out
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
@@ -53,7 +58,6 @@ module riscv_cpu_v2
     logic [31:0] RS2_DATA_FWD;      //read2 from regfile after data hazard forwarding
     logic [31:0] RS2_DATA_E;       //read2 from regfile after pipeline reg
     logic [31:0] RS2_DATA_E_FWD;   //read2 from regfile after data hazard forwarding
-    logic [31:0] RS2_DATA_M;    //read2 from regfile after 2pipeline reg
     logic [4:0] RD;                //write addr of regfile
     logic [4:0] RD_E;             //write addr of regfile after pipeline reg
     logic [4:0] RD_M;          //write addr of regfile after 2pipeline reg
@@ -652,5 +656,11 @@ module riscv_cpu_v2
     assign instr_e_out = INSTR_E;
     assign instr_m_out = INSTR_M;
     assign instr_w_out = INSTR_W;
+
+    assign pc_f_out = PC;
+    assign pc_d_out = PC_D;
+    assign pc_e_out = PC_E;
+    assign pc_m_out = PC_M;
+    assign pc_w_out = PC_W;
 
 endmodule

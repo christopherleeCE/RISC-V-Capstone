@@ -37,6 +37,12 @@ module top_fpga(
     logic [31:0] instr_m_out;
     logic [31:0] instr_w_out;
 
+    logic [31:0] pc_f_out;
+    logic [31:0] pc_d_out;
+    logic [31:0] pc_e_out;
+    logic [31:0] pc_m_out;
+    logic [31:0] pc_w_out;
+
     logic [3:0] pre_hex0;
     logic [3:0] pre_hex1;
     logic [3:0] pre_hex2;
@@ -125,7 +131,12 @@ module top_fpga(
         .instr_d_out(instr_d_out),
         .instr_e_out(instr_e_out),
         .instr_m_out(instr_m_out),
-        .instr_w_out(instr_w_out)
+        .instr_w_out(instr_w_out),
+        .pc_f_out(pc_f_out),
+        .pc_d_out(pc_d_out),
+        .pc_e_out(pc_e_out),
+        .pc_m_out(pc_m_out),
+        .pc_w_out(pc_w_out)
     );
 
     assign hex_sel = switches[2:0];

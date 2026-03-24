@@ -22,7 +22,7 @@ module clk_divider #(
                 clk_out <= ~clk_out;
             end
             else begin
-                cnt <= cnt + 1;
+                cnt <= cnt + 1'b1;
             end
         end
     end
