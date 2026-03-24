@@ -13,6 +13,8 @@ will over the coarse of the verification be in async, 1, 2, 3, 4, 5, but we cant
 1, 2, 3, 4 no verificaitn is done, but it still progresses through all of those rows over the coarse of five(?) clks, once addi is in
 gold[5] then its compared against the dut, which at this point that addi in the dut is now in the post_wb, right after the wb.
 
+Current semester
+================
 TODO clean up data mem signals
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
@@ -28,8 +30,13 @@ TODO rn there is a stall and a rst, stall follows the rst, its possible if the r
 TODO randomize t regs in gen_rand.py
 TODO update dut dump
 TODO add signed output (at least in decimal) to topfpga
-TODO add float decoding
+TODO add float decoding to ret_val in fpgatop
 TODO test float returns, see https://chatgpt.com/share/69c1cf61-b50c-8006-b547-a7d69a43d8f8
+TODO contact abrams, maybe invite him to see the demo on demo day
+
+Out of Semester
+===============
+frame buffer
 
 --------------TEST LOG----------------------------------------------------
 
