@@ -15,25 +15,18 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 
 Current semester
 ================
-TODO clean up data mem signals
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
 TODO ticcle scripts
 TODO quartus issues warning on compilation, maybe worth looking into
-TODO impelment bcd of the hex displays
-TODO maybe experement with removing the rst allignment in the topfpga, its not needed to pass the sim, it may not be needed in the fpga
-TODO rn there is a stall and a rst, stall follows the rst, its possible if the rst is alligned we can remove the stall,
-    and replace all uses of stall with rst (like in the pc.nop, and the pipeline reg pauses)
+TODO impelment bcd of the hex displays (signed switch)
 TODO randomize t regs in gen_rand.py
-TODO update dut dump
-TODO add signed output (at least in decimal) to topfpga
 chris TODO add float decoding to ret_val in fpgatop
 TODO test float returns, see https://chatgpt.com/share/69c1cf61-b50c-8006-b547-a7d69a43d8f8
 TODO contact abrams, maybe invite him to see the demo on demo day
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
     status reg could contain some more info like the element size mayhaps :)
-TODO make the hex switch less confusing
 TODO more demo programs in C
 
 Out of Semester
@@ -1308,6 +1301,7 @@ module top_riscv_cpu_v2_1();
             // IF stage
             // --------------------------------
             $display("[IF] PC               = 0x%08h", cpu_dut.PC);
+            $display("[IF] INSTR_MEM_OUT    = 0x%08h", cpu_dut.INSTR_MEM_OUT);
             $display("[IF] INSTR_F          = 0x%08h", cpu_dut.INSTR_F);
             $display("[IF] INSTR_F_MASKED   = 0x%08h", cpu_dut.INSTR_F_MASKED);
             $display("[IF] INSTR_F_FLUSH    = 0x%08h", cpu_dut.INSTR_F_FLUSH);

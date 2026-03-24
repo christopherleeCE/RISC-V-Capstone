@@ -84,9 +84,9 @@ module riscv_cpu_v2
     logic [33:0] d2e_control_E;    //decode to execute control signals post pipeline
 
     logic [164:0] e2m_data_E;          //execute to memory data signals
-    logic [8:0] e2m_control_E;       //execute to memory control signals
+    logic [4:0] e2m_control_E;       //execute to memory control signals
     logic [164:0] e2m_data_M;     //execute to memory post pipeline
-    logic [8:0] e2m_control_M;    //execute to memory control signals post pipeline  
+    logic [4:0] e2m_control_M;    //execute to memory control signals post pipeline  
 
     logic [164:0] m2w_data_M;         //memory to writeback data signals
     logic [4:0] m2w_control_M;       //memory to writeback control signals
@@ -266,18 +266,18 @@ module riscv_cpu_v2
     //     .read_data(FAKE_INSTR_F)
     // );
 
+    //prioroity case statement from hell
+        //under stall or rst asserted be force the output of instrmem to a nop, prevents
+        assign INSTR_F = ((!rst) || stall) ? 32'h00000013 : INSTR_MEM_OUT;
 
-    //under stall or rst asserted be force the output of instrmem to a nop, prevents
-    assign INSTR_F = ((!rst) || stall) ? 32'h00000013 : INSTR_MEM_OUT;
+        //preventing aliasing
+        assign INSTR_F_MASKED = (PC[31:14] == '0) ? INSTR_F : 32'h00000000;
 
-    //preventing aliasing
-    assign INSTR_F_MASKED = (PC[31:14] == '0) ? INSTR_F : 32'h00000000;
+        //deciding whether to flush instruction or not
+        assign INSTR_F_FLUSH = flush_FD ? 32'h00000013 : INSTR_F_MASKED; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
 
-    //deciding whether to flush instruction or not
-    assign INSTR_F_FLUSH = flush_FD ? 32'h00000013 : INSTR_F_MASKED; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
-
-    //preparing data for pipeline reg
-    assign f2d_data_F = {INSTR_F_FLUSH, PC};
+        //preparing data for pipeline reg
+        assign f2d_data_F = {INSTR_F_FLUSH, PC};
 
 //pipeline register
 /* < IF/ID > */ //====================================================================================================
@@ -503,10 +503,10 @@ module riscv_cpu_v2
     //preparing data and control signals for pipeline reg
     assign e2m_data_E = {ALU, RS2_DATA_E_FWD, RD_E, PC_plus_4_E, PC_E, INSTR_E};
     assign e2m_control_E = {
-        data_mem_wr_en_E,
-        addr_byte_E,
-        addr_half_E,
-        zero_extend_mem_E,
+        // data_mem_wr_en_E,
+        // addr_byte_E,
+        // addr_half_E,
+        // zero_extend_mem_E,
         dbus_sel_alu_E,
         dbus_sel_data_mem_E,
         dbus_sel_pc_plus_4_E,
@@ -528,7 +528,7 @@ module riscv_cpu_v2
     );
 
     dff_async_reset #(
-        .WIDTH(9)
+        .WIDTH(5)
     ) ex_mem_control_reg (
         .d(e2m_control_E),      // Include control signals in pipeline
         .clk(clk),
@@ -542,10 +542,10 @@ module riscv_cpu_v2
     //unpacking data and control signals from pipeline reg
     assign {ALU_M, RS2_DATA_M, RD_M, PC_plus_4_M, PC_M, INSTR_M} = e2m_data_M;
     assign {
-        data_mem_wr_en_M,
-        addr_byte_M,
-        addr_half_M,
-        zero_extend_mem_M,
+        // data_mem_wr_en_M,
+        // addr_byte_M,
+        // addr_half_M,
+        // zero_extend_mem_M,
         dbus_sel_alu_M,
         dbus_sel_data_mem_M,
         dbus_sel_pc_plus_4_M,

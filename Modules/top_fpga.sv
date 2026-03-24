@@ -145,12 +145,12 @@ module top_fpga(
         endcase
     end
 
-    assign hex_in0 = switches[3] ? pre_hex2 : pre_hex0;
-    assign hex_in1 = switches[3] ? pre_hex3 : pre_hex1;
-    assign hex_in2 = switches[3] ? pre_hex4 : pre_hex2;
-    assign hex_in3 = switches[3] ? pre_hex5 : pre_hex3;
-    assign hex_in4 = switches[3] ? pre_hex6 : pre_hex4;
-    assign hex_in5 = switches[3] ? pre_hex7 : pre_hex5;
+    assign hex_in0 = switches[3] ? pre_hex6 : pre_hex0;
+    assign hex_in1 = switches[3] ? pre_hex7 : pre_hex1;
+    assign hex_in2 = switches[3] ? '0       : pre_hex2;
+    assign hex_in3 = switches[3] ? '0       : pre_hex3;
+    assign hex_in4 = switches[3] ? '0       : pre_hex4;
+    assign hex_in5 = switches[3] ? '0       : pre_hex5;
 
     hex_display my_hex0(.SEL(hex_in0), .ZOUT(hex0));
     hex_display my_hex1(.SEL(hex_in1), .ZOUT(hex1));
