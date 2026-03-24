@@ -1342,7 +1342,7 @@ module top_riscv_cpu_v2_1();
             $display("[EX] ZERO_FLAG    = %0b",    cpu_dut.zero_flag);
             $display("[EX] BR_TAKEN     = %0b",    cpu_dut.branch_taken);
             $display("[EX] JMP_TAKEN    = %0b",    cpu_dut.jump_taken);
-            $display("[EX] PC_TARGET    = 0x%08h", cpu_dut.PC_target);
+            $display("[EX] PC_TARGET    = 0x%08h", cpu_dut.PC_TARGET);
                         $write("\n");
 
 
@@ -1352,7 +1352,7 @@ module top_riscv_cpu_v2_1();
             $display("[MEM] PC_M        = 0x%08h", cpu_dut.PC_M);
             $display("[MEM] INSTR_M     = 0x%08h", cpu_dut.INSTR_M);
             $display("[MEM] ALU_M       = 0x%08h", cpu_dut.ALU_M);
-            $display("[MEM] RS2_M_DATA  = 0x%08h", cpu_dut.RS2_DATA_M);
+            $display("[MEM] RS2_M_DATA  = 0x%08h", cpu_dut.my_data_mem.addr_internal_mirror);
             $display("[MEM] DMEM_OUT    = 0x%08h", cpu_dut.DATA_MEM_OUT);
             $display("[MEM] MEM_WR_EN   = %0b",    cpu_dut.data_mem_wr_en_M);
                         $write("\n");

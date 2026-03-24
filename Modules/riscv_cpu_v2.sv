@@ -32,10 +32,10 @@ module riscv_cpu_v2
     logic [31:0] PC_E;
     logic [31:0] PC_M;
     logic [31:0] PC_W;
-    logic [31:0] PC_target;        //target PC for branches (calculated in execute stage)
-    logic [31:0] PC_plus_4_E;      //PC + 4 (needed for JAL)
-    logic [31:0] PC_plus_4_M;
-    logic [31:0] PC_plus_4_W;
+    logic [31:0] PC_TARGET;        //target PC for branches (calculated in execute stage)
+    logic [31:0] PC_PLUS_4_E;      //PC + 4 (needed for JAL)
+    logic [31:0] PC_PLUS_4_M;
+    logic [31:0] PC_PLUS_4_W;
     logic [31:0] INSTR_MEM_OUT;
     logic [31:0] INSTR_F;           //IF instruction from instruction memory, before flush
     logic [31:0] INSTR_F_MASKED;    //for use in aliasing fix  
@@ -87,9 +87,9 @@ module riscv_cpu_v2
     logic [174:0] d2e_data_E;       //decode to execute post pipeline
     logic [33:0] d2e_control_E;    //decode to execute control signals post pipeline
 
-    logic [164:0] e2m_data_E;          //execute to memory data signals
+    logic [132:0] e2m_data_E;          //execute to memory data signals
     logic [4:0] e2m_control_E;       //execute to memory control signals
-    logic [164:0] e2m_data_M;     //execute to memory post pipeline
+    logic [132:0] e2m_data_M;     //execute to memory post pipeline
     logic [4:0] e2m_control_M;    //execute to memory control signals post pipeline  
 
     logic [164:0] m2w_data_M;         //memory to writeback data signals
@@ -242,11 +242,11 @@ module riscv_cpu_v2
     pc #(
         .WIDTH(32)
     ) pc_reg (
-        .d(PC_target),
+        .d(PC_TARGET),
         .clk(clk),
         .rst(rst),
         .nop(stall || ohalt || ofinish),
-        .wr_en(redirect_pc), //normally, PC increments by 4 each cycle, but if branch/jump taken, load PC_target
+        .wr_en(redirect_pc), //normally, PC increments by 4 each cycle, but if branch/jump taken, load PC_TARGET
         .next_q(NEXT_PC),
         .q(PC)
     );
@@ -404,7 +404,7 @@ module riscv_cpu_v2
 
     //unpacking data and control signals from pipeline reg
     assign {RS1_DATA_E, RS2_DATA_E, IM_E, RD_E, PC_E, RS1_E, RS2_E, INSTR_E} = d2e_data_E;
-    assign PC_plus_4_E = PC_E + 32'd4;
+    assign PC_PLUS_4_E = PC_E + 32'd4;
     assign {
         alu_use_im_E,
         alu_sel_add_E,
@@ -448,7 +448,7 @@ module riscv_cpu_v2
 
         (R1_case_dm2alu && dbus_sel_alu_M) : RS1_DATA_E_FWD = ALU_M;         //Take from ALU_M if needed in EX stage and was gotten from ALU
         (R1_case_dm2alu && dbus_sel_data_mem_M)  : RS1_DATA_E_FWD = DATA_MEM_OUT;  //Take from DATA_MEM_OUT if needed in EX stage and was gotten from Data Memory
-        (R1_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS1_DATA_E_FWD = PC_plus_4_M;  //Take from PC_plus_4_M if needed in EX stage and was gotten from PC+4
+        (R1_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS1_DATA_E_FWD = PC_PLUS_4_M;  //Take from PC_PLUS_4_M if needed in EX stage and was gotten from PC+4
         R1_case_rf2alu : RS1_DATA_E_FWD = RD_DATA;                                //Take from RD_DATA if needed in EX stage and was about to be written in WB stage
 
         default : RS1_DATA_E_FWD = RS1_DATA_E;
@@ -461,7 +461,7 @@ module riscv_cpu_v2
 
         (R2_case_dm2alu && dbus_sel_alu_M) : RS2_DATA_E_FWD = ALU_M;
         (R2_case_dm2alu && dbus_sel_data_mem_M)  : RS2_DATA_E_FWD = DATA_MEM_OUT; 
-        (R2_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS2_DATA_E_FWD = PC_plus_4_M;       
+        (R2_case_dm2alu && dbus_sel_pc_plus_4_M)  : RS2_DATA_E_FWD = PC_PLUS_4_M;       
         R2_case_rf2alu : RS2_DATA_E_FWD = RD_DATA;
 
         default : RS2_DATA_E_FWD = RS2_DATA_E;
@@ -502,10 +502,10 @@ module riscv_cpu_v2
     );
 
     //calculating target PC for branches and jumps
-    assign PC_target = (alu_sel_add_E) ? ALU : PC_E + IM_E; //left is for JALR, right for branches and JAL
+    assign PC_TARGET = (alu_sel_add_E) ? ALU : PC_E + IM_E; //left is for JALR, right for branches and JAL
 
     //preparing data and control signals for pipeline reg
-    assign e2m_data_E = {ALU, RS2_DATA_E_FWD, RD_E, PC_plus_4_E, PC_E, INSTR_E};
+    assign e2m_data_E = {ALU, RD_E, PC_PLUS_4_E, PC_E, INSTR_E};
     assign e2m_control_E = {
         // data_mem_wr_en_E,
         // addr_byte_E,
@@ -522,7 +522,7 @@ module riscv_cpu_v2
 
     //not sure but i think we may not need a pipeline reg here because of the nature of the data_mem
     dff_async_reset #(
-        .WIDTH(165)
+        .WIDTH(133)
     ) ex_mem_reg (
         .d(e2m_data_E),       
         .clk(clk),                   
@@ -544,7 +544,7 @@ module riscv_cpu_v2
 //==================================================================================================================== 
 
     //unpacking data and control signals from pipeline reg
-    assign {ALU_M, RS2_DATA_M, RD_M, PC_plus_4_M, PC_M, INSTR_M} = e2m_data_M;
+    assign {ALU_M, RD_M, PC_PLUS_4_M, PC_M, INSTR_M} = e2m_data_M;
     assign {
         // data_mem_wr_en_M,
         // addr_byte_M,
@@ -596,7 +596,7 @@ module riscv_cpu_v2
     assign DATA_MEM_OUT = NEW_DATA_MEM_OUT;
 
     //preparing data and control signals for pipeline reg
-    assign m2w_data_M = {ALU_M, DATA_MEM_OUT, RD_M, PC_plus_4_M, PC_M, INSTR_M};
+    assign m2w_data_M = {ALU_M, DATA_MEM_OUT, RD_M, PC_PLUS_4_M, PC_M, INSTR_M};
     assign m2w_control_M = {
         dbus_sel_alu_M,
         dbus_sel_data_mem_M,
@@ -630,7 +630,7 @@ module riscv_cpu_v2
 //====================================================================================================================     
 
     //unpacking data and control signals from pipeline reg
-    assign {ALU_W, DATA_MEM_OUT_W, RD_W, PC_plus_4_W, PC_W, INSTR_W} = m2w_data_W;
+    assign {ALU_W, DATA_MEM_OUT_W, RD_W, PC_PLUS_4_W, PC_W, INSTR_W} = m2w_data_W;
     assign {
         dbus_sel_alu_W,
         dbus_sel_data_mem_W,
@@ -645,7 +645,7 @@ module riscv_cpu_v2
 
         dbus_sel_alu_W        : RD_DATA = ALU_W;
         dbus_sel_data_mem_W   : RD_DATA = DATA_MEM_OUT_W;
-        dbus_sel_pc_plus_4_W  : RD_DATA = PC_plus_4_W;
+        dbus_sel_pc_plus_4_W  : RD_DATA = PC_PLUS_4_W;
 
         default : RD_DATA = '0;
         endcase
