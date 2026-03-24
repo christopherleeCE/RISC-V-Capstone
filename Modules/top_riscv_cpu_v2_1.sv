@@ -19,7 +19,6 @@ TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
 TODO ticcle scripts
 TODO impelment bcd of the hex displays (signed switch, switch determines if its interpreted as a signed or unsigned decimal)
-TODO randomize t regs in gen_rand.py
 chris TODO add float decoding to ret_val in fpgatop
 TODO test float returns, see https://chatgpt.com/share/69c1cf61-b50c-8006-b547-a7d69a43d8f8
 TODO contact abrams, maybe invite him to see the demo on demo day

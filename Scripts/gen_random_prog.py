@@ -62,27 +62,29 @@ def gen_branch_instr(instr:str, taken:bool, pc_offset:int, backwards:int) -> str
 
     if(instr == "beq"):
         if(taken):
-            return choice((f"beq t1, t2, { label[backwards] }\n",
-                           f"beq t4, t5, { label[backwards] }\n"))
+            return choice((f"beq t1, t2, { label[backwards] }\n",   #pos pos
+                           f"beq t4, t5, { label[backwards] }\n",   #neg neg
+                           f"beq zero, t3, { label[backwards] }\n"))#zero zero
         else: #not taken
-            return choice((f"beq zero, t1, { label[backwards] }\n",
-                           f"beq zero, t4, { label[backwards] }\n"))
+            return choice((f"beq zero, t1, { label[backwards] }\n", #zero pos
+                           f"beq zero, t4, { label[backwards] }\n"))#zero neg
         
     elif(instr == "bne"):
         if(taken):
-            return choice((f"bne zero, t1, { label[backwards] }\n",
-                           f"bne zero, t4, { label[backwards] }\n"))
-        else: #not taken
-            return choice((f"bne t1, t2, { label[backwards] }\n",
-                           f"bne t4, t5, { label[backwards] }\n"))
+            return choice((f"bne zero, t1, { label[backwards] }\n", #zero pos
+                           f"bne zero, t4, { label[backwards] }\n"))#zero neg
+        else: #not taken    
+            return choice((f"beq t1, t2, { label[backwards] }\n",   #pos pos   
+                           f"beq t4, t5, { label[backwards] }\n",   #neg neg
+                           f"beq zero, t3, { label[backwards] }\n"))#zero zero
 
     elif(instr == "blt"):
         if(taken):
-            return choice((f"blt t0, t1, { label[backwards] }\n",
-                           f"blt t6, t5, { label[backwards] }\n"))
+            return choice((f"blt t0, t1, { label[backwards] }\n",   #pos biggerpos
+                           f"blt t6, t5, { label[backwards] }\n"))  #biggerneg neg
         else: #not taken
-            return choice((f"blt t1, t0, { label[backwards] }\n",
-                           f"blt t5, t6, { label[backwards] }\n"))
+            return choice((f"blt t1, t0, { label[backwards] }\n",   #biggerneg neg
+                           f"blt t5, t6, { label[backwards] }\n"))  #pos biggerpos
         
     elif(instr == "bge"):
         if(taken):
@@ -213,13 +215,18 @@ def main():
             f.write(f"sw s0, {4*ii}(gp)\n")
         f.write("\n")
 
-        f.write("li t0, 17\n")
-        f.write("li t1, 32\n")
-        f.write("li t2, 32\n")
+        pos_rand = randint(15, 20)
+        pos_rand_delta = randint(10, 20)
+        neg_rand = randint(-20, -15)
+        neg_rand_delta = randint(10, 20)
+        
+        f.write(f"li t0, {pos_rand}\n") #15:20
+        f.write(f"li t1, {pos_rand + pos_rand_delta}\n") #+20
+        f.write(f"li t2, {pos_rand + pos_rand_delta}\n")
         f.write("li t3, 0\n")
-        f.write("li t4, -13\n")
-        f.write("li t5, -13\n")
-        f.write("li t6, -37\n")
+        f.write(f"li t4, {neg_rand}\n") #-15:-20
+        f.write(f"li t5, {neg_rand}\n")
+        f.write(f"li t6, {neg_rand - neg_rand_delta}\n") #-20
         f.write("\n")
 
         for reg in a_regs:
