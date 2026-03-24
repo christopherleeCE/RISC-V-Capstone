@@ -18,7 +18,6 @@ Current semester
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
 TODO ticcle scripts
-TODO work on .sdc file, does quit work, but works well enuf
 TODO impelment bcd of the hex displays (signed switch, switch determines if its interpreted as a signed or unsigned decimal)
 TODO randomize t regs in gen_rand.py
 chris TODO add float decoding to ret_val in fpgatop
