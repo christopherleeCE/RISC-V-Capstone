@@ -18,7 +18,7 @@ Current semester
 TODO clean up data mem signals
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
-TODO use halt and finish in the nop of the pc
+TODO use halt and finish in the nop of the pc, change nop to actually be a nop instead of a rst lol
 TODO make the decimals of the hex flash on completion, and tripple flash on halt, slow flash on finish
 TODO ticcle scripts
 TODO quartus issues warning on compilation, maybe worth looking into
@@ -30,12 +30,14 @@ TODO rn there is a stall and a rst, stall follows the rst, its possible if the r
 TODO randomize t regs in gen_rand.py
 TODO update dut dump
 TODO add signed output (at least in decimal) to topfpga
-TODO add float decoding to ret_val in fpgatop
+chris TODO add float decoding to ret_val in fpgatop
 TODO test float returns, see https://chatgpt.com/share/69c1cf61-b50c-8006-b547-a7d69a43d8f8
 TODO contact abrams, maybe invite him to see the demo on demo day
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
     status reg could contain some more info like the element size mayhaps :)
+TODO make the hex switch less confusing
+TODO more demo programs in C
 
 Out of Semester
 ===============
