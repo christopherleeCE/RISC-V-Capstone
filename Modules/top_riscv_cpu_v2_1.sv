@@ -1351,8 +1351,8 @@ module top_riscv_cpu_v2_1();
             // --------------------------------
             $display("[MEM] PC_M        = 0x%08h", cpu_dut.PC_M);
             $display("[MEM] INSTR_M     = 0x%08h", cpu_dut.INSTR_M);
-            $display("[MEM] ALU_M       = 0x%08h", cpu_dut.ALU_M);
-            $display("[MEM] RS2_M_DATA  = 0x%08h", cpu_dut.my_data_mem.addr_internal_mirror);
+            $display("[MEM] ADDR_REG    = 0x%08h", cpu_dut.my_data_mem.addr_internal_mirror);
+            $display("[MEM] WR_DATA_REG = 0x%08h", cpu_dut.my_data_mem.write_data_internal_mirror);
             $display("[MEM] DMEM_OUT    = 0x%08h", cpu_dut.DATA_MEM_OUT);
             $display("[MEM] MEM_WR_EN   = %0b",    cpu_dut.data_mem_wr_en_M);
                         $write("\n");

@@ -35,7 +35,7 @@ module data_memory
    logic [BIT_WIDTH-1:0] writeWord;  
 
    logic [ADDR_WIDTH-1:0] addr_internal_mirror;
-   // logic [ADDR_WIDTH-1:0] write_data_internal_mirror;
+   logic [ADDR_WIDTH-1:0] write_data_internal_mirror;
    // logic [3:0] byteena_sig_internal_mirror;
    logic addr_byte_internal_mirror;
    logic addr_half_internal_mirror;
@@ -111,15 +111,15 @@ module data_memory
       .q(addr_internal_mirror)
    );
 
-   // dff_async_reset #(
-   //    .WIDTH(32)
-   // )write_data_mirror(
-   //    .d(writeData),
-   //    .clk(clk),
-   //    .rst(rst),
-   //    .wr_en(1'b1),
-   //    .q(write_data_internal_mirror)
-   // );
+   dff_async_reset #(
+      .WIDTH(32)
+   )write_data_mirror(
+      .d(writeData),
+      .clk(clk),
+      .rst(rst),
+      .wr_en(1'b1),
+      .q(write_data_internal_mirror)
+   );
 
    // dff_async_reset #(
    //    .WIDTH(4)
