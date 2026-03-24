@@ -11,24 +11,55 @@ module top_fpga(
     output logic [6:0] hex2,
     output logic [6:0] hex3,
     output logic [6:0] hex4,
-    output logic [6:0] hex5
+    output logic [6:0] hex5,
+    output logic [5:0] hex_decimal_point
 );
 
-localparam int BASE_CLK_FREQ = 50000000;
-localparam int OPERATING_CLK_FREQ = 5000000;
-localparam int DEBUG_CLK_FREQ = 10;
-localparam int SLOW_FLASHING_LIGHT_FREQ = 1;
-localparam int FAST_FLASHING_LIGHT_FREQ = 5;
+    localparam int BASE_CLK_FREQ = 50000000;
+    localparam int OPERATING_CLK_FREQ = 5000000;
+    localparam int DEBUG_CLK_FREQ = 10;
+    localparam int SLOW_FLASHING_LIGHT_FREQ = 1;
+    localparam int FAST_FLASHING_LIGHT_FREQ = 5;
 
-logic ohalt, ofinish;
-logic local_clk, divided_clk, debug_clk, manual_clk, manual_clk_button;
-logic debug_clk_en, divided_clk_en; 
-logic global_rst, middle_rst, local_rst;
-logic [1:0] dbuttons; //debounced buttons
-logic [1:0] my_buttons; //inverted buttons so press is 1
-logic [9:0] dbswitches; //debounced switches
+    logic ohalt, ofinish;
+    logic local_clk, divided_clk, debug_clk, manual_clk, manual_clk_button;
+    logic debug_clk_en, divided_clk_en; 
+    logic global_rst, middle_rst, local_rst;
+    logic [1:0] dbuttons; //debounced buttons
+    logic [1:0] my_buttons; //inverted buttons so press is 1
+    logic [9:0] dbswitches; //debounced switches
 
-assign my_buttons = ~buttons;
+    logic [31:0] ret_val;
+    logic [31:0] curr_pc;
+    logic [31:0] instr_f_out;
+    logic [31:0] instr_d_out;
+    logic [31:0] instr_e_out;
+    logic [31:0] instr_m_out;
+    logic [31:0] instr_w_out;
+
+    logic [3:0] pre_hex0;
+    logic [3:0] pre_hex1;
+    logic [3:0] pre_hex2;
+    logic [3:0] pre_hex3;
+    logic [3:0] pre_hex4;
+    logic [3:0] pre_hex5;
+    logic [3:0] pre_hex6;
+    logic [3:0] pre_hex7;
+
+    logic [2:0] hex_sel;
+
+    logic [3:0] hex_in0;
+    logic [3:0] hex_in1;
+    logic [3:0] hex_in2;
+    logic [3:0] hex_in3;
+    logic [3:0] hex_in4;
+    logic [3:0] hex_in5;
+
+    logic slow_flash, fast_flash, staggered_fast_flash;
+    logic status_light;
+    logic [1:0] cnt;
+
+    assign my_buttons = ~buttons;
 
     clk_divider #(
         .DIVIDE(BASE_CLK_FREQ/OPERATING_CLK_FREQ)
@@ -83,15 +114,6 @@ assign my_buttons = ~buttons;
     // //this is the "correct" way we should be assigning the clk
     // assign local_clk = debug_clk;
 
-
-    logic [31:0] ret_val;
-    logic [31:0] curr_pc;
-    logic [31:0] instr_f_out;
-    logic [31:0] instr_d_out;
-    logic [31:0] instr_e_out;
-    logic [31:0] instr_m_out;
-    logic [31:0] instr_w_out;
-
     riscv_cpu_v2 cpu_dut(
         .clk(local_clk),
         .rst(local_rst),
@@ -106,16 +128,6 @@ assign my_buttons = ~buttons;
         .instr_w_out(instr_w_out)
     );
 
-    logic [3:0] pre_hex0;
-    logic [3:0] pre_hex1;
-    logic [3:0] pre_hex2;
-    logic [3:0] pre_hex3;
-    logic [3:0] pre_hex4;
-    logic [3:0] pre_hex5;
-    logic [3:0] pre_hex6;
-    logic [3:0] pre_hex7;
-
-    logic [2:0] hex_sel;
     assign hex_sel = switches[2:0];
 
     always_comb begin
@@ -133,13 +145,6 @@ assign my_buttons = ~buttons;
         endcase
     end
 
-    logic [3:0] hex_in0;
-    logic [3:0] hex_in1;
-    logic [3:0] hex_in2;
-    logic [3:0] hex_in3;
-    logic [3:0] hex_in4;
-    logic [3:0] hex_in5;
-
     assign hex_in0 = switches[3] ? pre_hex2 : pre_hex0;
     assign hex_in1 = switches[3] ? pre_hex3 : pre_hex1;
     assign hex_in2 = switches[3] ? pre_hex4 : pre_hex2;
@@ -153,11 +158,6 @@ assign my_buttons = ~buttons;
     hex_display my_hex3(.SEL(hex_in3), .ZOUT(hex3));
     hex_display my_hex4(.SEL(hex_in4), .ZOUT(hex4));
     hex_display my_hex5(.SEL(hex_in5), .ZOUT(hex5));
-
-
-    logic slow_flash, fast_flash, staggered_fast_flash;
-    logic status_light;
-    logic [1:0] cnt;
 
     clk_divider #(
         .DIVIDE(BASE_CLK_FREQ/SLOW_FLASHING_LIGHT_FREQ)
@@ -207,6 +207,8 @@ assign my_buttons = ~buttons;
     assign debug_leds[6] = manual_clk;
     assign debug_leds[7] = debug_clk_en;
     assign debug_leds[8] = 1'b1;
-    assign debug_leds[9] = status_light;
+    assign debug_leds[9] = 1'b0;
+
+    assign hex_decimal_point = ~{6{status_light}};
 
 endmodule

@@ -19,7 +19,8 @@ module pc #(parameter int WIDTH = 32)
         priority case(1'b1)
 
         wr_en               : ff_d = d;
-        ((!rst) || nop)     : ff_d = 0;
+        (!rst)              : ff_d = 0;
+        nop                 : ff_d = ff_q;
         default             : ff_d = (ff_q + 4);
 
         endcase

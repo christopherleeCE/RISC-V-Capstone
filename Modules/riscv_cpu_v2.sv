@@ -241,7 +241,7 @@ module riscv_cpu_v2
         .d(PC_target),
         .clk(clk),
         .rst(rst),
-        .nop(stall),
+        .nop(stall || ohalt || ofinish),
         .wr_en(redirect_pc), //normally, PC increments by 4 each cycle, but if branch/jump taken, load PC_target
         .next_q(NEXT_PC),
         .q(PC)
