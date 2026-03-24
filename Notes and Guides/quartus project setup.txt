@@ -1,5 +1,26 @@
-paste these into the .qsf file in the quartus project directory
+Change the Configuration mode for .mif mem Initialization
+=========================================================
+Assignments 
+> Device 
+    > Device and Pin Options 
+        > Configuration (left panel) 
+            > Configuration Mode (right panel) 
+                > Single Uncompressed Image with Memory Initialization (512Kbits UFM)
 
+
+Set libraary directory so that quartus knows where to find the .mif files
+=========================================================================
+Assignments
+> Libraries (left panel)
+    > Project libraries (right panel)
+        > Click the "Use projects relative path" box (probably doesnt matter but i would do it anyway)
+            > Click the three dots and select the modules folder
+                > Click the "Add" button
+                    > Click the "Apply" button
+
+
+paste these into the .qsf file in the quartus project directory (open the file in a text editor), and restart the project
+=========================================================================================================================
 set_location_assignment PIN_C14 -to hex0[0]
 set_location_assignment PIN_E15 -to hex0[1]
 set_location_assignment PIN_C15 -to hex0[2]

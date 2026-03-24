@@ -17,15 +17,14 @@ Current semester
 ================
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
-TODO ticcle scripts
 TODO impelment bcd of the hex displays (signed switch, switch determines if its interpreted as a signed or unsigned decimal)
 chris TODO add float decoding to ret_val in fpgatop
-TODO test float returns, see https://chatgpt.com/share/69c1cf61-b50c-8006-b547-a7d69a43d8f8
 TODO contact abrams, maybe invite him to see the demo on demo day
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
     status reg could contain some more info like the element size mayhaps :)
 TODO more demo programs in C
+TODO fix pi.c
 
 Out of Semester
 ===============

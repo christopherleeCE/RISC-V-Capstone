@@ -2,7 +2,7 @@
 
 int main() {
 
-    int n = 15;   // change to test deeper iterations
+    int n = 10;   // change to test deeper iterations
 
     int a = 0;
     int b = 1;
