@@ -18,6 +18,8 @@ Current semester
 TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
 TODO impelment bcd of the hex displays (signed switch, switch determines if its interpreted as a signed or unsigned decimal)
+     REPLY - I can try to design and verify a SystemVerilog module for this, test it, and then try to deploy it to the FPGA.
+             Looks like the "double dabble" algorithm might be the way to go for this, will get started after the conference.
 chris TODO add float decoding to ret_val in fpgatop
 TODO contact abrams, maybe invite him to see the demo on demo day
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
