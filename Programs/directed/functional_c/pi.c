@@ -34,8 +34,6 @@ int main() {
     int interations_fpga = 100*MILLION;
     int interations_sim = 1000;
 
-    //this is the best way to do this, i swear
-    float y = (float)((uint32_t)compute_pi(interations_sim, scale))/(float)scale;
-    //im just like him fr
-    return tb_return(*(int*)&y);
+    // :)
+    return tb_return(*(int*)&(float){(float)(uint32_t)compute_pi(interations_sim, scale)/(float)scale});
 }
