@@ -11,10 +11,10 @@ y (1) = 4
 The given solution is y(t) = (t^3)/3 + t + 8/3
 For multiple values of t:
 
-@ t = 2 : 7.333...
-@ t = 3 : 14.666...
-@ t = 4 : 28.000
-@ t = 5 : 49.333...
+@ t = 2 : y(t) = 7.333...
+@ t = 3 : y(t) = 14.666...
+@ t = 4 : y(t) = 28.000
+@ t = 5 : y(t) = 49.333...
 
 GOAL: Can the CPU estimate some of these values using RK4 method?
 VERDICT: Yes! Messing around with the value of the step and scale factor influences a balance
@@ -40,7 +40,7 @@ that come after the decimal (as set by the conversion function at the bottom).
 
 #define T_0 1 //initial condition
 #define Y_0 4
-#define T (T_0 + H)//final time
+#define T 3 //final time - select a value for T
 //NOTE - Would recommended leaving this as a small value (t = t0 + H) to reduce runtime for
 //regression testing
 
