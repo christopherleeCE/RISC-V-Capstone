@@ -1,17 +1,15 @@
 #include <stdint.h>
 #include "tb.h"
 
-volatile int32_t pi_scaled_result;
-
 // Computes pi scaled by SCALE (fixed-point style)
-int32_t compute_pi(int iterations, int32_t SCALE) {
-    int32_t sum = 0;
+int compute_pi(int iterations, int SCALE) {
+    int sum = 0;
 
     for (int k = 0; k < iterations; k++) {
-        int32_t denom = 2 * k + 1;
+        int denom = 2 * k + 1;
 
         // term = SCALE / denom
-        int32_t term = SCALE / denom;   // forces div
+        int term = SCALE / denom;   // forces div
 
         if (k % 2 == 0) {               // forces rem
             sum += term;
@@ -24,23 +22,20 @@ int32_t compute_pi(int iterations, int32_t SCALE) {
 }
 
 /*
-1mil,   bb40e194 : 3141591444 (5.5 seconds)
-10mil,  bb40e4fc : 3141592316 (1 minute)
-100mil, bb40e554 : 3141592404 (~9 minutes)
+100mil  :   0x40490FD9 (9 minutes) precision lost in float
+10mil   :   0x40490FD9 (50 seconds)
+1mil    :   0x40490fD6 (5.5 seconds)
 */
 
 int main() {
 
     int MILLION = 1000000;
-    int scale = 10000000;
+    int scale = 1000000000; //largest scale without overflow
     int interations_fpga = 100*MILLION;
     int interations_sim = 1000;
 
-
-    return tb_return(compute_pi(interations_sim, scale));
-
+    //this is the best way to do this, i swear
+    float y = (float)((uint32_t)compute_pi(interations_sim, scale))/(float)scale;
+    //im just like him fr
+    return tb_return(*(int*)&y);
 }
-
-// int main(){
-//     return tb_return(0);
-// }

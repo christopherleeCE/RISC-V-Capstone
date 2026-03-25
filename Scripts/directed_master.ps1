@@ -200,6 +200,11 @@ if(-not $compile){
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         if($no_run){
+            $timer.Stop()
+            $endTime = Get-Date
+            Write-Host "`nScript Started: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+            Write-Host "Script Finished: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+            Write-Host "Script Runtime: $($timer.Elapsed.ToString('hh\:mm\:ss\.ff'))`n"
             exit 0
         }
 
@@ -354,6 +359,11 @@ if(-not $compile){
         if ($LASTEXITCODE -ne 0) { exit 1 }
 
         if($no_run){
+            $timer.Stop()
+            $endTime = Get-Date
+            Write-Host "`nScript Started: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+            Write-Host "Script Finished: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+            Write-Host "Script Runtime: $($timer.Elapsed.ToString('hh\:mm\:ss\.ff'))`n"
             exit 0
         }
 
