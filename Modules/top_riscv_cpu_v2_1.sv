@@ -15,7 +15,7 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 
 Current semester
 ================
-TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
+holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
 TODO impelment bcd of the hex displays (signed switch, switch determines if its interpreted as a signed or unsigned decimal)
      REPLY - I can try to design and verify a SystemVerilog module for this, test it, and then try to deploy it to the FPGA.
