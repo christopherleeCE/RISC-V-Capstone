@@ -1,6 +1,7 @@
 param(
     [switch]$help,
-    [string]$project_name
+    [string]$project_name,
+    [switch]$y
 )
 
 $startTime = Get-Date
@@ -18,6 +19,7 @@ if($help){
 
     -help:          brings up this dialog
     -project_name:  define the project name, flag not needed but the argument is
+    -y:             skip confirmation prompt before programming
 
     Usage Example: 
     PS C:\Users\Chris\Documents\Quartus\Quartus Projects\new_capstone> ..\..\Prototype\RISC-V-Capstone\Scripts\deploy_fpga.ps1 new_capstone
@@ -37,8 +39,11 @@ Write-Host "Updating .mif's in Quartus and assembling...`n" -ForegroundColor Mag
 quartus_sh -t "$relativeScriptPath\assemble.tcl" $projectName
 if ($LASTEXITCODE -ne 0) {Write-Host "`n'quartus_sh -t "$relativeScriptPath\assemble.tcl" $projectName' threw an error`n" -ForegroundColor Red}
 
-Write-Host "`nFinished assembling, Press the 'ANY KEY' to run the programmer... " -ForegroundColor Magenta -NoNewLine
-Read-Host
+if(-not $y){
+    Write-Host "`nFinished assembling, Press the 'ANY KEY' to run the programmer... " -ForegroundColor Magenta -NoNewLine
+    Read-Host
+
+}Write-Host "`nFinished assembling, running the programmer... " -ForegroundColor Magenta
 
 quartus_sh -t "$relativeScriptPath\program.tcl" $projectName
 if ($LASTEXITCODE -ne 0) {Write-Host "`n'quartus_sh -t "$relativeScriptPath\program.tcl" $projectName' threw an error`n" -ForegroundColor Red}

@@ -40,9 +40,10 @@ that come after the decimal (as set by the conversion function at the bottom).
 
 #define T_0 1 //initial condition
 #define Y_0 4
-#define T 3 //final time - select a value for T
+#define T (T_0 + H)//3 //final time - select a value for T
 //NOTE - Would recommended leaving this as a small value (t = t0 + H) to reduce runtime for
 //regression testing
+    //NOTE - homie, please do that then... -chris
 
 //Please do not mess with the following! --------------------------------------------------------
 //Let's solve some constants now to save division and multiplication
