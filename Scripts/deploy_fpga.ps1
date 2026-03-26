@@ -30,8 +30,8 @@ $projectName = $project_name
 $scriptDir = $PSScriptRoot
 $relativeScriptPath = Resolve-Path $scriptDir -Relative -ErrorAction SilentlyContinue
 
-Write-Host "`nUsing project: $projectName" -ForegroundColor Cyan
-Write-Host "Relative path to .tcl files: $relativeScriptPath" -ForegroundColor Cyan
+Write-Host "`nUsing project: $projectName" -ForegroundColor Blue
+Write-Host "Relative path to .tcl files: $relativeScriptPath" -ForegroundColor Blue
 Write-Host "Updating .mif's in Quartus and assembling...`n" -ForegroundColor Magenta
 
 quartus_sh -t "$relativeScriptPath\assemble.tcl" $projectName
