@@ -31,9 +31,12 @@ int main() {
 
     int MILLION = 1000000;
     int scale = 1000000000; //largest scale without overflow
-    int interations_fpga = 10*MILLION;
+    int interations_fpga = 1*MILLION;
     int interations_sim = 1000;
 
     // :)
     return tb_return(*(int*)&(float){(float)(uint32_t)compute_pi(interations_sim,scale)/(float)scale});
+    //return tb_return(0b01111111100000000000000000000001);
+    //return tb_return(*(int*)&(float){3.141592});
+    //return tb_return(0x40490FD9);
 }

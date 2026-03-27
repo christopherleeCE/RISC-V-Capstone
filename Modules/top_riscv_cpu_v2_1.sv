@@ -186,6 +186,37 @@ module top_riscv_cpu_v2_1();
         .pc_w_out(pc_w_out)
     );
 
+    logic [31:0] fnum;
+
+    logic ostart;
+    logic state_zero;
+    logic state_denorm;
+    logic state_norm;
+    logic state_inf;
+    logic state_nan;
+    logic owork;
+    logic odone;
+
+    logic [59:0] bcd;
+
+    assign fnum = 32'h40490FD9;
+    //assign fnum = 32'h40490fd8;
+    float2bcd my_float2bcd(
+        .fnum(fnum),
+        .clk(clk),
+        .rst(rst),
+        .start(1'b1),
+        .ostart(ostart),
+        .state_zero(state_zero),
+        .state_denorm(state_denorm),
+        .state_norm(state_norm),
+        .state_inf(state_inf),
+        .state_nan(state_nan),
+        .odone(odone),
+        .bcd(bcd)
+    );
+
+
     //grabing vsim args
     initial begin
 

@@ -43,36 +43,36 @@ module top_fpga(
     logic [31:0] pc_m_out;
     logic [31:0] pc_w_out;
 
-    logic [3:0] pre_hex0;
-    logic [3:0] pre_hex1;
-    logic [3:0] pre_hex2;
-    logic [3:0] pre_hex3;
-    logic [3:0] pre_hex4;
-    logic [3:0] pre_hex5;
-    logic [3:0] pre_hex6;
-    logic [3:0] pre_hex7;
-    logic [3:0] pre_hex8;
-    logic [3:0] pre_hex9;
-    logic [3:0] pre_hex10;
-    logic [3:0] pre_hex11;
+    logic [4:0] pre_hex0;
+    logic [4:0] pre_hex1;
+    logic [4:0] pre_hex2;
+    logic [4:0] pre_hex3;
+    logic [4:0] pre_hex4;
+    logic [4:0] pre_hex5;
+    logic [4:0] pre_hex6;
+    logic [4:0] pre_hex7;
+    logic [4:0] pre_hex8;
+    logic [4:0] pre_hex9;
+    logic [4:0] pre_hex10;
+    logic [4:0] pre_hex11;
 
     logic [2:0] hex_sel;
 
-    logic [3:0] hex_in0;
-    logic [3:0] hex_in1;
-    logic [3:0] hex_in2;
-    logic [3:0] hex_in3;
-    logic [3:0] hex_in4;
-    logic [3:0] hex_in5;
+    logic [4:0] hex_in0;
+    logic [4:0] hex_in1;
+    logic [4:0] hex_in2;
+    logic [4:0] hex_in3;
+    logic [4:0] hex_in4;
+    logic [4:0] hex_in5;
 
     logic slow_flash, fast_flash, staggered_fast_flash;
     logic status_light;
     logic [1:0] cnt;
 
     logic ostart;
-    logic oshifting;
+    logic oworking;
     logic float_done;
-    logic [47:0] bcd;
+    logic [59:0] bcd;
 
     assign my_buttons = ~buttons;
 
@@ -148,14 +148,26 @@ module top_fpga(
         .pc_w_out(pc_w_out)
     );
 
+
+    logic state_zero;
+    logic state_denorm;
+    logic state_norm;
+    logic state_inf;
+    logic state_nan;
+    logic odone;
+
     float2bcd my_float2bcd(
         .fnum(ret_val),
         .clk(local_clk),
         .rst(local_rst),
         .start(ofinish),
         .ostart(ostart),
-        .oshifting(oshifting),
-        .odone(float_done),
+        .state_zero(state_zero),
+        .state_denorm(state_denorm),
+        .state_norm(state_norm),
+        .state_inf(state_inf),
+        .state_nan(state_nan),
+        .odone(odone),
         .bcd(bcd)
     );
 
@@ -164,15 +176,16 @@ module top_fpga(
     always_comb begin
         case(hex_sel)
 
-            3'd0 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {12'b0, instr_f_out};
-            3'd1 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {12'b0, instr_d_out};
-            3'd2 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {12'b0, instr_e_out};
-            3'd3 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {12'b0, instr_m_out};
-            3'd4 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {12'b0, instr_w_out};
+            //hell... hexdecoders are 5bits wide, 5'b0XXXX are normal hex values, 5'b1XXXX are special chars, bcd is already encoded correctly in the float2bcd moudle, the rest of the case statement needs to be encoded manually as seen below
+            3'd0 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {1'b0, instr_f_out[31:28], 1'b0, instr_f_out[27:24], 1'b0, instr_f_out[23:20], 1'b0, instr_f_out[19:16], 1'b0, instr_f_out[15:12], 1'b0, instr_f_out[11:8], 1'b0, instr_f_out[7:4], 1'b0, instr_f_out[3:0]};
+            3'd1 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {1'b0, instr_d_out[31:28], 1'b0, instr_d_out[27:24], 1'b0, instr_d_out[23:20], 1'b0, instr_d_out[19:16], 1'b0, instr_d_out[15:12], 1'b0, instr_d_out[11:8], 1'b0, instr_d_out[7:4], 1'b0, instr_d_out[3:0]};
+            3'd2 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {1'b0, instr_e_out[31:28], 1'b0, instr_e_out[27:24], 1'b0, instr_e_out[23:20], 1'b0, instr_e_out[19:16], 1'b0, instr_e_out[15:12], 1'b0, instr_e_out[11:8], 1'b0, instr_e_out[7:4], 1'b0, instr_e_out[3:0]};
+            3'd3 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {1'b0, instr_m_out[31:28], 1'b0, instr_m_out[27:24], 1'b0, instr_m_out[23:20], 1'b0, instr_m_out[19:16], 1'b0, instr_m_out[15:12], 1'b0, instr_m_out[11:8], 1'b0, instr_m_out[7:4], 1'b0, instr_m_out[3:0]};
+            3'd4 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {1'b0, instr_w_out[31:28], 1'b0, instr_w_out[27:24], 1'b0, instr_w_out[23:20], 1'b0, instr_w_out[19:16], 1'b0, instr_w_out[15:12], 1'b0, instr_w_out[11:8], 1'b0, instr_w_out[7:4], 1'b0, instr_w_out[3:0]};
             3'd5 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = bcd;
-            3'd6 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {12'b0, curr_pc};
-            3'd7 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {12'b0, ret_val};
-            default: {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = 48'hCAFEDEADBEEF;
+            3'd6 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {1'b0, curr_pc[31:28], 1'b0, curr_pc[27:24], 1'b0, curr_pc[23:20], 1'b0, curr_pc[19:16], 1'b0, curr_pc[15:12], 1'b0, curr_pc[11:8], 1'b0, curr_pc[7:4], 1'b0, curr_pc[3:0]};
+            3'd7 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {1'b0, ret_val[31:28], 1'b0, ret_val[27:24], 1'b0, ret_val[23:20], 1'b0, ret_val[19:16], 1'b0, ret_val[15:12], 1'b0, ret_val[11:8], 1'b0, ret_val[7:4], 1'b0, ret_val[3:0]};
+            default: {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = 60'hEEFCAFEDEADBEEF;
 
         endcase
     end
@@ -230,22 +243,33 @@ module top_fpga(
         endcase
     end
 
-    assign debug_leds[0] = local_rst;
-    assign debug_leds[1] = global_rst;
-    assign debug_leds[2] = local_clk;
-    assign debug_leds[3] = 1'b1;
-    assign debug_leds[4] = manual_clk;
-    assign debug_leds[5] = debug_clk_en;
-    assign debug_leds[6] = 1'b1;
-    assign debug_leds[7] = ostart;
-    assign debug_leds[8] = oshifting;
-    assign debug_leds[9] = float_done && slow_flash;
+    // assign debug_leds[0] = local_rst;
+    // assign debug_leds[1] = global_rst;
+    // assign debug_leds[2] = local_clk;
+    // assign debug_leds[3] = 1'b1;
+    // assign debug_leds[4] = manual_clk;
+    // assign debug_leds[5] = debug_clk_en;
+    // assign debug_leds[6] = 1'b1;
+    // assign debug_leds[7] = ostart;
+    // assign debug_leds[8] = oworking;
+    // assign debug_leds[9] = float_done && slow_flash;
+
+    assign debug_leds[0] = ofinish;
+    assign debug_leds[1] = ohalt;
+    assign debug_leds[2] = 1'b1;
+    assign debug_leds[3] = ostart;
+    assign debug_leds[4] = state_zero;
+    assign debug_leds[5] = state_denorm;
+    assign debug_leds[6] = state_norm;
+    assign debug_leds[7] = state_inf;
+    assign debug_leds[8] = state_nan;
+    assign debug_leds[9] = odone;
 
     assign hex_decimal_point[0] = ~(status_light);
     assign hex_decimal_point[1] = ~(status_light);
     assign hex_decimal_point[2] = ~(status_light);
     assign hex_decimal_point[3] = ~(status_light);
     assign hex_decimal_point[4] = ~(status_light);
-    assign hex_decimal_point[5] = ~(status_light || ((switches[3:0] == 4'b1101) && ~ohalt));
+    assign hex_decimal_point[5] = ~(status_light);
 
 endmodule
