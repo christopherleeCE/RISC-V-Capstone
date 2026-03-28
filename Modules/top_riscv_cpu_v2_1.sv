@@ -18,6 +18,7 @@ Current semester
 holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
 TODO more demo programs in C
+TODO fix decimal point logic
 TODO contact abrams, maybe invite him to see the demo on demo day
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched

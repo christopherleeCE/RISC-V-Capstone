@@ -87,7 +87,7 @@ int main() {
     float_pi = (float)scaled_pi / (float)scale;
 
     float magnitude = 7;
-    float angle = float_pi * 1.3;
+    float angle = float_pi * 1.67;
 
     float cos_val = my_cos(angle, trig_interations);
     float sin_val = my_sin(angle, trig_interations);
@@ -101,7 +101,7 @@ int main() {
         //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
     #endif
     
-    return tb_return(*(int*)&(float){y_vector});
+    return tb_return(*(int*)&(float){x_vector});
 
 }
 
