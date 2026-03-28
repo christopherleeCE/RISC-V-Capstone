@@ -9,6 +9,8 @@ module float2bcd(
     output logic state_zero,
     output logic state_denorm,
     output logic state_norm,
+    output logic state_denorm_int,
+    output logic state_norm_int,
     output logic state_inf,
     output logic state_nan,
     output logic odone,
@@ -16,15 +18,18 @@ module float2bcd(
 );
 
 localparam int FF_TRAIN_EC = 11;
+localparam int BCD_INT_SEC_BW = 284;
+localparam int BCD_INT_SEC_NW = 71;
 
 logic sign;
 logic [7:0] exp;
 logic [23:0] mantisa;
 logic [276:0] pre_norm, norm;
-logic [127:0] int_sec;
+logic [127:0] int_sec_async;
 logic [148:0] frac_sec_async;
 logic [152:0] frac_sec; //4 bits larger, enuf to accomidate nibble of int portion after mul10
-//128 (1 from 1.f + 127 from 2^127) bits for int poriton, implicit binary point, 149 (23 + 126 from f in 1.f)
+                        //128 (1 from 1.f + 127 from 2^127) bits for int poriton, implicit binary point, 149 (23 + 126 from f in 1.f)
+logic [283:0] int_sec, next_int_sec;
 logic [59:0] pre_bcd;
 
 logic [4:0] auto_sign;
@@ -32,11 +37,13 @@ logic [7:0] unbiased_exp;
 
 
 //state regs, the norm state and denorm state are ubiquidouse with each other, leaving in both for debuging
-//logic state_zero, state_denorm, state_norm, state_inf, state_nan;
+//logic state_zero, state_denorm, state_norm, state_denorm_int, state_norm_int, state_inf, state_nan;
 logic disp_zero, disp_denorm_norm, disp_inf, disp_nan;
 
 logic start_q, state_done;
 logic [4:0] ff_train [FF_TRAIN_EC-1:0];
+
+logic [7:0] cnt;
 
 assign unbiased_exp = fnum[30:23];
 
@@ -68,10 +75,26 @@ assign {
 assign pre_norm = {127'b0, mantisa, 126'b0};
 
 assign norm = (unbiased_exp >= 8'd127) ? pre_norm << exp : pre_norm >> exp;
-assign int_sec = norm[276:149];
+assign int_sec_async = norm[276:149];
 assign frac_sec_async = norm[148:0];
 
-//int_sec gets passed into a bcd when edgar finishes that
+genvar ii;
+generate for(ii = 32; ii < (BCD_INT_SEC_NW); ii++) begin
+
+    //if bcd nibble is >= 5, add three to that nibble, then all nibbles are bitshifted in ff block
+    assign next_int_sec[(3+(4*ii)):(0+(4*ii))] = (int_sec[(3+(4*ii)):(0+(4*ii))] >= 4'd5) ?
+                                                int_sec[(3+(4*ii)):(0+(4*ii))] + 4'd3     :
+                                                int_sec[(3+(4*ii)):(0+(4*ii))]            ;
+
+end endgenerate 
+
+assign next_int_sec[127:0] = int_sec[127:0];
+logic [127:0] lower;
+logic [155:0] upper;
+assign lower = int_sec[127:0];
+assign upper = int_sec[283:128];
+
+//assign next_int_sec = int_sec + 4'd3;
 
 //frac_sec goes through mul10 algorithm fsm
 always_ff @(posedge clk or negedge rst) begin
@@ -80,6 +103,8 @@ always_ff @(posedge clk or negedge rst) begin
         state_zero <= '0;
         state_denorm <= '0;
         state_norm <= '0;
+        state_denorm_int <= '0;
+        state_norm_int <= '0;
         state_inf <= '0;
         state_nan <= '0;
         disp_zero <= '0;
@@ -89,6 +114,9 @@ always_ff @(posedge clk or negedge rst) begin
         state_done <= '0;
 
         frac_sec <= '0;
+        int_sec <= '0;
+
+        cnt <= '0;
 
         //rst ff train
         for(int ii = 0; ii < FF_TRAIN_EC; ii++) begin
@@ -100,28 +128,44 @@ always_ff @(posedge clk or negedge rst) begin
         state_zero <= (unbiased_exp == 8'b0) && (mantisa[22:0] == 22'b0);
         state_denorm <= (unbiased_exp == 8'b0) && (mantisa[22:0] != 22'b0);
         state_norm <= (unbiased_exp > 8'b0 ) && (unbiased_exp < 8'hFF);
+        state_denorm_int <= (unbiased_exp == 8'b0) && (mantisa[22:0] != 22'b0);
+        state_norm_int <= (unbiased_exp > 8'b0 ) && (unbiased_exp < 8'hFF);
         state_inf <= (unbiased_exp == 8'hFF) && (mantisa[22:0] == 22'b0);
         state_nan <= (unbiased_exp == 8'hFF) && (mantisa[22:0] != 22'b0);
 
         frac_sec <= {4'b0, frac_sec_async};
+        int_sec <= {156'b0, int_sec_async};
 
     end else if(state_zero) begin
         state_zero <= '0;
         state_done <= 1'b1;
         disp_zero <= 1'b1;
 
-    end else if(state_denorm || state_norm) begin
-        state_denorm     <= ~(ff_train[FF_TRAIN_EC-1][4] == 1'b1);
-        state_norm       <= ~(ff_train[FF_TRAIN_EC-1][4] == 1'b1);
-        state_done             <=  (ff_train[FF_TRAIN_EC-1][4] == 1'b1);
+    end else if(state_denorm || state_norm || state_denorm_int || state_norm_int) begin
+        state_denorm    <= ~(ff_train[FF_TRAIN_EC-1][4] == 1'b1);
+        state_norm      <= ~(ff_train[FF_TRAIN_EC-1][4] == 1'b1);
+        state_done      <=  (ff_train[FF_TRAIN_EC-1][4] == 1'b1) && (cnt == 8'h7F); //int_sec[127:0] == 128'b0
+        state_denorm_int<= ~(cnt == 8'h7F);
+        state_norm_int  <= ~(cnt == 8'h7F);
         disp_denorm_norm <= 1'b1;
 
-        frac_sec <= (frac_sec[148:0] << 2'd3) + (frac_sec[148:0] << 1'd1);
-
-        ff_train[0] <= {1'b1, frac_sec[152:149]};  //set occupied bit to high, lower 4 bits are the bcd
-        for(int ii = 1; ii < FF_TRAIN_EC; ii++) begin
-            ff_train[ii] <= ff_train[ii-1];
+        //stop double dabble after all 128 bit of int section of float are shifted
+        if(state_denorm_int || state_norm_int) begin
+            int_sec[0] <= '0;
+            int_sec[283:1] <= next_int_sec[282:0];
         end
+
+        //disable write_en on fftrain once end has been reached
+        if(state_denorm || state_norm) begin
+            frac_sec <= (frac_sec[148:0] << 2'd3) + (frac_sec[148:0] << 1'd1);
+            ff_train[0] <= {1'b1, frac_sec[152:149]};  //set occupied bit to high, lower 4 bits are the bcd
+            for(int ii = 1; ii < FF_TRAIN_EC; ii++) begin
+                ff_train[ii] <= ff_train[ii-1];
+            end
+        end
+
+        //keep track of how many shifts in the double dable
+        cnt <= cnt + 1'b1;
         
     end else if(state_inf) begin
         state_inf <= '0;
@@ -152,7 +196,7 @@ localparam logic [4:0] UPPERCASE_A = 5'd10;
 assign auto_sign = (sign ? NEGATIVE_SIGN : ALL_OFF); //either negsign of all of hex encode value
 
 assign pre_bcd = {
-    1'b0, int_sec[3:0],
+    1'b0, int_sec_async[3:0],
     1'b0, ff_train[10][3:0], 
     1'b0, ff_train[9][3:0], 
     1'b0, ff_train[8][3:0], 
@@ -164,6 +208,21 @@ assign pre_bcd = {
     1'b0, ff_train[2][3:0], 
     1'b0, ff_train[1][3:0], 
     1'b0, ff_train[0][3:0]
+};
+
+logic [43:0] debug_bcd;
+assign debug_bcd ={
+    ff_train[10][3:0], 
+    ff_train[9][3:0], 
+    ff_train[8][3:0], 
+    ff_train[7][3:0], 
+    ff_train[6][3:0], 
+    ff_train[5][3:0], 
+    ff_train[4][3:0], 
+    ff_train[3][3:0], 
+    ff_train[2][3:0], 
+    ff_train[1][3:0], 
+    ff_train[0][3:0]
 };
 
 always_comb begin

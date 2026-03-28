@@ -199,8 +199,10 @@ module top_riscv_cpu_v2_1();
 
     logic [59:0] bcd;
 
-    assign fnum = 32'h40490FD9;
-    //assign fnum = 32'h40490fd8;
+    //assign fnum = 32'h40490FD9; //pi
+    //assign fnum = 32'h4b3c614e; //12345678
+    assign fnum = 32'h7f7fffff; //max float
+
     float2bcd my_float2bcd(
         .fnum(fnum),
         .clk(clk),
@@ -210,6 +212,8 @@ module top_riscv_cpu_v2_1();
         .state_zero(state_zero),
         .state_denorm(state_denorm),
         .state_norm(state_norm),
+        .state_denorm_int(state_denorm_int),
+        .state_norm_int(state_norm_int),
         .state_inf(state_inf),
         .state_nan(state_nan),
         .odone(odone),
