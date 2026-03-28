@@ -2,14 +2,14 @@
 #include "tb.h"
 
 // Computes pi scaled by SCALE (fixed-point style)
-int compute_pi(int iterations, int SCALE) {
-    int sum = 0;
+uint64_t compute_pi(int iterations, uint64_t SCALE) {
+    uint64_t sum = 0;
 
     for (int k = 0; k < iterations; k++) {
-        int denom = 2 * k + 1;
+        uint64_t denom = 2 * k + 1;
 
         // term = SCALE / denom
-        int term = SCALE / denom;   // forces div
+        uint64_t term = SCALE / denom;   // forces div
 
         if (k % 2 == 0) {               // forces rem
             sum += term;
@@ -31,9 +31,9 @@ float my_pow(float x, int exp){
     }return ret;
 }
 
-int my_factorial(int x){
+int64_t my_factorial(int x){
 
-    int ret = 1;
+    int64_t ret = 1;
 
     for(int ii = 1; ii <= x; ++ii){
 
@@ -76,11 +76,11 @@ float my_cos(float rads, int itr){
 
 int main() {
     // SCALE = 1,000,000 for fixed-point precision
-    int scale = 10000000; //havent seen an overflow with this
-    int pi_interations = 1000000;//1000; //use 1000000 in deployment
-    int trig_interations = 7; //above 6 or 7 (jajaja) will cause factorial overflow
+    uint64_t scale = 1000000000000; //havent seen an overflow with this
+    uint64_t pi_interations = 100000;//1000; //use 100000 in deployment
+    int trig_interations = 10; //above 6 or 7 (jajaja) will cause factorial overflow
 
-    int scaled_pi;
+    uint64_t scaled_pi;
     float float_pi;
 
     scaled_pi = compute_pi(pi_interations, scale);
@@ -89,7 +89,6 @@ int main() {
     float magnitude = 7;
     float angle = float_pi * 1.3;
 
-
     float cos_val = my_cos(angle, trig_interations);
     float sin_val = my_sin(angle, trig_interations);
 
@@ -97,12 +96,11 @@ int main() {
     float y_vector = sin_val * magnitude;
 
     #ifdef X86_BUILD
-    printf("float_pi: %f\n", float_pi);
-    printf("[cos sin] = [%f %f]\n", cos_val, sin_val);
-    printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
-    printf("in cartesian cordinates, <%.2f, %.2f>\n", x_vector, y_vector);
+        //printf("float_pi: %f\n", float_pi);
+        printf("[%f, %f, %f, %f]\n", cos_val, sin_val, x_vector, y_vector);
+        //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
     #endif
-
+    
     return tb_return(*(int*)&(float){y_vector});
 
 }
