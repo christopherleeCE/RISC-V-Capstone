@@ -17,16 +17,12 @@ Current semester
 ================
 holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
 TODO code coverage
-TODO impelment bcd of the hex displays (signed switch, switch determines if its interpreted as a signed or unsigned decimal)
-     REPLY - I can try to design and verify a SystemVerilog module for this, test it, and then try to deploy it to the FPGA.
-             Looks like the "double dabble" algorithm might be the way to go for this, will get started after the conference.
-chris TODO add float decoding to ret_val in fpgatop
+TODO more demo programs in C
 TODO contact abrams, maybe invite him to see the demo on demo day
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
     status reg could contain some more info like the element size mayhaps :)
-TODO more demo programs in C
-TODO fix pi.c
+
 
 Out of Semester
 ===============
@@ -173,7 +169,6 @@ module top_riscv_cpu_v2_1();
         .ohalt(ohalt),
         .ofinish(ofinish),
         .a0(ret_val),
-        .pc_out(curr_pc),
         .instr_f_out(instr_f_out),
         .instr_d_out(instr_d_out),
         .instr_e_out(instr_e_out),
@@ -185,41 +180,6 @@ module top_riscv_cpu_v2_1();
         .pc_m_out(pc_m_out),
         .pc_w_out(pc_w_out)
     );
-
-    logic [31:0] fnum;
-
-    logic ostart;
-    logic state_zero;
-    logic state_denorm;
-    logic state_norm;
-    logic state_inf;
-    logic state_nan;
-    logic owork;
-    logic odone;
-
-    logic [59:0] bcd;
-
-    //assign fnum = 32'h40490FD9; //pi
-    //assign fnum = 32'h4b3c614e; //12345678
-    assign fnum = 32'h7f7fffff; //max float
-
-    float2bcd my_float2bcd(
-        .fnum(fnum),
-        .clk(clk),
-        .rst(rst),
-        .start(1'b1),
-        .ostart(ostart),
-        .state_zero(state_zero),
-        .state_denorm(state_denorm),
-        .state_norm(state_norm),
-        .state_denorm_int(state_denorm_int),
-        .state_norm_int(state_norm_int),
-        .state_inf(state_inf),
-        .state_nan(state_nan),
-        .odone(odone),
-        .bcd(bcd)
-    );
-
 
     //grabing vsim args
     initial begin
@@ -300,21 +260,6 @@ module top_riscv_cpu_v2_1();
     //         rst <= middle_rst;
     //     end
     // end
-
-    //this may have a more preferable rst timing depending
-    //on how the other solution gets synthesised, but idk
-    // always_ff @(posedge clk) begin
-    //     if (!global_rst) begin
-    //         middle_rst <= 1'b0;
-    //         pre_rst <= 1'b0;
-    //     end
-    //     else begin
-    //         middle_rst <= 1'b1;
-    //         pre_rst <= middle_rst;
-    //     end
-    // end
-
-    // assign rst = pre_rst && global_rst;
     
     initial begin
 

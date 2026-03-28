@@ -6,43 +6,42 @@ module float2bcd(
     input logic rst,
     input logic start,
     output logic ostart,
-    output logic state_zero,
-    output logic state_denorm,
-    output logic state_norm,
-    output logic state_denorm_int,
-    output logic state_norm_int,
-    output logic state_inf,
-    output logic state_nan,
+    output logic oworking,
+    // output logic state_zero,
+    // output logic state_denorm,
+    // output logic state_norm,
+    // output logic state_denorm_int,
+    // output logic state_norm_int,
+    // output logic state_inf,
+    // output logic state_nan,
     output logic odone,
-    output logic [59:0]bcd
+    output logic [149:0]bcd
 );
 
-localparam int FF_TRAIN_EC = 11;
+localparam int FF_TRAIN_EC = 12;
 localparam int BCD_INT_SEC_BW = 284;
 localparam int BCD_INT_SEC_NW = 71;
 
 logic sign;
-logic [7:0] exp;
+logic [7:0] exp, unbiased_exp;
 logic [23:0] mantisa;
+
 logic [276:0] pre_norm, norm;
 logic [127:0] int_sec_async;
 logic [148:0] frac_sec_async;
-logic [152:0] frac_sec; //4 bits larger, enuf to accomidate nibble of int portion after mul10
-                        //128 (1 from 1.f + 127 from 2^127) bits for int poriton, implicit binary point, 149 (23 + 126 from f in 1.f)
+
+                        //4 bits larger, enuf to accomidate nibble of int portion after mul10
+logic [152:0] frac_sec; //128 (1 from 1.f + 127 from 2^127) bits for int poriton, implicit binary point, 149 (23 + 126 from f in 1.f)
 logic [283:0] int_sec, next_int_sec;
-logic [59:0] pre_bcd;
 
+logic [149:0] pre_bcd;
 logic [4:0] auto_sign;
-logic [7:0] unbiased_exp;
-
 
 //state regs, the norm state and denorm state are ubiquidouse with each other, leaving in both for debuging
-//logic state_zero, state_denorm, state_norm, state_denorm_int, state_norm_int, state_inf, state_nan;
+logic start_q, state_zero, state_denorm, state_norm, state_denorm_int, state_norm_int, state_inf, state_nan, state_done;
 logic disp_zero, disp_denorm_norm, disp_inf, disp_nan;
 
-logic start_q, state_done;
 logic [4:0] ff_train [FF_TRAIN_EC-1:0];
-
 logic [7:0] cnt;
 
 assign unbiased_exp = fnum[30:23];
@@ -73,28 +72,24 @@ assign {
 };
 
 assign pre_norm = {127'b0, mantisa, 126'b0};
-
 assign norm = (unbiased_exp >= 8'd127) ? pre_norm << exp : pre_norm >> exp;
+
 assign int_sec_async = norm[276:149];
 assign frac_sec_async = norm[148:0];
 
 genvar ii;
-generate for(ii = 32; ii < (BCD_INT_SEC_NW); ii++) begin
-
+assign next_int_sec[127:0] = int_sec[127:0];
+generate for(ii = 32; ii < (BCD_INT_SEC_NW); ii++) begin : add_3_block
     //if bcd nibble is >= 5, add three to that nibble, then all nibbles are bitshifted in ff block
     assign next_int_sec[(3+(4*ii)):(0+(4*ii))] = (int_sec[(3+(4*ii)):(0+(4*ii))] >= 4'd5) ?
                                                 int_sec[(3+(4*ii)):(0+(4*ii))] + 4'd3     :
                                                 int_sec[(3+(4*ii)):(0+(4*ii))]            ;
-
 end endgenerate 
 
-assign next_int_sec[127:0] = int_sec[127:0];
 logic [127:0] lower;
 logic [155:0] upper;
 assign lower = int_sec[127:0];
 assign upper = int_sec[283:128];
-
-//assign next_int_sec = int_sec + 4'd3;
 
 //frac_sec goes through mul10 algorithm fsm
 always_ff @(posedge clk or negedge rst) begin
@@ -196,22 +191,57 @@ localparam logic [4:0] UPPERCASE_A = 5'd10;
 assign auto_sign = (sign ? NEGATIVE_SIGN : ALL_OFF); //either negsign of all of hex encode value
 
 assign pre_bcd = {
-    1'b0, int_sec_async[3:0],
+        auto_sign,
+    1'b0, upper[43:40],
+    1'b0, upper[39:36],
+    1'b0, upper[35:32],
+    1'b0, upper[31:28],
+    1'b0, upper[27:24],
+    //////////////////////
+    1'b0, upper[23:20],
+    1'b0, upper[19:16],
+    1'b0, upper[15:12],
+    1'b0, upper[11:8],
+    1'b0, upper[7:4],
+    1'b0, upper[3:0],
+    //////////////////////
+    1'b0, ff_train[11][3:0], 
     1'b0, ff_train[10][3:0], 
     1'b0, ff_train[9][3:0], 
     1'b0, ff_train[8][3:0], 
     1'b0, ff_train[7][3:0], 
-    1'b0, ff_train[6][3:0], 
+    1'b0, ff_train[6][3:0],
+    //////////////////////
     1'b0, ff_train[5][3:0], 
     1'b0, ff_train[4][3:0], 
     1'b0, ff_train[3][3:0], 
     1'b0, ff_train[2][3:0], 
     1'b0, ff_train[1][3:0], 
-    1'b0, ff_train[0][3:0]
+    1'b0, ff_train[0][3:0],
+    //////////////////////
+        auto_sign,
+    1'b0, upper[7:4],
+    1'b0, upper[3:0],
+    1'b0, ff_train[11][3:0], 
+    1'b0, ff_train[10][3:0], 
+    1'b0, ff_train[9][3:0]
 };
 
-logic [43:0] debug_bcd;
+logic [95:0] debug_bcd;
 assign debug_bcd ={
+    upper[47:44],
+    upper[43:40],
+    upper[39:36],
+    upper[35:32],
+    upper[31:28],
+    upper[27:24],
+    upper[23:20],
+    upper[19:16],
+    upper[15:12],
+    upper[11:8],
+    upper[7:4],
+    upper[3:0],
+    ff_train[11][3:0], 
     ff_train[10][3:0], 
     ff_train[9][3:0], 
     ff_train[8][3:0], 
@@ -228,25 +258,33 @@ assign debug_bcd ={
 always_comb begin
     unique case(1'b1)
 
-    disp_zero           : bcd = {ALL_OFF, ALL_OFF, ALL_OFF, ALL_OFF, auto_sign, 5'h0,
-                                ALL_OFF, ALL_OFF, ALL_OFF, ALL_OFF, auto_sign, 5'h0};
-                                
     disp_denorm_norm    : bcd = pre_bcd;
 
+    disp_zero           : bcd = {ALL_OFF, ALL_OFF, ALL_OFF, ALL_OFF, auto_sign, 5'h0,
+                                ALL_OFF, ALL_OFF, ALL_OFF, ALL_OFF, auto_sign, 5'h0,
+                                ALL_OFF, ALL_OFF, ALL_OFF, ALL_OFF, auto_sign, 5'h0,
+                                ALL_OFF, ALL_OFF, ALL_OFF, ALL_OFF, auto_sign, 5'h0};
+
     disp_inf            : bcd = {ALL_OFF, ALL_OFF, auto_sign, LOWERCASE_I, LOWERCASE_N, LOWERCASE_F,
+                                ALL_OFF, ALL_OFF, auto_sign, LOWERCASE_I, LOWERCASE_N, LOWERCASE_F,
+                                ALL_OFF, ALL_OFF, auto_sign, LOWERCASE_I, LOWERCASE_N, LOWERCASE_F,
                                 ALL_OFF, ALL_OFF, auto_sign, LOWERCASE_I, LOWERCASE_N, LOWERCASE_F};
 
     disp_nan            : bcd = {ALL_OFF, ALL_OFF, ALL_OFF, UPPERCASE_N, UPPERCASE_A, UPPERCASE_N,
+                                ALL_OFF, ALL_OFF, ALL_OFF, UPPERCASE_N, UPPERCASE_A, UPPERCASE_N,
+                                ALL_OFF, ALL_OFF, ALL_OFF, UPPERCASE_N, UPPERCASE_A, UPPERCASE_N,
                                 ALL_OFF, ALL_OFF, ALL_OFF, UPPERCASE_N, UPPERCASE_A, UPPERCASE_N};
                                 
     default             : bcd = {5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19,
+                                5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19,
+                                5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19,
                                 5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19, 5'd19};
 
     endcase
 end
 
 assign ostart = start_q;
-assign oworking = (state_zero || state_denorm || state_norm || state_inf || state_nan);
+assign oworking = (state_zero || state_denorm || state_norm || state_denorm_int || state_norm_int || state_inf || state_nan);
 assign odone = state_done;
 
 endmodule

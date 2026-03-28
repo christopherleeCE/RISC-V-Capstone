@@ -6,7 +6,6 @@ module riscv_cpu_v2
     output logic ohalt, //when this is asserted, CPU should stop execution. Please implement in testbench
     output logic ofinish,
     output logic [31:0] a0,
-    output logic [31:0] pc_out,
     output logic [31:0] instr_f_out,
     output logic [31:0] instr_d_out,
     output logic [31:0] instr_e_out,
@@ -250,8 +249,6 @@ module riscv_cpu_v2
         .next_q(NEXT_PC),
         .q(PC)
     );
-
-    assign pc_out = PC;
 
     mk9_rom_mif_aclr mk9_instr_mem (
         .address(NEXT_PC[13:2]),
@@ -651,8 +648,8 @@ module riscv_cpu_v2
         endcase
     end
     
-    assign instr_f_out = INSTR_F;
-    assign instr_d_out = INSTR_D;
+    assign instr_f_out = INSTR_F_FLUSH;
+    assign instr_d_out = INSTR_D_FLUSH;
     assign instr_e_out = INSTR_E;
     assign instr_m_out = INSTR_M;
     assign instr_w_out = INSTR_W;
