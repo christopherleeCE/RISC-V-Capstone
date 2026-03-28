@@ -1,17 +1,15 @@
 #include <stdint.h>
 #include "tb.h"
 
-volatile int32_t pi_scaled_result;
-
 // Computes pi scaled by SCALE (fixed-point style)
-int32_t compute_pi(int iterations, int32_t SCALE) {
-    int32_t sum = 0;
+int compute_pi(int iterations, int SCALE) {
+    int sum = 0;
 
     for (int k = 0; k < iterations; k++) {
-        int32_t denom = 2 * k + 1;
+        int denom = 2 * k + 1;
 
         // term = SCALE / denom
-        int32_t term = SCALE / denom;   // forces div
+        int term = SCALE / denom;   // forces div
 
         if (k % 2 == 0) {               // forces rem
             sum += term;
@@ -78,9 +76,9 @@ float my_cos(float rads, int itr){
 
 int main() {
     // SCALE = 1,000,000 for fixed-point precision
-    int scale = 1000000;
-    int pi_interations = 1000; //1000 takes ~20 seconds to calculate pi
-    int trig_interations = 5; //above 6 or 7 (jajaja) will cause factorial overflow
+    int scale = 10000000; //havent seen an overflow with this
+    int pi_interations = 1000000;//1000; //use 1000000 in deployment
+    int trig_interations = 7; //above 6 or 7 (jajaja) will cause factorial overflow
 
     int scaled_pi;
     float float_pi;
@@ -89,20 +87,23 @@ int main() {
     float_pi = (float)scaled_pi / (float)scale;
 
     float magnitude = 7;
-    float angle = float_pi * .3;
+    float angle = float_pi * 1.3;
 
-    //return tb_return(angle*100);
 
-    float cos_val = my_cos(angle, 5);
-    float sin_val = my_sin(angle, 5);
+    float cos_val = my_cos(angle, trig_interations);
+    float sin_val = my_sin(angle, trig_interations);
 
     float x_vector = cos_val * magnitude;
     float y_vector = sin_val * magnitude;
 
-    //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
-    //printf("in cartesian cordinates, <%.2f, %.2f>\n", x_vector, y_vector);
+    #ifdef X86_BUILD
+    printf("float_pi: %f\n", float_pi);
+    printf("[cos sin] = [%f %f]\n", cos_val, sin_val);
+    printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
+    printf("in cartesian cordinates, <%.2f, %.2f>\n", x_vector, y_vector);
+    #endif
 
-    return tb_return(x_vector*100);
+    return tb_return(*(int*)&(float){y_vector});
 
 }
 
