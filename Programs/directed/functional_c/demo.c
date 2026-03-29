@@ -77,7 +77,7 @@ float my_cos(float rads, int itr){
 int main() {
     // SCALE = 1,000,000 for fixed-point precision
     uint64_t scale = 1000000000000; //havent seen an overflow with this
-    uint64_t pi_interations = 100000;//1000; //use 100000 in deployment
+    uint64_t pi_interations = 1000;//1000; //use 100000 in deployment
     int trig_interations = 10; //above 6 or 7 (jajaja) will cause factorial overflow
 
     uint64_t scaled_pi;
@@ -95,11 +95,11 @@ int main() {
     float x_vector = cos_val * magnitude;
     float y_vector = sin_val * magnitude;
 
-    #ifdef X86_BUILD
-        //printf("float_pi: %f\n", float_pi);
-        printf("[%f, %f, %f, %f]\n", cos_val, sin_val, x_vector, y_vector);
-        //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
-    #endif
+    // #ifdef X86_BUILD
+    //     //printf("float_pi: %f\n", float_pi);
+    //     printf("[%f, %f, %f, %f]\n", cos_val, sin_val, x_vector, y_vector);
+    //     //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
+    // #endif
     
     return tb_return(*(int*)&(float){x_vector});
 

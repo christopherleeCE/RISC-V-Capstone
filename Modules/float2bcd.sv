@@ -15,6 +15,7 @@ module float2bcd(
     // output logic state_inf,
     // output logic state_nan,
     output logic odone,
+    output logic dp_en,
     output logic [149:0]bcd
 );
 
@@ -286,5 +287,6 @@ end
 assign ostart = start_q;
 assign oworking = (state_zero || state_denorm || state_norm || state_denorm_int || state_norm_int || state_inf || state_nan);
 assign odone = state_done;
+assign dp_en = disp_denorm_norm;
 
 endmodule

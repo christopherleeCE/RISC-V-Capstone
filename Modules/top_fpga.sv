@@ -72,6 +72,7 @@ module top_fpga(
     logic ostart;
     logic oworking;
     logic float_done;
+    logic dp_en;
     logic [149:0] bcd;
 
     logic int_bcd_neg_flag;
@@ -204,6 +205,7 @@ module top_fpga(
         // .state_inf(state_inf),
         // .state_nan(state_nan),
         .odone(float_done),
+        .dp_en(dp_en),
         .bcd(bcd)
     );
 
@@ -315,10 +317,10 @@ module top_fpga(
     assign debug_leds[8] = oworking;
     assign debug_leds[9] = float_done && slow_flash;
 
-    assign hex_decimal_point[0] = ~(status_light || (switches[4:0] == 5'b01111) && ~ohalt);
+    assign hex_decimal_point[0] = ~(status_light || (switches[4:0] == 5'b01111) && dp_en && ~ohalt);
     assign hex_decimal_point[1] = ~(status_light);
     assign hex_decimal_point[2] = ~(status_light);
-    assign hex_decimal_point[3] = ~(status_light || (switches[3:0] == 4'b1101) && ~ohalt);
+    assign hex_decimal_point[3] = ~(status_light || (switches[3:0] == 4'b1101) && dp_en && ~ohalt);
     assign hex_decimal_point[4] = ~(status_light);
     assign hex_decimal_point[5] = ~(status_light);
 
