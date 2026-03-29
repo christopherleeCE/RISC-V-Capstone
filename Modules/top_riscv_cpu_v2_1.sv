@@ -19,6 +19,7 @@ holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like t
 TODO code coverage
 TODO more demo programs in C
 TODO contact abrams, maybe invite him to see the demo on demo day
+TODO fsm for array access
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
     status reg could contain some more info like the element size mayhaps :)
@@ -27,6 +28,9 @@ TODO discuss the uart needs, may need a self clearing reg, dual port mem, its ow
 Out of Semester
 ===============
 frame buffer
+ecall (contr regs?)
+fsm for ecall???
+
 
 --------------TEST LOG----------------------------------------------------
 
