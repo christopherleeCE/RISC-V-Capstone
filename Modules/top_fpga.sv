@@ -245,9 +245,9 @@ module top_fpga(
             4'hA : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_e_out[31:28], 1'b0, pc_e_out[27:24], 1'b0, pc_e_out[23:20], 1'b0, pc_e_out[19:16], 1'b0, pc_e_out[15:12], 1'b0, pc_e_out[11:8], 1'b0, pc_e_out[7:4], 1'b0, pc_e_out[3:0]};
             4'hB : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_m_out[31:28], 1'b0, pc_m_out[27:24], 1'b0, pc_m_out[23:20], 1'b0, pc_m_out[19:16], 1'b0, pc_m_out[15:12], 1'b0, pc_m_out[11:8], 1'b0, pc_m_out[7:4], 1'b0, pc_m_out[3:0]};
             4'hC : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_w_out[31:28], 1'b0, pc_w_out[27:24], 1'b0, pc_w_out[23:20], 1'b0, pc_w_out[19:16], 1'b0, pc_w_out[15:12], 1'b0, pc_w_out[11:8], 1'b0, pc_w_out[7:4], 1'b0, pc_w_out[3:0]};
-            4'hD : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[29:0], bcd[29:0]};
-            4'hE : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[89:60], bcd[59:30]};
-            4'hF : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[149:120], bcd[119:90]};
+            4'hD : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[29:0], bcd[29:0]};      //lower 2 int digits, upper 3 fractional digits, with neg sign as applicable
+            4'hE : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[89:60], bcd[59:30]};    //fractional section of float
+            4'hF : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[149:120], bcd[119:90]}; //int section of float
             default: {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = 60'hEEFCAFEDEADBEEF;
 
         endcase
