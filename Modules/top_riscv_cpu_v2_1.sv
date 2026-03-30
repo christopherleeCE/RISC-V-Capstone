@@ -24,6 +24,7 @@ TODO fsm for topfile array access via 2nd data_mem port
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
     status reg could contain some more info like the element size mayhaps :)
+TODO try to fix dual port warning
 
 
 Out of Semester
@@ -169,6 +170,10 @@ module top_riscv_cpu_v2_1();
     logic [31:0] pc_e_out;
     logic [31:0] pc_m_out;
     logic [31:0] pc_w_out;
+    logic portb_rst;
+    logic [31:0] portb_addr;
+    logic portb_clk;
+    logic [31:0] portb_q;
 
     assign INSTR_FLUSH = cpu_dut.stall ? 32'h00000013 :  INSTR_ASYNC;
 
@@ -189,7 +194,11 @@ module top_riscv_cpu_v2_1();
         .pc_d_out(pc_d_out),
         .pc_e_out(pc_e_out),
         .pc_m_out(pc_m_out),
-        .pc_w_out(pc_w_out)
+        .pc_w_out(pc_w_out),
+        .portb_rst(portb_rst),
+        .portb_addr(portb_addr),
+        .portb_clk(portb_clk),
+        .portb_q(portb_q)
     );
 
     //grabing vsim args

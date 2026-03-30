@@ -1,20 +1,24 @@
 
 module data_memory
   #( 
-     parameter int BIT_WIDTH,
-     parameter int ADDR_WIDTH=32 
-     )
-   (
-    input  logic [ADDR_WIDTH-1:0] addr,
-    input  logic [BIT_WIDTH-1:0] writeData,
-    input  logic          writeEn,
-    output logic [BIT_WIDTH-1:0] readData,
-    input  logic          clk,
-    input  logic          rst,
-    input  logic          addr_byte,          //are we reading/writing a byte, half-word, or word?
-    input  logic          addr_half,
-    input  logic          zero_extend           //should we zero-extend the data read from memory
-    );
+      parameter int BIT_WIDTH,
+      parameter int ADDR_WIDTH=32 
+   )(
+      input  logic [ADDR_WIDTH-1:0] addr,
+      input  logic [BIT_WIDTH-1:0] writeData,
+      input  logic          writeEn,
+      output logic [BIT_WIDTH-1:0] readData,
+      input  logic          clk,
+      input  logic          rst,
+      input  logic          addr_byte,          //are we reading/writing a byte, half-word, or word?
+      input  logic          addr_half,
+      input  logic          zero_extend,           //should we zero-extend the data read from memory
+
+      input logic portb_rst,
+      input logic [ADDR_WIDTH-1:0] portb_addr,
+      input logic portb_clk,
+      input logic [BIT_WIDTH-1:0] portb_q
+   );
 
    // byteena and halfena signals for data memory
    logic [3:0] byteena_temp, halfena_temp, byteena_sig;
@@ -141,15 +145,31 @@ module data_memory
       .q({addr_byte_internal_mirror, addr_half_internal_mirror, zero_extend_mirror})
    );
 
-   mk9_ram_mif	mk9_ram_mif_inst (
-      .aclr ( !rst ),
-      .address ( addr[11:2] ),
-      .byteena ( byteena_sig ),
-      .clock ( clk ),
-      .data ( writeWord ),
-      .wren ( writeEn ),
-      .q ( data_out_mem )
-   );
+   // mk9_ram_mif	mk9_ram_mif_inst (
+   //    .aclr ( !rst ),
+   //    .address ( addr[11:2] ),
+   //    .byteena ( byteena_sig ),
+   //    .clock ( clk ),
+   //    .data ( writeWord ),
+   //    .wren ( writeEn ),
+   //    .q ( data_out_mem )
+   // );
+
+   dual_mk9_ram_mif my_dual_mk9_ram_mif(
+      .aclr_a(!rst),
+      .address_a(addr[11:2]),
+      .byteena_a(byteena_sig),
+      .clock_a(clk),
+      .data_a(writeWord),
+      .wren_a(writeEn),
+      .q_a(data_out_mem),
+      .aclr_b(portb_rst),
+      .address_b(portb_addr[11:2]),
+      .clock_b(portb_clk),
+      .data_b(32'b0),
+      .wren_b(1'b0),
+      .q_b(portb_q)
+	);
 
    /* < Read from MEM > */ //==================================================================================================== 
 

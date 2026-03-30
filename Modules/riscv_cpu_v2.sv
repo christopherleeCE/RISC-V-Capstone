@@ -15,7 +15,11 @@ module riscv_cpu_v2
     output logic [31:0] pc_d_out,
     output logic [31:0] pc_e_out,
     output logic [31:0] pc_m_out,
-    output logic [31:0] pc_w_out
+    output logic [31:0] pc_w_out,
+    input logic portb_rst,
+    input logic [31:0] portb_addr,
+    input logic portb_clk,
+    input logic [31:0] portb_q
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
@@ -70,6 +74,7 @@ module riscv_cpu_v2
     logic [31:0] DATA_MEM_OUT, NEW_DATA_MEM_OUT;
     logic [31:0] DATA_MEM_OUT_W;
     logic [31:0] DATA_MEM_ADDR;
+    logic [31:0] DATA_MEM_ADDR_B;
 
     logic zero_flag;               //from alu, is the result zero?
     logic less_than;              //from alu, is op1 < op2? (for signed comparisons)
@@ -556,6 +561,7 @@ module riscv_cpu_v2
 
     // synchronous-read data mem, so inputs come straight from EX stage
     assign DATA_MEM_ADDR = ALU - LOWEST_DATA_MEM_ADDR;
+    assign DATA_MEM_ADDR_B = portb_addr - LOWEST_DATA_MEM_ADDR;
 
     data_memory #(
         .BIT_WIDTH(32)
@@ -568,7 +574,11 @@ module riscv_cpu_v2
         .rst(rst),
         .addr_byte(addr_byte_E),
         .addr_half(addr_half_E),
-        .zero_extend(zero_extend_mem_E)
+        .zero_extend(zero_extend_mem_E),
+        .portb_rst(portb_rst),
+        .portb_addr(DATA_MEM_ADDR_B),
+        .portb_clk(portb_clk),
+        .portb_q(portb_q)
     ); 
 
     //leaving this here in case we need to compare the bram to the lutram behavior at any point
