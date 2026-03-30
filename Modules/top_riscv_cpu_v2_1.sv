@@ -19,7 +19,8 @@ holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like t
 TODO code coverage
 TODO more demo programs in C
 TODO contact abrams, maybe invite him to see the demo on demo day
-TODO fsm for array access
+TODO add 2nd port to data me, make accessable externally
+TODO fsm for topfile array access via 2nd data_mem port
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
     status reg could contain some more info like the element size mayhaps :)
@@ -27,9 +28,15 @@ TODO discuss the uart needs, may need a self clearing reg, dual port mem, its ow
 
 Out of Semester
 ===============
-frame buffer
-ecall (contr regs?)
-fsm for ecall???
+in datamem there is a text buffer and frame buffer, when in text mode (controll reg required)
+vga will read from port b of the datamem, apply font, output to vga, independent of the cpu state
+when in graphics mode, vga reads from frame buffer though port b, and output through vga
+ecall (print) would do things like handle write to frame buffer, update cursor, handle newline,
+handle scrolling (keyboard input seems a bit out of scope but who knows maybe that will change at some poitn)
+doing something like a controller, we have an async button, 2FF syncronizer, debounce, optional sample reg(realisticly
+could be implemented in software by just only polling the inputs in the program at specific times), store in special
+register, heve it memmapped, that is to say a LW(special_addr) fetches from that register,
+we can tell c to map a variable that specific addr (the addr of the special reg)
 
 
 --------------TEST LOG----------------------------------------------------
