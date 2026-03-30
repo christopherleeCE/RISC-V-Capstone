@@ -134,7 +134,27 @@ module top_fpga(
 
     // //this is the "correct" way we should be assigning the clk
     // assign local_clk = debug_clk;
+    logic [31:0] portb_q, portb_addr;
+    logic b_loading, b_incing;
+    always_ff @(posedge manual_clk or posedge debug_clk_en) begin
+        if(debug_clk_en) begin //rst
+            b_loading <= 1'b1;
+            b_incing <= '0;
 
+            portb_addr <= '0;
+
+        end else if(b_loading) begin
+            b_loading <= '0;
+            b_incing <= 1'b1;
+
+            portb_addr <= ret_val;
+
+        end else if(b_incing) begin
+
+            portb_addr <= portb_addr + 32'h4;
+
+        end
+    end
     riscv_cpu_v2 cpu_dut(
         .clk(local_clk),
         .rst(local_rst),
@@ -150,7 +170,11 @@ module top_fpga(
         .pc_d_out(pc_d_out),
         .pc_e_out(pc_e_out),
         .pc_m_out(pc_m_out),
-        .pc_w_out(pc_w_out)
+        .pc_w_out(pc_w_out),
+        .portb_rst(1'b1),//.portb_rst(!debug_clk_en),
+        .portb_addr(portb_addr),
+        .portb_clk(manual_clk),
+        .portb_q(portb_q)
     );
 
     bin_to_bcd #(
@@ -233,6 +257,7 @@ module top_fpga(
 
             //hell... hexdecoders are 5bits wide, 5'b0XXXX are normal hex values, 5'b1XXXX are special chars, bcd is already encoded correctly in the float2bcd moudle, the rest of the case statement needs to be encoded manually as seen below
             4'h0 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_f_out[31:28], 1'b0, instr_f_out[27:24], 1'b0, instr_f_out[23:20], 1'b0, instr_f_out[19:16], 1'b0, instr_f_out[15:12], 1'b0, instr_f_out[11:8], 1'b0, instr_f_out[7:4], 1'b0, instr_f_out[3:0]};
+            //4'h0 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {1'b0, portb_q[23:20], 1'b0, portb_q[19:16], 1'b0, portb_q[15:12], 1'b0, portb_q[11:8], 1'b0, portb_q[7:4], 1'b0, portb_q[3:0], 1'b0, portb_addr[23:20], 1'b0, portb_addr[19:16], 1'b0, portb_addr[15:12], 1'b0, portb_addr[11:8], 1'b0, portb_addr[7:4], 1'b0, portb_addr[3:0]};
             4'h1 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_d_out[31:28], 1'b0, instr_d_out[27:24], 1'b0, instr_d_out[23:20], 1'b0, instr_d_out[19:16], 1'b0, instr_d_out[15:12], 1'b0, instr_d_out[11:8], 1'b0, instr_d_out[7:4], 1'b0, instr_d_out[3:0]};
             4'h2 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_e_out[31:28], 1'b0, instr_e_out[27:24], 1'b0, instr_e_out[23:20], 1'b0, instr_e_out[19:16], 1'b0, instr_e_out[15:12], 1'b0, instr_e_out[11:8], 1'b0, instr_e_out[7:4], 1'b0, instr_e_out[3:0]};
             4'h3 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_m_out[31:28], 1'b0, instr_m_out[27:24], 1'b0, instr_m_out[23:20], 1'b0, instr_m_out[19:16], 1'b0, instr_m_out[15:12], 1'b0, instr_m_out[11:8], 1'b0, instr_m_out[7:4], 1'b0, instr_m_out[3:0]};

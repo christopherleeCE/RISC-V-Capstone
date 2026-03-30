@@ -1,25 +1,19 @@
 #include "tb.h"
 
-volatile int num = 3;
-volatile int num1 = 13;
-volatile int num2 = 23;
-volatile int num3 = 33;
-volatile int num4 = 43;
-volatile int num5 = 53;
-volatile int num6 = 63;
-volatile int num7 = 73;
-
 int main(){
 
-    int x = 7 + num;
-    x = 7 + num1;
-    x = 7 + num2;
-    x = 7 + num3;
-    x = 7 + num4;
-    x = 7 + num5;
-    x = 7 + num6;
-    x = 7 + num7;
+    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
 
-    return tb_return(num * num2);
+    arr[1] = arr[1] + 10;
+    arr[3] = arr[3] + 10;
+    arr[5] = arr[5] + 10;
+    arr[7] = arr[7] + 10;
+
+    int x = 0;
+    for(int ii = 0; ii < 1000; ii++){
+        x = x * 3;
+    }
+
+    return tb_return((int)arr);
 
 }
