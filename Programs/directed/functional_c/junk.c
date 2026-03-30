@@ -14,6 +14,6 @@ int main(){
         x = x * 3;
     }
 
-    return tb_return((int)arr);
+    return tb_return(0);//(int)arr);
 
 }
