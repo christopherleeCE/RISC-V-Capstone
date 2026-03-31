@@ -19,7 +19,7 @@ module riscv_cpu_v2
     input logic portb_rst,
     input logic [31:0] portb_addr,
     input logic portb_clk,
-    input logic [31:0] portb_q
+    output logic [31:0] portb_q
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore

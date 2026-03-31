@@ -25,7 +25,13 @@ _start:
             nop
             nop
             nop
-            nop
+            li sp, 0x4000
+            lw x10, 0(sp)
+            lw x11, 4(sp)
+            lw x12, 8(sp)
+            lw x13, 12(sp)
+            lw x14, 16(sp)
+            lw x15, 20(sp)
             nop
             nop
             nop
@@ -275,3 +281,6 @@ _start:
 .section .data
     .word 0x00004000
     .word 0xCAFEBABE
+    .word 0x080081E5
+    .word 0x12345678
+    .word 0x87654321

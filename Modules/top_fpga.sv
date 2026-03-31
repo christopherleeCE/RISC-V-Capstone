@@ -29,7 +29,7 @@ module top_fpga(
     logic [1:0] my_buttons; //inverted buttons so press is 1
     logic [9:0] dbswitches; //debounced switches
 
-    logic [31:0] ret_val;
+    logic [31:0] a0, ret_val;
     logic [31:0] curr_pc;
     logic [31:0] instr_f_out;
     logic [31:0] instr_d_out;
@@ -147,7 +147,7 @@ module top_fpga(
             b_loading <= '0;
             b_incing <= 1'b1;
 
-            portb_addr <= ret_val;
+            portb_addr <= a0;
 
         end else if(b_incing) begin
 
@@ -160,7 +160,7 @@ module top_fpga(
         .rst(local_rst),
         .ohalt(ohalt),
         .ofinish(ofinish),
-        .a0(ret_val),
+        .a0(a0),
         .instr_f_out(instr_f_out),
         .instr_d_out(instr_d_out),
         .instr_e_out(instr_e_out),
@@ -171,11 +171,22 @@ module top_fpga(
         .pc_e_out(pc_e_out),
         .pc_m_out(pc_m_out),
         .pc_w_out(pc_w_out),
-        .portb_rst(1'b1),//.portb_rst(!debug_clk_en),
+        .portb_rst(!debug_clk_en),
         .portb_addr(portb_addr),
         .portb_clk(manual_clk),
         .portb_q(portb_q)
     );
+
+    always_comb begin
+        case(switches[6:5])
+
+            2'd0 : ret_val = a0;
+            2'd1 : ret_val = a0;
+            2'd2 : ret_val = portb_q;
+            2'd3 : ret_val = portb_addr;
+
+        endcase
+    end
 
     bin_to_bcd #(
         .bin_width(32),
@@ -256,23 +267,22 @@ module top_fpga(
         case(hex_sel)
 
             //hell... hexdecoders are 5bits wide, 5'b0XXXX are normal hex values, 5'b1XXXX are special chars, bcd is already encoded correctly in the float2bcd moudle, the rest of the case statement needs to be encoded manually as seen below
-            4'h0 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_f_out[31:28], 1'b0, instr_f_out[27:24], 1'b0, instr_f_out[23:20], 1'b0, instr_f_out[19:16], 1'b0, instr_f_out[15:12], 1'b0, instr_f_out[11:8], 1'b0, instr_f_out[7:4], 1'b0, instr_f_out[3:0]};
-            //4'h0 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {1'b0, portb_q[23:20], 1'b0, portb_q[19:16], 1'b0, portb_q[15:12], 1'b0, portb_q[11:8], 1'b0, portb_q[7:4], 1'b0, portb_q[3:0], 1'b0, portb_addr[23:20], 1'b0, portb_addr[19:16], 1'b0, portb_addr[15:12], 1'b0, portb_addr[11:8], 1'b0, portb_addr[7:4], 1'b0, portb_addr[3:0]};
-            4'h1 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_d_out[31:28], 1'b0, instr_d_out[27:24], 1'b0, instr_d_out[23:20], 1'b0, instr_d_out[19:16], 1'b0, instr_d_out[15:12], 1'b0, instr_d_out[11:8], 1'b0, instr_d_out[7:4], 1'b0, instr_d_out[3:0]};
-            4'h2 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_e_out[31:28], 1'b0, instr_e_out[27:24], 1'b0, instr_e_out[23:20], 1'b0, instr_e_out[19:16], 1'b0, instr_e_out[15:12], 1'b0, instr_e_out[11:8], 1'b0, instr_e_out[7:4], 1'b0, instr_e_out[3:0]};
-            4'h3 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_m_out[31:28], 1'b0, instr_m_out[27:24], 1'b0, instr_m_out[23:20], 1'b0, instr_m_out[19:16], 1'b0, instr_m_out[15:12], 1'b0, instr_m_out[11:8], 1'b0, instr_m_out[7:4], 1'b0, instr_m_out[3:0]};
-            4'h4 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_w_out[31:28], 1'b0, instr_w_out[27:24], 1'b0, instr_w_out[23:20], 1'b0, instr_w_out[19:16], 1'b0, instr_w_out[15:12], 1'b0, instr_w_out[11:8], 1'b0, instr_w_out[7:4], 1'b0, instr_w_out[3:0]};
-            4'h5 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, ret_val[31:28], 1'b0, ret_val[27:24], 1'b0, ret_val[23:20], 1'b0, ret_val[19:16], 1'b0, ret_val[15:12], 1'b0, ret_val[11:8], 1'b0, ret_val[7:4], 1'b0, ret_val[3:0]};
-            4'h6 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = int_bcd_output; //udec
-            4'h7 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = int_bcd_output; //sdec
-            4'h8 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_f_out[31:28], 1'b0, pc_f_out[27:24], 1'b0, pc_f_out[23:20], 1'b0, pc_f_out[19:16], 1'b0, pc_f_out[15:12], 1'b0, pc_f_out[11:8], 1'b0, pc_f_out[7:4], 1'b0, pc_f_out[3:0]};
-            4'h9 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_d_out[31:28], 1'b0, pc_d_out[27:24], 1'b0, pc_d_out[23:20], 1'b0, pc_d_out[19:16], 1'b0, pc_d_out[15:12], 1'b0, pc_d_out[11:8], 1'b0, pc_d_out[7:4], 1'b0, pc_d_out[3:0]};
-            4'hA : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_e_out[31:28], 1'b0, pc_e_out[27:24], 1'b0, pc_e_out[23:20], 1'b0, pc_e_out[19:16], 1'b0, pc_e_out[15:12], 1'b0, pc_e_out[11:8], 1'b0, pc_e_out[7:4], 1'b0, pc_e_out[3:0]};
-            4'hB : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_m_out[31:28], 1'b0, pc_m_out[27:24], 1'b0, pc_m_out[23:20], 1'b0, pc_m_out[19:16], 1'b0, pc_m_out[15:12], 1'b0, pc_m_out[11:8], 1'b0, pc_m_out[7:4], 1'b0, pc_m_out[3:0]};
-            4'hC : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_w_out[31:28], 1'b0, pc_w_out[27:24], 1'b0, pc_w_out[23:20], 1'b0, pc_w_out[19:16], 1'b0, pc_w_out[15:12], 1'b0, pc_w_out[11:8], 1'b0, pc_w_out[7:4], 1'b0, pc_w_out[3:0]};
-            4'hD : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[29:0], bcd[29:0]};      //lower 2 int digits, upper 3 fractional digits, with neg sign as applicable
-            4'hE : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[89:60], bcd[59:30]};    //fractional section of float
-            4'hF : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[149:120], bcd[119:90]}; //int section of float
+            5'h0 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_f_out[31:28], 1'b0, instr_f_out[27:24], 1'b0, instr_f_out[23:20], 1'b0, instr_f_out[19:16], 1'b0, instr_f_out[15:12], 1'b0, instr_f_out[11:8], 1'b0, instr_f_out[7:4], 1'b0, instr_f_out[3:0]};
+            5'h1 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_d_out[31:28], 1'b0, instr_d_out[27:24], 1'b0, instr_d_out[23:20], 1'b0, instr_d_out[19:16], 1'b0, instr_d_out[15:12], 1'b0, instr_d_out[11:8], 1'b0, instr_d_out[7:4], 1'b0, instr_d_out[3:0]};
+            5'h2 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_e_out[31:28], 1'b0, instr_e_out[27:24], 1'b0, instr_e_out[23:20], 1'b0, instr_e_out[19:16], 1'b0, instr_e_out[15:12], 1'b0, instr_e_out[11:8], 1'b0, instr_e_out[7:4], 1'b0, instr_e_out[3:0]};
+            5'h3 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_m_out[31:28], 1'b0, instr_m_out[27:24], 1'b0, instr_m_out[23:20], 1'b0, instr_m_out[19:16], 1'b0, instr_m_out[15:12], 1'b0, instr_m_out[11:8], 1'b0, instr_m_out[7:4], 1'b0, instr_m_out[3:0]};
+            5'h4 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, instr_w_out[31:28], 1'b0, instr_w_out[27:24], 1'b0, instr_w_out[23:20], 1'b0, instr_w_out[19:16], 1'b0, instr_w_out[15:12], 1'b0, instr_w_out[11:8], 1'b0, instr_w_out[7:4], 1'b0, instr_w_out[3:0]};
+            5'h5 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, ret_val[31:28], 1'b0, ret_val[27:24], 1'b0, ret_val[23:20], 1'b0, ret_val[19:16], 1'b0, ret_val[15:12], 1'b0, ret_val[11:8], 1'b0, ret_val[7:4], 1'b0, ret_val[3:0]};
+            5'h6 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = int_bcd_output; //udec
+            5'h7 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = int_bcd_output; //sdec
+            5'h8 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_f_out[31:28], 1'b0, pc_f_out[27:24], 1'b0, pc_f_out[23:20], 1'b0, pc_f_out[19:16], 1'b0, pc_f_out[15:12], 1'b0, pc_f_out[11:8], 1'b0, pc_f_out[7:4], 1'b0, pc_f_out[3:0]};
+            5'h9 : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_d_out[31:28], 1'b0, pc_d_out[27:24], 1'b0, pc_d_out[23:20], 1'b0, pc_d_out[19:16], 1'b0, pc_d_out[15:12], 1'b0, pc_d_out[11:8], 1'b0, pc_d_out[7:4], 1'b0, pc_d_out[3:0]};
+            5'hA : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_e_out[31:28], 1'b0, pc_e_out[27:24], 1'b0, pc_e_out[23:20], 1'b0, pc_e_out[19:16], 1'b0, pc_e_out[15:12], 1'b0, pc_e_out[11:8], 1'b0, pc_e_out[7:4], 1'b0, pc_e_out[3:0]};
+            5'hB : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_m_out[31:28], 1'b0, pc_m_out[27:24], 1'b0, pc_m_out[23:20], 1'b0, pc_m_out[19:16], 1'b0, pc_m_out[15:12], 1'b0, pc_m_out[11:8], 1'b0, pc_m_out[7:4], 1'b0, pc_m_out[3:0]};
+            5'hC : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {20'b0, 1'b0, pc_w_out[31:28], 1'b0, pc_w_out[27:24], 1'b0, pc_w_out[23:20], 1'b0, pc_w_out[19:16], 1'b0, pc_w_out[15:12], 1'b0, pc_w_out[11:8], 1'b0, pc_w_out[7:4], 1'b0, pc_w_out[3:0]};
+            5'hD : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[29:0], bcd[29:0]};      //lower 2 int digits, upper 3 fractional digits, with neg sign as applicable
+            5'hE : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[89:60], bcd[59:30]};    //fractional section of float
+            5'hF : {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = {bcd[149:120], bcd[119:90]}; //int section of float
             default: {pre_hex11, pre_hex10, pre_hex9, pre_hex8, pre_hex7, pre_hex6, pre_hex5, pre_hex4, pre_hex3, pre_hex2, pre_hex1, pre_hex0} = 60'hEEFCAFEDEADBEEF;
 
         endcase

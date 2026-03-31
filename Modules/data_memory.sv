@@ -17,7 +17,7 @@ module data_memory
       input logic portb_rst,
       input logic [ADDR_WIDTH-1:0] portb_addr,
       input logic portb_clk,
-      input logic [BIT_WIDTH-1:0] portb_q
+      output logic [BIT_WIDTH-1:0] portb_q
    );
 
    // byteena and halfena signals for data memory
@@ -163,7 +163,7 @@ module data_memory
       .data_a(writeWord),
       .wren_a(writeEn),
       .q_a(data_out_mem),
-      .aclr_b(portb_rst),
+      .aclr_b(!portb_rst),
       .address_b(portb_addr[11:2]),
       .clock_b(portb_clk),
       .data_b(32'b0),
