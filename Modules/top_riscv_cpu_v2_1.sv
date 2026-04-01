@@ -175,6 +175,7 @@ module top_riscv_cpu_v2_1();
     logic [31:0] portb_addr;
     logic portb_clk;
     logic [31:0] portb_q;
+    logic portb_addr_byte;
 
     assign INSTR_FLUSH = cpu_dut.stall ? 32'h00000013 :  INSTR_ASYNC;
 
@@ -199,7 +200,8 @@ module top_riscv_cpu_v2_1();
         .portb_rst(portb_rst),
         .portb_addr(portb_addr),
         .portb_clk(portb_clk),
-        .portb_q(portb_q)
+        .portb_q(portb_q),
+        .portb_addr_byte(portb_addr_byte)
     );
 
     //grabing vsim args

@@ -87,6 +87,8 @@ module top_fpga(
     logic [6:0] pre_hex_disp4;
     logic [6:0] pre_hex_disp5;
 
+    logic ascii_mode;
+    assign ascii_mode = switches[6:5] == 2'b01;
 
     assign my_buttons = ~buttons;
 
@@ -159,7 +161,7 @@ module top_fpga(
 
         end else if(b_incing) begin
 
-            portb_addr <= portb_addr + 32'h4;
+            portb_addr <= portb_addr + ((ascii_mode) ? 32'h1 : 32'h4);
 
         end
     end
@@ -182,7 +184,8 @@ module top_fpga(
         .portb_rst(!debug_clk_en),
         .portb_addr(portb_addr),
         .portb_clk(manual_clk),
-        .portb_q(portb_q)
+        .portb_q(portb_q),
+        .portb_addr_byte(ascii_mode)
     );
 
     always_comb begin
@@ -315,12 +318,12 @@ module top_fpga(
         .ZOUT(ascii_hex_decoded)
     );
 
-    assign hex0 = (switches[6:5] == 2'b01) ? ascii_hex_decoded : pre_hex_disp0;
-    assign hex1 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp1;
-    assign hex2 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp2;
-    assign hex3 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp3;
-    assign hex4 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp4;
-    assign hex5 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp5;
+    assign hex0 = (ascii_mode) ? ascii_hex_decoded : pre_hex_disp0;
+    assign hex1 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp1;
+    assign hex2 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp2;
+    assign hex3 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp3;
+    assign hex4 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp4;
+    assign hex5 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp5;
 
     clk_divider #(
         .DIVIDE(BASE_CLK_FREQ/SLOW_FLASHING_LIGHT_FREQ)
