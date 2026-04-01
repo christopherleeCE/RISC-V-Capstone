@@ -23,8 +23,6 @@ TODO discuss the uart needs, may need a self clearing reg, dual port mem, its ow
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
     status reg could contain some more info like the element size mayhaps :)
 TODO try to fix dual port warning
-TODO asci table for topfpga
-TODO added byte access in the dual port
 TODO maybe some cool external libs, like malloc
 
 
