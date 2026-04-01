@@ -1,6 +1,36 @@
 
 //alt pll in ip catalogcheckch
 
+/*
+topbutton enable 10hz clk, if full clk is disabled
+bottombutton manual clk button, active if full clk is disabled
+topbutton rst the pointer seq engine
+bottombutton increment the pointer seq engine
+
+sw[9] rst to cpu active low
+sw[8] enable full clk (5mhz)
+sw[7] n/a
+sw[6:5] select the source [11 10 01 00] = [pointer in seq engine, contents of pointer loc, ascii mode (overites sw[4:0]), raw retvalue]
+sw[4] select if we display the upper 6 digits or lower 6 digits
+sw[3:0]...
+0000 instr_f
+0001 instr_d
+0010 instr_e
+0011 instr_m
+0100 instr_w
+0101 rethex
+0110 udec
+0111 sdec
+1000 pc_f
+1001 pc_d
+1010 pc_e
+1011 pc_m
+1100 pc_w
+1101 floatmix (1 sign, 2 ints, 3 fractions), mirrored on disp low and high
+1110 6'floatfrac / 6'floatfrac
+1111 sign, 5'floatint / 6'floatint
+*/
+
 module top_fpga(
     input logic global_clk,
     input logic [9:0] switches,
@@ -255,24 +285,7 @@ module top_fpga(
         .bcd(bcd)
     );
 
-/*
-1 0000 instr
-1 0001 instr
-1 0010 instr
-1 0011 instr
-1 0100 instr
-1 0101 rethex
-1 0110 udec
-1 0111 sdec
-1 1000 pc
-1 1001 pc
-1 1010 pc
-1 1011 pc
-1 1100 pc
-1 1101 floatmix
-1 1110 floatfac/floatint
-1 1111 floatint/floatint(sign)
-*/  assign hex_sel = switches[3:0];
+    assign hex_sel = switches[3:0];
 
     always_comb begin
         case(hex_sel)
