@@ -17,7 +17,8 @@ module data_memory
       input logic portb_rst,
       input logic [ADDR_WIDTH-1:0] portb_addr,
       input logic portb_clk,
-      output logic [BIT_WIDTH-1:0] portb_q
+      output logic [BIT_WIDTH-1:0] portb_q,
+      input logic portb_addr_byte
    );
 
    // byteena and halfena signals for data memory
@@ -155,6 +156,37 @@ module data_memory
    //    .q ( data_out_mem )
    // );
 
+   logic [31:0] addr_internal_mirrorb;
+   logic [31:0] data_out_memb;
+   logic [31:0] readWordb;
+   logic [7:0] data_byte_rb;
+   logic [15:0] data_half_rb;
+   logic [31:0] readDataPreMaskb;
+   logic addr_byteb, addr_byte_internal_mirrorb;
+
+   assign addr_byteb = portb_addr_byte;
+
+   dff_async_reset #(
+      .WIDTH(32)
+   )addr_mirrorb(
+      .d(portb_addr),
+      .clk(portb_clk),
+      .rst(portb_rst),
+      .wr_en(1'b1),
+      .q(addr_internal_mirrorb)
+   );
+
+   dff_async_reset #(
+      .WIDTH(1)
+   )addr_byte_mirrorb(
+      .d(addr_byteb),
+      .clk(portb_clk),
+      .rst(portb_rst),
+      .wr_en(1'b1),
+      .q(addr_byte_internal_mirrorb)
+   );
+
+
    dual_mk9_ram_mif my_dual_mk9_ram_mif(
       .aclr_a(!rst),
       .address_a(addr[11:2]),
@@ -168,14 +200,15 @@ module data_memory
       .clock_b(portb_clk),
       .data_b(32'b0),
       .wren_b(1'b0),
-      .q_b(portb_q)
+      .q_b(data_out_memb)
 	);
 
    /* < Read from MEM > */ //==================================================================================================== 
 
    //preventing aliasing
    // assign readWord = (addr_internal_mirror[31:12] == '0) ? data_out_mem : 32'h0;
-   assign readWord = data_out_mem;     
+   assign readWord = data_out_mem;
+   assign readWordb = data_out_memb;    
 
    // select the appropriate byte based on the address
    always_comb begin
@@ -188,8 +221,19 @@ module data_memory
       endcase
    end
 
+   always_comb begin
+      unique case (addr_internal_mirrorb[1:0])
+            2'b00	:	data_byte_rb = readWordb[7:0];
+            2'b01	:	data_byte_rb = readWordb[15:8];
+            2'b10	:	data_byte_rb = readWordb[23:16];
+            2'b11	:	data_byte_rb = readWordb[31:24];
+            default	:	data_byte_rb = readWordb[7:0];
+      endcase
+   end
+
    // select the appropriate half-word based on the address
    assign data_half_r = addr_internal_mirror[1] ? readWord[31:16] : readWord[15:0];
+   assign data_half_rb = addr_internal_mirrorb[1] ? readWordb[31:16] : readWordb[15:0];
 
    // are we reading a byte, half-word, or word?
    // always_comb begin
@@ -207,9 +251,15 @@ module data_memory
             default	:	readDataPreMask = readWord;
       endcase
    end
+   always_comb begin
+      unique case ({addr_byte_internal_mirrorb})
+            2'b1	:	readDataPreMaskb = {24'b0, data_byte_rb};
+            default	:	readDataPreMaskb = readWordb;
+      endcase
+   end
 
    assign readData = (addr_internal_mirror[31:12] == '0) ? readDataPreMask : 32'h0;
-
+   assign portb_q = (addr_internal_mirrorb[31:12] == '0) ? readDataPreMaskb : 32'h0;
 
    
 endmodule 

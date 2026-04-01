@@ -19,7 +19,8 @@ module riscv_cpu_v2
     input logic portb_rst,
     input logic [31:0] portb_addr,
     input logic portb_clk,
-    output logic [31:0] portb_q
+    output logic [31:0] portb_q,
+    input logic portb_addr_byte
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
@@ -578,7 +579,8 @@ module riscv_cpu_v2
         .portb_rst(portb_rst),
         .portb_addr(DATA_MEM_ADDR_B),
         .portb_clk(portb_clk),
-        .portb_q(portb_q)
+        .portb_q(portb_q),
+        .portb_addr_byte(portb_addr_byte)
     ); 
 
     //leaving this here in case we need to compare the bram to the lutram behavior at any point

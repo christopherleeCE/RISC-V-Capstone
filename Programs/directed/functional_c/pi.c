@@ -31,7 +31,7 @@ int main() {
 
     int MILLION = 1000000;
     int scale = 1000000000; //largest scale without overflow
-    int interations_fpga = 1*MILLION;
+    int interations_fpga = 10*MILLION;
     int interations_sim = 1000;
 
     // :)
