@@ -19,12 +19,13 @@ holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like t
 TODO code coverage
 TODO more demo programs in C
 TODO contact abrams, maybe invite him to see the demo on demo day
-TODO add 2nd port to data me, make accessable externally
-TODO fsm for topfile array access via 2nd data_mem port
 TODO discuss the uart needs, may need a self clearing reg, dual port mem, its own sequencing engine, null terminator etc
     maybe an addr reg, and a size reg (in bytes), and a status reg, write to the staTus reg, gets self cleared, but addr and size reg are untouched
     status reg could contain some more info like the element size mayhaps :)
 TODO try to fix dual port warning
+TODO asci table for topfpga
+TODO added byte access in the dual port
+TODO maybe some cool external libs, like malloc
 
 
 Out of Semester
