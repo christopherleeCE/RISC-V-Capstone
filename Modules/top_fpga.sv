@@ -79,6 +79,14 @@ module top_fpga(
     logic [3:0] pre_int_bcd_output [9:0];
     logic [59:0] int_bcd_output;
 
+    logic [6:0] ascii_hex_decoded;
+    logic [6:0] pre_hex_disp0;
+    logic [6:0] pre_hex_disp1;
+    logic [6:0] pre_hex_disp2;
+    logic [6:0] pre_hex_disp3;
+    logic [6:0] pre_hex_disp4;
+    logic [6:0] pre_hex_disp5;
+
 
     assign my_buttons = ~buttons;
 
@@ -181,7 +189,7 @@ module top_fpga(
         case(switches[6:5])
 
             2'd0 : ret_val = a0;
-            2'd1 : ret_val = a0;
+            2'd1 : ret_val = a0; //gets overwritten down the line, outputs ascii instead
             2'd2 : ret_val = portb_q;
             2'd3 : ret_val = portb_addr;
 
@@ -295,12 +303,24 @@ module top_fpga(
     assign hex_in4 = switches[4] ? pre_hex10 : pre_hex4;
     assign hex_in5 = switches[4] ? pre_hex11 : pre_hex5;
 
-    hex_display my_hex0(.SEL(hex_in0), .ZOUT(hex0));
-    hex_display my_hex1(.SEL(hex_in1), .ZOUT(hex1));
-    hex_display my_hex2(.SEL(hex_in2), .ZOUT(hex2));
-    hex_display my_hex3(.SEL(hex_in3), .ZOUT(hex3));
-    hex_display my_hex4(.SEL(hex_in4), .ZOUT(hex4));
-    hex_display my_hex5(.SEL(hex_in5), .ZOUT(hex5));
+    hex_display my_hex0(.SEL(hex_in0), .ZOUT(pre_hex_disp0));
+    hex_display my_hex1(.SEL(hex_in1), .ZOUT(pre_hex_disp1));
+    hex_display my_hex2(.SEL(hex_in2), .ZOUT(pre_hex_disp2));
+    hex_display my_hex3(.SEL(hex_in3), .ZOUT(pre_hex_disp3));
+    hex_display my_hex4(.SEL(hex_in4), .ZOUT(pre_hex_disp4));
+    hex_display my_hex5(.SEL(hex_in5), .ZOUT(pre_hex_disp5));
+
+    ascii_decoder my_ascii_decoder(
+        .SEL(portb_q[7:0]),
+        .ZOUT(ascii_hex_decoded)
+    );
+
+    assign hex0 = (switches[6:5] == 2'b01) ? ascii_hex_decoded : pre_hex_disp0;
+    assign hex1 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp1;
+    assign hex2 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp2;
+    assign hex3 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp3;
+    assign hex4 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp4;
+    assign hex5 = (switches[6:5] == 2'b01) ? ~7'b0000000 : pre_hex_disp5;
 
     clk_divider #(
         .DIVIDE(BASE_CLK_FREQ/SLOW_FLASHING_LIGHT_FREQ)

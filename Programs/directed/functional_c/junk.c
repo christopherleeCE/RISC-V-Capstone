@@ -2,5 +2,7 @@
 
 int main(){
 
-    return tb_return(0);
+    char str[] = {"h   e   l   l   o       w   o   r   l   d"};
+
+    return tb_return(str);
 }
