@@ -75,6 +75,19 @@ elif [ "$mode" = "gcc" ] ; then
 
     #gpt recomended linking and compiling in one stage, its reasoning didnt seem super sound,
     #commented out old compile + link method below
+
+    #defines the following..
+    #target isa
+    #abi (whatever that is)
+    #excludes std lib
+    #excludes automatic _start (we define it manually)
+    #defines no OS everioment
+    #defines linker script
+    #input file
+    #include path (headers)
+    #library path (static)
+    #link library libdrysoup.a
+    #some these may not be necissary , but i havent flound any issues with including them
     riscv64-unknown-elf-gcc \
     -march=rv32im \
     -mabi=ilp32 \
@@ -83,6 +96,9 @@ elif [ "$mode" = "gcc" ] ; then
     -ffreestanding \
     -T linker.ld \
     "$file" \
+    -I../Programs/directed/lib \
+    -L../Programs/directed/lib \
+    -ldrysoup \
     -lgcc \
     -o program.elf
 

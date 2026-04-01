@@ -127,6 +127,27 @@ if (-not (Test-Path $logFolder)) {
 
 Write-Host "Running from Modules folder, continuing..."
 
+#copmile our lib automatically if in compile mode
+if ($compile) {
+
+    $LibDir = "../Programs/directed/lib"
+
+    $libCFiles = Get-ChildItem "$LibDir\*.c"
+
+    foreach ($f in $libCFiles) {
+        $cfile = "$LibDir/$($f.BaseName).c"
+        $obj = "$LibDir/$($f.BaseName).o"
+
+        wsl bash -c "riscv64-unknown-elf-gcc -march=rv32im -mabi=ilp32 -ffreestanding -nostdlib -c $cfile -o $obj"
+    }
+
+    $LibDirFullA = "$LibDir/libdrysoup.a"
+    $LibDirFullO = "$LibDir/*.o"
+    wsl bash -c "riscv64-unknown-elf-ar rcs $LibDirFullA $LibDirFullO"
+
+    Remove-Item "$LibDir/*.o"
+}
+
 if(-not $compile){
     if($program_file_name -eq ''){
 
@@ -312,8 +333,9 @@ if(-not $compile){
                 Add-Content -Path $diffLog -Value "Error: Could not find return value in sim.log"
             }
 
+            #-I defines the include path, where tb.h is located
             Write-Output("Running program in WSL-x86 and parsing return value`n")
-            $x86ReturnValue = wsl bash -c "gcc $wslPath -DX86_BUILD -o x86.out && ./x86.out"
+            $x86ReturnValue = wsl bash -c "gcc -I../Programs/directed/lib $wslPath -DX86_BUILD -o x86.out && ./x86.out"
             $x86ReturnValue = [int]$x86ReturnValue.Trim('<', '>')
 
             if($x86ReturnValue -eq $simReturnValue){
@@ -390,8 +412,9 @@ if(-not $compile){
             Add-Content -Path $diffLog -Value "Error: Could not find return value in sim.log"
         }
 
+        #-I defines the include path, where tb.h is located
         Write-Output("Running program in WSL-x86 and parsing return value`n")
-        $x86ReturnValue = wsl bash -c "gcc $wslPath -DX86_BUILD -o x86.out && ./x86.out"
+        $x86ReturnValue = wsl bash -c "gcc -I../Programs/directed/lib $wslPath -DX86_BUILD -o x86.out && ./x86.out"
         $x86ReturnValue = [int]$x86ReturnValue.Trim('<', '>')
 
         if($x86ReturnValue -eq $simReturnValue){

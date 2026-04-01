@@ -23,6 +23,7 @@ Modules/instruction_memory.txt
 Modules/data_memory.hex
 Modules/instruction_memory.hex
 Modules/dump.vcd
+Programs/directed/lib/libdrysoup.a
 
 Logs
 .vscode

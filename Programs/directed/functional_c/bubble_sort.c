@@ -1,5 +1,4 @@
 #include "tb.h"
-#include "memcpy.c"
 
 int main(){
 
@@ -20,15 +19,15 @@ int main(){
         -84, -57, 47, 26, -18, 52, 28, 97};
     int N = sizeof(test_array)/sizeof(int);
 
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N - i; j++) {
-            if (test_array[j] > test_array[j + 1]) {
-                int temp = test_array[j];
-                test_array[j] = test_array[j + 1];
-                test_array[j + 1] = temp;
-            }
-        }
-    }
+    // for (int i = 0; i < N; i++) {
+    //     for (int j = 0; j < N - i; j++) {
+    //         if (test_array[j] > test_array[j + 1]) {
+    //             int temp = test_array[j];
+    //             test_array[j] = test_array[j + 1];
+    //             test_array[j + 1] = temp;
+    //         }
+    //     }
+    // }
 
     // #ifdef X86_BUILD
     //     for(int ii = 0; ii < N; ii++)
