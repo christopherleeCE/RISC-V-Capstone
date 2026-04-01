@@ -43,6 +43,11 @@ int main()
 
     merge_sort(test_array, length); //call the merge sort function
 
+    // #ifdef X86_BUILD
+    // for(int ii = 0; ii < sizeof(test_array)/sizeof(test_array[0]); ii++)
+    //     printf("%d\n", test_array[ii]);
+    // #endif
+
     return tb_return(test_array[0]); //return the array range
 }
 
