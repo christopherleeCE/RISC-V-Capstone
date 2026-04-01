@@ -3,4 +3,4 @@ param(
     [switch]$deploy
 )
 
-echo "hi"
+Write-Host "hi" -ForegroundColor Cyan
