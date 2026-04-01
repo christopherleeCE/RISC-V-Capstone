@@ -34,5 +34,5 @@ int main(){
     //         printf("%d\n", test_array[ii]);
     // #endif
 
-    return tb_return((int)test_array[0]);
+    return tb_return((int)test_array[0]); //dont push without index, will fail verification
 }
