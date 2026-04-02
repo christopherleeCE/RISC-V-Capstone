@@ -23,6 +23,7 @@ way memory is mapped for our CPU, just a guess, but strange...
 */
 
 #include "tb.h"
+#include "drysoup.h"
 
 //function prototypes
 void merge_sort(int a[], int length);
@@ -49,6 +50,7 @@ int main()
     // #endif
 
     return tb_return(range(test_array, length)); //return the length of the array
+    //return tb_return(pack_ptr((uint32_t)test_array, length, false));
 }
 
 void merge_sort(int a[], int length)
