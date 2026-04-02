@@ -30,7 +30,7 @@
         }
 
         //pass through return value
-        static inline int tb_return(int ret) { return ret; }
+        static inline int tb_return(int ret) {return ret;}
 
     #else
 
@@ -38,7 +38,7 @@
         #include <stdio.h>
 
         //print out return for direct_master.ps1 to parse from output
-        static inline int tb_return(int ret) {
+        static inline int tb_return(int ret){
             printf("<%d>\n", ret);
             return ret;
         }

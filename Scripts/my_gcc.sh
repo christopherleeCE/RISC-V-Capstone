@@ -81,6 +81,7 @@ elif [ "$mode" = "gcc" ] ; then
     #abi (whatever that is)
     #excludes std lib
     #excludes automatic _start (we define it manually)
+    #prevents compiler from adding in builtin funcs like memcpy as we define those ourselves, might not be necissary
     #defines no OS everioment
     #defines linker script
     #input file
@@ -93,6 +94,7 @@ elif [ "$mode" = "gcc" ] ; then
     -mabi=ilp32 \
     -nostdlib \
     -nostartfiles \
+    -fno-builtin \
     -ffreestanding \
     -T linker.ld \
     "$file" \

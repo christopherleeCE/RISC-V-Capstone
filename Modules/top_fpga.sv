@@ -109,13 +109,23 @@ module top_fpga(
     logic [3:0] pre_int_bcd_output [9:0];
     logic [59:0] int_bcd_output;
 
-    logic [6:0] ascii_hex_decoded;
+    logic [6:0] ascii_hex_decoded0;
+    logic [6:0] ascii_hex_decoded1;
+    logic [6:0] ascii_hex_decoded2;
+    logic [6:0] ascii_hex_decoded3;
+    logic [6:0] ascii_hex_decoded4;
+    logic [6:0] ascii_hex_decoded5;
+    logic [7:0] ascii_val_ff_train [5:0];
     logic [6:0] pre_hex_disp0;
     logic [6:0] pre_hex_disp1;
     logic [6:0] pre_hex_disp2;
     logic [6:0] pre_hex_disp3;
     logic [6:0] pre_hex_disp4;
     logic [6:0] pre_hex_disp5;
+
+    logic [31:0] portb_q, portb_addr;
+    logic b_loading, b_incing, b_done;
+    logic [15:0] seq_eng_cnt, max_arr_index;
 
     logic ascii_mode;
     assign ascii_mode = switches[6:5] == 2'b01;
@@ -172,29 +182,49 @@ module top_fpga(
         endcase
     end
 
-    // //this is the "correct" way we should be assigning the clk
-    // assign local_clk = debug_clk;
-    logic [31:0] portb_q, portb_addr;
-    logic b_loading, b_incing;
     always_ff @(posedge manual_clk or posedge debug_clk_en) begin
         if(debug_clk_en) begin //rst
             b_loading <= 1'b1;
             b_incing <= '0;
+            b_done <= '0;
+
+            seq_eng_cnt <= '0;
+            max_arr_index <= '0;
 
             portb_addr <= '0;
+
+            for(int ii = 0; ii < 6; ii++) begin
+                ascii_val_ff_train[ii] <= '0;
+            end
 
         end else if(b_loading) begin
             b_loading <= '0;
             b_incing <= 1'b1;
 
-            portb_addr <= a0;
+            max_arr_index <= a0[31:16];
+            portb_addr <= {16'b0, a0[15:0]};
 
         end else if(b_incing) begin
+            b_incing <= ~(seq_eng_cnt == max_arr_index);
+            b_done <= (seq_eng_cnt == max_arr_index);
 
+            seq_eng_cnt <= seq_eng_cnt + 1'b1;
             portb_addr <= portb_addr + ((ascii_mode) ? 32'h1 : 32'h4);
+
+            ascii_val_ff_train[0] <= portb_q[7:0];
+            for(int ii = 1; ii < 6; ii++) begin
+                ascii_val_ff_train[ii] <= ascii_val_ff_train[ii-1];
+            end
+
+        end else if(b_done) begin
+            //do nothing, only way out is rst
 
         end
     end
+
+    
+
+
     riscv_cpu_v2 cpu_dut(
         .clk(local_clk),
         .rst(local_rst),
@@ -326,17 +356,19 @@ module top_fpga(
     hex_display my_hex4(.SEL(hex_in4), .ZOUT(pre_hex_disp4));
     hex_display my_hex5(.SEL(hex_in5), .ZOUT(pre_hex_disp5));
 
-    ascii_decoder my_ascii_decoder(
-        .SEL(portb_q[7:0]),
-        .ZOUT(ascii_hex_decoded)
-    );
+    ascii_decoder my_ascii_decoder0(.SEL(ascii_val_ff_train[0]), .ZOUT(ascii_hex_decoded0));
+    ascii_decoder my_ascii_decoder1(.SEL(ascii_val_ff_train[1]), .ZOUT(ascii_hex_decoded1));
+    ascii_decoder my_ascii_decoder2(.SEL(ascii_val_ff_train[2]), .ZOUT(ascii_hex_decoded2));
+    ascii_decoder my_ascii_decoder3(.SEL(ascii_val_ff_train[3]), .ZOUT(ascii_hex_decoded3));
+    ascii_decoder my_ascii_decoder4(.SEL(ascii_val_ff_train[4]), .ZOUT(ascii_hex_decoded4));
+    ascii_decoder my_ascii_decoder5(.SEL(ascii_val_ff_train[5]), .ZOUT(ascii_hex_decoded5));
 
-    assign hex0 = (ascii_mode) ? ascii_hex_decoded : pre_hex_disp0;
-    assign hex1 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp1;
-    assign hex2 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp2;
-    assign hex3 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp3;
-    assign hex4 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp4;
-    assign hex5 = (ascii_mode) ? ~7'b0000000 : pre_hex_disp5;
+    assign hex0 = (ascii_mode) ? ascii_hex_decoded0 : pre_hex_disp0;
+    assign hex1 = (ascii_mode) ? ascii_hex_decoded1 : pre_hex_disp1;
+    assign hex2 = (ascii_mode) ? ascii_hex_decoded2 : pre_hex_disp2;
+    assign hex3 = (ascii_mode) ? ascii_hex_decoded3 : pre_hex_disp3;
+    assign hex4 = (ascii_mode) ? ascii_hex_decoded4 : pre_hex_disp4;
+    assign hex5 = (ascii_mode) ? ascii_hex_decoded5 : pre_hex_disp5;
 
     clk_divider #(
         .DIVIDE(BASE_CLK_FREQ/SLOW_FLASHING_LIGHT_FREQ)
@@ -383,9 +415,9 @@ module top_fpga(
     assign debug_leds[3] = 1'b1;
     assign debug_leds[4] = manual_clk;
     assign debug_leds[5] = debug_clk_en;
-    assign debug_leds[6] = 1'b1;
-    assign debug_leds[7] = ostart;
-    assign debug_leds[8] = oworking;
+    assign debug_leds[6] = b_loading;
+    assign debug_leds[7] = b_incing;
+    assign debug_leds[8] = b_done;
     assign debug_leds[9] = float_done && slow_flash;
 
     assign hex_decimal_point[0] = ~(status_light || (switches[4:0] == 5'b01111) && dp_en && ~ohalt);
