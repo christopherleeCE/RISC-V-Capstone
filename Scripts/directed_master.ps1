@@ -128,17 +128,18 @@ if (-not (Test-Path $logFolder)) {
 Write-Host "Running from Modules folder, continuing..."
 
 #copmile our lib automatically if in compile mode
-if ($compile) {
+if($compile){
 
     $LibDir = "../Programs/directed/lib"
 
     $libCFiles = Get-ChildItem "$LibDir\*.c"
 
-    foreach ($f in $libCFiles) {
+    #gen lib for rv32im
+    foreach($f in $libCFiles){
         $cfile = "$LibDir/$($f.BaseName).c"
         $obj = "$LibDir/$($f.BaseName).o"
 
-        wsl bash -c "riscv64-unknown-elf-gcc -march=rv32im -mabi=ilp32 -ffreestanding -nostdlib -c $cfile -o $obj"
+        wsl bash -c "riscv64-unknown-elf-gcc -march=rv32im -mabi=ilp32 -fno-builtin -ffreestanding -c $cfile -o $obj"
     }
 
     $LibDirFullA = "$LibDir/libdrysoup.a"
@@ -146,10 +147,24 @@ if ($compile) {
     wsl bash -c "riscv64-unknown-elf-ar rcs $LibDirFullA $LibDirFullO"
 
     Remove-Item "$LibDir/*.o"
+
+    #gen lib for x86
+    foreach($f in $libCFiles){
+        $cfile = "$LibDir/$($f.BaseName).c"
+        $obj = "$LibDir/$($f.BaseName).o"
+
+        wsl bash -c "gcc -c $cfile -o $obj"
+    }   
+
+    $LibDirFullA = "$LibDir/libdrysoup_x86.a"
+    $LibDirFullO = "$LibDir/*.o"
+    wsl bash -c "riscv64-unknown-elf-ar rcs $LibDirFullA $LibDirFullO"
+
+    Remove-Item "$LibDir/*.o"
 }
 
-if(-not $compile){
-    if($program_file_name -eq ''){
+if(-not $compile){ #no -compile flag =============================================================================
+    if($program_file_name -eq ''){ #filename not given, run all
 
         $runs = (Get-ChildItem -Path ..\Programs\directed\$directory\ -Filter *.s).count
         $runCount = 0
@@ -193,7 +208,7 @@ if(-not $compile){
 
             Write-Host "Finished testing all programs.."
         }
-    }else{
+    }else{ #filename given, run given file
 
         $runs = 1
         $runCount = 1
@@ -285,7 +300,7 @@ if(-not $compile){
         }
     }
 }else{ #-compile flag ================================================================================================================
-    if($program_file_name -eq ''){
+    if($program_file_name -eq ''){ #filename not given, run all
 
         $runs = (Get-ChildItem -Path ..\Programs\directed\$directory\ -Filter *.c).count
         $runCount = 0
@@ -321,21 +336,20 @@ if(-not $compile){
             New-Item -Path $diffLog -ItemType File -Force > $null
 
             Write-Output("`nParsing return value from sim...`n")
-            # 1. Capture the match object
             $match = Select-String -Path .\sim.log -Pattern 'Return value in DUT a0:\s+(-?\d+)'
 
-            # 2. Check if the object is null (no match found)
+            #check for null ret val
             if ($null -ne $match) {
                 $simReturnValue = [int]$match.Matches[0].Groups[1].Value
             } else {
-                # Handle the error or set a default
+                #error msg
                 $simReturnValue = $null 
                 Add-Content -Path $diffLog -Value "Error: Could not find return value in sim.log"
             }
 
             #-I defines the include path, where tb.h is located
             Write-Output("Running program in WSL-x86 and parsing return value`n")
-            $x86ReturnValue = wsl bash -c "gcc -I../Programs/directed/lib $wslPath -DX86_BUILD -o x86.out && ./x86.out"
+            $x86ReturnValue = wsl bash -c "gcc $wslPath -I../Programs/directed/lib -L../Programs/directed/lib -ldrysoup_x86 -DX86_BUILD -o x86.out && ./x86.out"
             $x86ReturnValue = [int]$x86ReturnValue.Trim('<', '>')
 
             if($x86ReturnValue -eq $simReturnValue){
@@ -353,7 +367,7 @@ if(-not $compile){
 
             Write-Host "Finished testing all programs.."
         }
-    }else{
+    }else{ #filename given, run given file
 
         $runs = 1
         $runCount = 1
@@ -400,21 +414,20 @@ if(-not $compile){
         New-Item -Path $diffLog -ItemType File -Force > $null
 
         Write-Output("`nParsing return value from sim...`n")
-        # 1. Capture the match object
         $match = Select-String -Path .\sim.log -Pattern 'Return value in DUT a0:\s+(-?\d+)'
 
-        # 2. Check if the object is null (no match found)
+        #check for null retval
         if ($null -ne $match) {
             $simReturnValue = [int]$match.Matches[0].Groups[1].Value
         } else {
-            # Handle the error or set a default
+            #error msg
             $simReturnValue = $null 
             Add-Content -Path $diffLog -Value "Error: Could not find return value in sim.log"
         }
 
         #-I defines the include path, where tb.h is located
         Write-Output("Running program in WSL-x86 and parsing return value`n")
-        $x86ReturnValue = wsl bash -c "gcc -I../Programs/directed/lib $wslPath -DX86_BUILD -o x86.out && ./x86.out"
+        $x86ReturnValue = wsl bash -c "gcc $wslPath -I../Programs/directed/lib -L../Programs/directed/lib -ldrysoup_x86 -DX86_BUILD -o x86.out && ./x86.out"
         $x86ReturnValue = [int]$x86ReturnValue.Trim('<', '>')
 
         if($x86ReturnValue -eq $simReturnValue){

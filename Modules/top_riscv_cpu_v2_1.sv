@@ -34,6 +34,8 @@ doing something like a controller, we have an async button, 2FF syncronizer, deb
 could be implemented in software by just only polling the inputs in the program at specific times), store in special
 register, heve it memmapped, that is to say a LW(special_addr) fetches from that register,
 we can tell c to map a variable that specific addr (the addr of the special reg)
+systime, rng
+tetris.c, bad_apple.c
 
 
 --------------TEST LOG----------------------------------------------------

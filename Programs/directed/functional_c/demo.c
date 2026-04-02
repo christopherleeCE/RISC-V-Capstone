@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "tb.h"
+#include "drysoup.h"
 
 // Computes pi scaled by SCALE (fixed-point style)
 uint64_t compute_pi(int iterations, uint64_t SCALE) {
@@ -101,7 +102,7 @@ int main() {
     //     //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
     // #endif
     
-    return tb_return(*(int*)&(float){x_vector});
+    return tb_return(rf2i(x_vector));
 
 }
 
