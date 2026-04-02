@@ -48,7 +48,7 @@ int main()
     //     printf("%d\n", test_array[ii]);
     // #endif
 
-    return tb_return(test_array[0]); //return the array range
+    return tb_return(range(test_array, length)); //return the length of the array
 }
 
 void merge_sort(int a[], int length)
@@ -115,7 +115,7 @@ void merge_sorted_arrays(int a[], int l, int m, int r)
         //(i < left_length)
 
         if ((i < left_length) &&
-        (j >= right_length) || temp_left[i] <= temp_right[j])
+        ((j >= right_length) || temp_left[i] <= temp_right[j]))
         {
             a[k] = temp_left[i];
             i++;
@@ -124,4 +124,10 @@ void merge_sorted_arrays(int a[], int l, int m, int r)
             j++;
         }
     }
+}
+
+//for calculating the range of the array
+int range(int a[], int length)
+{
+    return (a[length-1] - a[0]);
 }
