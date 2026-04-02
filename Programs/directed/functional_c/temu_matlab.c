@@ -1,4 +1,5 @@
 #include "tb.h"
+#include "drysoup.h"
 
 #define N 3
 
@@ -27,13 +28,6 @@ int main() {
         }
     }
 
-    // Collapse result matrix to a single deterministic value
-    int checksum = 0;
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            checksum += C[i][j];
-        }
-    }
-
-    return tb_return(checksum);
+    return tb_return(C[0][0]);
+    //return tb_return(pack_ptr(C, 9, false));
 }
