@@ -14,7 +14,7 @@
 void *memcpy(void *dest, const void *src, size_t n);
 void *memset(void *s, int c, size_t n);
 uint32_t pack_ptr(uint32_t ptr, uint16_t len, bool is_string);
-//int rawfloat2int(float); i will not create this function as i declare that we will do this as god (john carmack) indented, with *(int*)&(float){my_float}
+//int rawfloat2int(float); this function would be incompatable with the x86 build, use *(int*)&(float){my_float} as god(john carmack) intended
 
 #endif
 
