@@ -9,7 +9,7 @@ bottombutton increment the pointer seq engine
 
 sw[9] rst to cpu active low
 sw[8] enable full clk (5mhz)
-sw[7] n/a
+sw[7] decimal point status light en, (when high decimal points in hex disp will slow flash on completion of prog)
 sw[6:5] select the source [11 10 01 00] = [pointer in seq engine, contents of pointer loc, ascii mode (overites sw[4:0]), raw retvalue]
 sw[4] select if we display the upper 6 digits or lower 6 digits
 sw[3:0]...
@@ -301,7 +301,7 @@ module top_fpga(
     float2bcd my_float2bcd(
         .fnum(ret_val),
         .clk(local_clk),
-        .rst(local_rst),
+        .rst(!manual_clk),
         .start(ofinish),
         .ostart(ostart),
         .oworking(oworking),
@@ -403,7 +403,7 @@ module top_fpga(
         priority case(1'b1)
 
         ohalt   :   status_light = ohalt && staggered_fast_flash;
-        ofinish :   status_light = ofinish && slow_flash && (~debug_clk_en);
+        ofinish :   status_light = ofinish && slow_flash && (switches[7]);
         default :   status_light = 1'b0;
 
         endcase

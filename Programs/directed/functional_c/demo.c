@@ -78,7 +78,8 @@ float my_cos(float rads, int itr){
 int main() {
     // SCALE = 1,000,000 for fixed-point precision
     uint64_t scale = 1000000000000; //havent seen an overflow with this
-    uint64_t pi_interations = 1000;//1000; //use 100000 in deployment
+    uint64_t pi_interations = 1000; //use 100000 in deployment
+    //uint64_t pi_interations = 100000;
     int trig_interations = 10; //above 6 or 7 (jajaja) will cause factorial overflow
 
     uint64_t scaled_pi;
@@ -87,23 +88,45 @@ int main() {
     scaled_pi = compute_pi(pi_interations, scale);
     float_pi = (float)scaled_pi / (float)scale;
 
-    float magnitude = 7;
-    float angle = float_pi * 1.67;
+    float magnitude;
+    float angle;
 
-    float cos_val = my_cos(angle, trig_interations);
-    float sin_val = my_sin(angle, trig_interations);
+    float cos_val;
+    float sin_val;
 
-    float x_vector = cos_val * magnitude;
-    float y_vector = sin_val * magnitude;
+    float x_vector;
+    float y_vector;
 
+    float ret[21][2];
+
+    //for(int ii = 0; ii <= 20; ++ii){
+    for(int ii = 0; ii <= 0; ++ii){
+        magnitude = 7;
+        angle = float_pi * (ii*.1);
+
+        cos_val = my_cos(angle, trig_interations);
+        sin_val = my_sin(angle, trig_interations);
+
+        x_vector = cos_val * magnitude;
+        y_vector = sin_val * magnitude;
+
+        ret[ii][0] = x_vector;
+        ret[ii][1] = y_vector;
+    }
     // #ifdef X86_BUILD
     //     //printf("float_pi: %f\n", float_pi);
     //     printf("[%f, %f, %f, %f]\n", cos_val, sin_val, x_vector, y_vector);
     //     //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
     // #endif
-    
-    return tb_return(rf2i(x_vector));
 
+    // for(int ii = 0; ii < 21; ++ii){
+    //     for(int jj = 0; jj < 2; ++jj){
+    //         printf("%f ", ret[ii][jj]);
+    //     }printf("\n");
+    // }
+
+    return tb_return(rf2i(ret[0][0]));
+    //return tb_return(pack_ptr((uint32_t)ret, 21*2, false));
 }
 
 // int main(){
