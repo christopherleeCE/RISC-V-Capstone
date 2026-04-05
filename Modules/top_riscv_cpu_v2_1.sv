@@ -34,7 +34,7 @@ could be implemented in software by just only polling the inputs in the program 
 register, heve it memmapped, that is to say a LW(special_addr) fetches from that register,
 we can tell c to map a variable that specific addr (the addr of the special reg)
 systime, rng
-tetris.c, bad_apple.c
+tetris.c, bad_apple.c, (doom.c? :)
 
 
 --------------TEST LOG----------------------------------------------------
@@ -1480,7 +1480,7 @@ module top_riscv_cpu_v2_1();
                 end
 
                  $write("\n\tDATA_MEM\n\t");
-                for(int ii = 63; ii >= 0; ii--) begin
+                for(int ii = 64-1; ii >= 0; ii--) begin
                     $write("\t%2d: 0x%h", ii, DATA_MEM[c][ii]);
 
                     if(ii % 8 == 0) begin //i know i should just use 2nd for loop shut up

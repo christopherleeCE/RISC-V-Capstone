@@ -9,8 +9,19 @@
         __attribute__((naked, used))
         void _start(void) {
             __asm__ volatile (
-                "la sp, _estack\n"
+                //write init header for heap
                 "la a0, _heap_start\n"
+                "la a1, _heap_end\n"
+                "sub a2, a1, a0\n"
+                "addi a2, a2, -12\n" //calc payload size of init block
+                "sw a2, 0(a0)\n"    //write header.size
+                "sb zero, 4(a0)\n"   //write header.occupied = 0
+                "add a0, a0, a2\n"
+                "add a0, a0, 8\n"   //a0 = _heap_start + payload_size + 8 (8 bytes of the header)
+                "sw a2, 0(a0)\n"      //write footer.size
+                "la sp, _estack\n"
+
+                //jmp to int main
                 "jal ra, main\n"
                 "nop\n"
                 "nop\n"
