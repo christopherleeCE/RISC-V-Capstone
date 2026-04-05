@@ -16,6 +16,9 @@ void* memset(void *s, int c, size_t n);
 uint32_t pack_ptr(uint32_t ptr, uint16_t len, bool is_string);
 int rf2i(float);
 void* malloc(size_t payload_size);
+void* calloc(size_t count, size_t element_size);
+void* realloc(void* ptr, size_t new_size);
+void free(void* ptr);
 
 #endif
 

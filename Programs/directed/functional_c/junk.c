@@ -23,14 +23,8 @@ int main(){
     //     , -84, -57, 47, 26, -18, 52, 28, 97
     //     };
     // arr[7] = num * 1000;
-    // int* temp1 = malloc(9);
-    // int* temp2 = malloc(1);
-    // int* temp3 = malloc(8);
-    
-    // *(temp1) = temp1;
-    // *(temp1+1) = temp2;
-    // *(temp1+2) = temp3;
-  
+    //int* empty = malloc(4);
+
     return tb_return(0);
     //return tb_return(pack_ptr((uint32_t)arr, sizeof(arr)/sizeof(arr[0]), false));
 }

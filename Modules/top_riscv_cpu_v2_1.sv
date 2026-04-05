@@ -19,7 +19,8 @@ holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like t
 TODO code coverage
 TODO more demo programs in C
 TODO contact abrams, maybe invite him to see the demo on demo day
-TODO maybe some cool external libs, like malloc
+TODO maybe some cool external libs
+TODO ifdef malloc
 
 
 Out of Semester
