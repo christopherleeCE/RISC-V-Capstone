@@ -3,13 +3,14 @@
 
     #ifndef X86_BUILD
 
-        extern unsigned int _estack;
+        //extern unsigned int _estack; dont think its needed
 
         //init stack point to top of dmem address space, jump to int main, 7 nops to let pipeline settle before calling ebreak
         __attribute__((naked, used))
         void _start(void) {
             __asm__ volatile (
                 "la sp, _estack\n"
+                "la a0, _heap_start\n"
                 "jal ra, main\n"
                 "nop\n"
                 "nop\n"

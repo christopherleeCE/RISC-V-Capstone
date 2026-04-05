@@ -131,6 +131,7 @@ Write-Host "Running from Modules folder, continuing..."
 if($compile){
 
     $LibDir = "../Programs/directed/lib"
+    Remove-Item "$LibDir/*.a"
 
     $libCFiles = Get-ChildItem "$LibDir\*.c"
 
