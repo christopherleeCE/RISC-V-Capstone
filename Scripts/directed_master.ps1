@@ -154,12 +154,12 @@ if($compile){
         $cfile = "$LibDir/$($f.BaseName).c"
         $obj = "$LibDir/$($f.BaseName).o"
 
-        wsl bash -c "gcc -c $cfile -o $obj"
+        wsl bash -c "gcc -DX86_BUILD -c $cfile -o $obj"
     }   
 
     $LibDirFullA = "$LibDir/libdrysoup_x86.a"
     $LibDirFullO = "$LibDir/*.o"
-    wsl bash -c "riscv64-unknown-elf-ar rcs $LibDirFullA $LibDirFullO"
+    wsl bash -c "ar rcs $LibDirFullA $LibDirFullO"
 
     Remove-Item "$LibDir/*.o"
 }
@@ -217,7 +217,6 @@ if(-not $compile){ #no -compile flag ===========================================
         $file = Get-Item "..\Programs\directed\$directory\$program_file_name"
 
         $wslPath = "../Programs/directed/$directory/$($file.name)"
-        Write-Host $wslPath
         Write-Host "Testing $wslPath..."
 
         # Write-Host "Assembling in WSL..."
@@ -376,7 +375,6 @@ if(-not $compile){ #no -compile flag ===========================================
         $file = Get-Item "..\Programs\directed\$directory\$program_file_name"
 
         $wslPath = "../Programs/directed/$directory/$($file.name)"
-        Write-Host $wslPath
         Write-Host "Testing $wslPath..."
 
         # Write-Host "Assembling in WSL..."

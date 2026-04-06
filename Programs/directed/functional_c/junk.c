@@ -24,7 +24,14 @@ int main(){
     //     };
     // arr[7] = num * 1000;
     //int* empty = malloc(4);
+    int* temp1 = malloc(4);
+    int* temp2 = malloc(8);
+    int* temp3 = malloc(0);
+    int* temp4 = malloc(16);
+    int* temp5 = malloc(20);
 
-    return tb_return(0);
+    *temp3 = 67;
+
+    return tb_return(*temp3);
     //return tb_return(pack_ptr((uint32_t)arr, sizeof(arr)/sizeof(arr[0]), false));
 }
