@@ -52,7 +52,7 @@
         //print out return for direct_master.ps1 to parse from output
         static inline int tb_return(int ret){
             printf("<%d>\n", ret);
-            return ret;
+            return 0;
         }
 
     #endif

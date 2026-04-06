@@ -33,5 +33,5 @@ int main(){
     *temp3 = 67;
 
     return tb_return(*temp3);
-    //return tb_return(pack_ptr((uint32_t)arr, sizeof(arr)/sizeof(arr[0]), false));
+
 }

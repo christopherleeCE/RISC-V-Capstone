@@ -427,6 +427,14 @@ if(-not $compile){ #no -compile flag ===========================================
         #-I defines the include path, where tb.h is located
         Write-Output("Running program in WSL-x86 and parsing return value`n")
         $x86ReturnValue = wsl bash -c "gcc $wslPath -I../Programs/directed/lib -L../Programs/directed/lib -ldrysoup_x86 -DX86_BUILD -o x86.out && ./x86.out"
+
+        ### a reminder...
+        # $x86ReturnValue = $x86ReturnValue | Where-Object {
+        #     $_ -ne "" -and
+        #     $_ -ne "User not found." -and
+        #     $_ -ne "Error code: Wsl/WSL_E_USER_NOT_FOUND"
+        # }
+
         $x86ReturnValue = [int]$x86ReturnValue.Trim('<', '>')
 
         if($x86ReturnValue -eq $simReturnValue){
