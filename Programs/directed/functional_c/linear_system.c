@@ -38,6 +38,6 @@ int main()
     #endif
 
     //return
-    return(tb_return(b_matrix[0]*SCALE));
+    return(tb_return(pack_ptr(b_matrix, sizeof(b_matrix)/sizeof(b_matrix[0]), false)));
 }
 
