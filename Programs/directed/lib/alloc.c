@@ -52,22 +52,23 @@
             if((*(header_ptr + HEADER_SIZE_FIELD_SIZE) == 0) & (same_size | valid_bigger_size)){
 
                 //save old block size
-                old_payload_size = *(int32_t*)(header_ptr);
+                old_payload_size = *(size_t*)(header_ptr);
 
                 //write new size to header.size, set to occupied, set footer.size
-                *(int32_t*)(header_ptr) = payload_size;
+                *(size_t*)(header_ptr) = payload_size;
                 *((header_ptr) + HEADER_SIZE_FIELD_SIZE) = 1; 
-                *(int32_t*)(header_ptr + HEADER_TOTAL_SIZE + payload_size) = payload_size;
+                *(size_t*)(header_ptr + HEADER_TOTAL_SIZE + payload_size) = payload_size;
 
                 //if we need to, allocate a free second block
                 if(valid_bigger_size){
                     new_block_size = (HEADER_TOTAL_SIZE + payload_size + FOOTER_SIZE);
                     next_payload_size = old_payload_size - new_block_size; //old_payload_size - payload_size - header&footer
 
+                    uint8_t* next_header_addr = header_ptr + new_block_size;
                     //write header, set to unoccoupied, set footer.size for second half of split block
-                    *(int32_t*)(header_ptr + new_block_size) = next_payload_size;
-                    *((header_ptr + new_block_size) + HEADER_SIZE_FIELD_SIZE) = 0;
-                    *(int32_t*)((header_ptr + new_block_size) + HEADER_TOTAL_SIZE + next_payload_size) = next_payload_size;
+                    *(size_t*)(next_header_addr) = next_payload_size;
+                    *(next_header_addr + HEADER_SIZE_FIELD_SIZE) = 0;
+                    *(size_t*)(next_header_addr + HEADER_TOTAL_SIZE + next_payload_size) = next_payload_size;
 
                 //return ptr to allocated block
                 }return (header_ptr + HEADER_TOTAL_SIZE);
@@ -153,15 +154,17 @@
             
             
         }else if(next_free & !prev_free){
-            new_size = *(size_t*)(mid_blk_tot_size + header_ptr) + *(size_t*)(header_ptr) + HEADER_TOTAL_SIZE + FOOTER_SIZE;
+            uint8_t* next_blk_header_addr = mid_blk_tot_size + header_ptr;
+            new_size = *(size_t*)(next_blk_header_addr) + *(size_t*)(header_ptr) + HEADER_TOTAL_SIZE + FOOTER_SIZE;
             *(size_t*)(header_ptr) = new_size;
-            *(size_t*)(*(size_t*)(mid_blk_tot_size + header_ptr) + HEADER_TOTAL_SIZE + mid_blk_tot_size + header_ptr) = new_size;
+            *(size_t*)(*(size_t*)(next_blk_header_addr) + HEADER_TOTAL_SIZE + next_blk_header_addr) = new_size;
             *((uint8_t*)ptr - HEADER_FLAGS_FIELD_SIZE) = 0;
 
         }else if(next_free & prev_free){
-            new_size = *(size_t*)(mid_blk_tot_size + header_ptr) + *(size_t*)(header_ptr) + *(size_t*)(prev_blk_header_addr) + 2*(HEADER_TOTAL_SIZE + FOOTER_SIZE);
+            uint8_t* next_blk_header_addr = mid_blk_tot_size + header_ptr;
+            new_size = *(size_t*)(next_blk_header_addr) + *(size_t*)(header_ptr) + *(size_t*)(prev_blk_header_addr) + 2*(HEADER_TOTAL_SIZE + FOOTER_SIZE);
             *(size_t*)(prev_blk_header_addr) = new_size;
-            *(size_t*)(*(size_t*)(mid_blk_tot_size + header_ptr) + HEADER_TOTAL_SIZE + mid_blk_tot_size + header_ptr) = new_size;
+            *(size_t*)(*(size_t*)(next_blk_header_addr) + HEADER_TOTAL_SIZE + next_blk_header_addr) = new_size;
             *((uint8_t*)prev_blk_header_addr + HEADER_SIZE_FIELD_SIZE) = 0;
             
         }
