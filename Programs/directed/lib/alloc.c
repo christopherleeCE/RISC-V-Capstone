@@ -33,7 +33,7 @@
         //clamp payload_size to multiples of 4
         int mod = payload_size % 4;
         if(mod != 0){
-            payload_size = payload_size + (4 - (payload_size % 4));
+            payload_size = payload_size + (4 - mod);
         }
 
         uint8_t* heap_start = &_heap_start;
