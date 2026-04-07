@@ -20,7 +20,7 @@ TODO code coverage
 TODO more demo programs in C
 TODO contact abrams, maybe invite him to see the demo on demo day
 TODO maybe some cool external libs
-TODO ifdef malloc
+TODO optimize alloc.c
 
 
 Out of Semester
