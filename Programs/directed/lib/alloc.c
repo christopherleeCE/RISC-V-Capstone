@@ -39,7 +39,6 @@
         uint8_t* heap_start = &_heap_start;
         uint8_t* heap_end = &_heap_end; //exclusive
         uint8_t* header_ptr = heap_start;
-        size_t old_payload_size, next_payload_size, new_block_size;
 
         bool same_size, valid_bigger_size;
 
@@ -52,7 +51,7 @@
             if((*(header_ptr + HEADER_SIZE_FIELD_SIZE) == 0) & (same_size | valid_bigger_size)){
 
                 //save old block size
-                old_payload_size = *(size_t*)(header_ptr);
+                size_t old_payload_size = *(size_t*)(header_ptr);
 
                 //write new size to header.size, set to occupied, set footer.size
                 *(size_t*)(header_ptr) = payload_size;
@@ -61,8 +60,8 @@
 
                 //if we need to, allocate a free second block
                 if(valid_bigger_size){
-                    new_block_size = (HEADER_TOTAL_SIZE + payload_size + FOOTER_SIZE);
-                    next_payload_size = old_payload_size - new_block_size; //old_payload_size - payload_size - header&footer
+                    size_t new_block_size = (HEADER_TOTAL_SIZE + payload_size + FOOTER_SIZE);
+                    size_t next_payload_size = old_payload_size - new_block_size; //old_payload_size - payload_size - header&footer
 
                     uint8_t* next_header_addr = header_ptr + new_block_size;
                     //write header, set to unoccoupied, set footer.size for second half of split block
@@ -127,16 +126,14 @@
         uint8_t* header_ptr = ptr - HEADER_TOTAL_SIZE;
 
         size_t mid_blk_tot_size = (HEADER_TOTAL_SIZE + *(size_t*)header_ptr + FOOTER_SIZE);
-        size_t prev_blk_pl_size;
-        uint8_t* prev_blk_header_addr;
         size_t new_size;
-
+        uint8_t* prev_blk_header_addr;
                                 //next blk header.size  //middle blk total size  //middle blk headerprt
         bool next_free = !*(bool*)((HEADER_SIZE_FIELD_SIZE) + mid_blk_tot_size + (header_ptr)); //next blk status
 
         bool prev_free = 0; //if at start of heap, dont check prev blk
         if(header_ptr != heap_start){
-            prev_blk_pl_size = *(header_ptr - FOOTER_SIZE);
+            size_t prev_blk_pl_size = *(header_ptr - FOOTER_SIZE);
             prev_blk_header_addr = header_ptr - FOOTER_SIZE - prev_blk_pl_size - HEADER_TOTAL_SIZE;
 
                                 //middle hptr  //prev footer  //prev blk payload size  //prev blk header.flags
