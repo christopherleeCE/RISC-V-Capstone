@@ -24,14 +24,22 @@ int main(){
     //     };
     // arr[7] = num * 1000;
     //int* empty = malloc(4);
-    int* temp1 = malloc(4);
-    int* temp2 = malloc(8);
-    int* temp3 = malloc(0);
-    int* temp4 = malloc(16);
-    int* temp5 = malloc(20);
+    int* temp1 = malloc(0);
+    int* temp2 = malloc(4);
+    int* temp3 = malloc(8);
+    int* temp4 = malloc(0);
+    int* temp5 = realloc(NULL, 16);
 
-    *temp3 = 67;
+    free(temp1);
+    realloc(temp2, 0);
+    realloc(temp3, 1);
+    free(temp3);
+    temp5 = realloc(temp5, 20);
+    free(temp5);
+    free(temp4);
 
-    return tb_return(*temp3);
+    int* ret = calloc(40, 1);
+
+    return tb_return(0);
 
 }

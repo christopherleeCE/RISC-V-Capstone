@@ -86,7 +86,7 @@
         if(ret_ptr == NULL) {return NULL;}
 
         for(size_t ii = 0; ii < total; ++ii){
-            *(ret_ptr + ii) = 17;
+            *(ret_ptr + ii) = 0;
 
         }return ret_ptr;
     }
