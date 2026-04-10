@@ -81,12 +81,18 @@
     void* calloc(size_t count, size_t element_size){
 
         size_t total = count*element_size;
-        uint8_t* ret_ptr = malloc(count*element_size);
+
+        //clamp total to multiples of 4
+        int mod = total % 4;
+        if(mod != 0) {total = total + (4 - mod);}
+
+        uint32_t* ret_ptr = malloc(total);
 
         if(ret_ptr == NULL) {return NULL;}
 
+        total = total / 4;
         for(size_t ii = 0; ii < total; ++ii){
-            *(ret_ptr + ii) = 17;
+            *(ret_ptr + ii) = 0;
 
         }return ret_ptr;
     }
