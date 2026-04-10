@@ -30,8 +30,6 @@ int main(){
     int* temp4 = malloc(16);
     int* temp5 = malloc(20);
 
-    *temp3 = 67;
-
-    return tb_return(*temp3);
+    return tb_return(*temp3, *temp3);
 
 }

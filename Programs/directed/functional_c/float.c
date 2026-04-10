@@ -10,6 +10,5 @@ int main() {
     float area = pi * r * r;
     float area_times_100 = area * 100;
 
-    return tb_return(area_times_100);
-    // return tb_return(0);
+    return tb_return(area_times_100, area_times_100);
 }

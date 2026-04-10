@@ -73,7 +73,7 @@ int main()
     }
 
     //return the estimated value of the solution
-    return tb_return(convert(y));
+    return tb_return(convert(y), convert(y));
 }
 
 //The ordinary differential equation

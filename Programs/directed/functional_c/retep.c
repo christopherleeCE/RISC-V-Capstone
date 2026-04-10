@@ -13,5 +13,5 @@ int main() {
         a = a;
     #endif
 
-    return tb_return(a);
+    return tb_return(a, a);
 }

@@ -9,5 +9,5 @@ int main() {
         }
     }
 
-    return tb_return(sum);
+    return tb_return(sum, sum);
 }
