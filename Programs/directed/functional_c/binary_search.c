@@ -17,7 +17,7 @@ int main(){
     //call the binary search
     int index = binary_search(array, sizeof(array)/sizeof(array[0]), target);
 
-    return(tb_return(index)); //return the index
+    return(tb_return(index, index)); //return the index
 
 }
 
