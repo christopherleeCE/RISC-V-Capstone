@@ -4,6 +4,7 @@ set -e
 # --- Defaults ---
 file="program_asm.s"
 mode="gas"
+notb=false
 
 # --- Argument Parsing ---
 while [[ $# -gt 0 ]]; do
@@ -13,6 +14,7 @@ while [[ $# -gt 0 ]]; do
       echo "  -help : Show this menu"
       echo "  -gcc  : Use GCC toolchain"
       echo "  -gas  : Use GAS toolchain (default)"
+      echo "  -notb : passes -DNO_TB to compilation flags"
       exit 0
       ;;
     -gcc)
@@ -21,6 +23,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     -gas)
       mode="gas"
+      shift
+      ;;
+    -notb)
+      notb=true
       shift
       ;;
     -*)
@@ -34,6 +40,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+define=""
+if [ "$notb" = true ]; then
+    define="-DNO_TB"
+fi
 
 #check if file exits
 if [[ ! -f "$file" ]]; then
@@ -97,12 +108,15 @@ elif [ "$mode" = "gcc" ] ; then
     -fno-builtin \
     -ffreestanding \
     -T linker.ld \
+    $define \
     "$file" \
     -I../Programs/directed/lib \
     -L../Programs/directed/lib \
     -ldrysoup \
     -lgcc \
     -o program.elf
+
+    #read -p "Press Enter to continue..."
 
     # riscv64-unknown-elf-gcc \
     # -march=rv32im \

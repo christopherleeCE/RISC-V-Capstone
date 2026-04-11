@@ -9,7 +9,7 @@ int main() {
     int temp;
 
     if (n == 0)
-        return tb_return(0);
+        return tb_return(0, 0);
 
     for (int i = 2; i <= n; i++) {
         temp = a + b;
@@ -17,5 +17,5 @@ int main() {
         b = temp;
     }
 
-    return tb_return(b);
+    return tb_return(b, b);
 }

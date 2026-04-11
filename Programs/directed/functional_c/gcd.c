@@ -12,5 +12,5 @@ int main() {
 
     int result = findGCD(num1 < 0 ? -num1 : num1, num2 < 0 ? -num2 : num2);
 
-    return tb_return(result);
+    return tb_return(result, result);
 }

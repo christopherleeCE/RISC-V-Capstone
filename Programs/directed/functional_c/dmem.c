@@ -40,7 +40,7 @@ int main(void) {
     int result1 = add(global_counter, global_array[0]);
     int result2 = compute_sum(global_array, 4);
 
-    return tb_return(result1 + result2);
+    return tb_return(result1 + result2, result1 + result2);
 }
 
 

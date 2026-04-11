@@ -38,6 +38,9 @@ int main()
     #endif
 
     //return
-    return(tb_return(pack_ptr(b_matrix, sizeof(b_matrix)/sizeof(b_matrix[0]), false)));
+    return(tb_return(
+        b_matrix[0],
+        pack_ptr((uint32_t*)b_matrix, sizeof(b_matrix)/sizeof(b_matrix[0]), false))
+    );
 }
 

@@ -12,5 +12,5 @@ int main() {
         sum += arr[i];
     }
 
-    return tb_return(sum);
+    return tb_return(sum, sum);
 }

@@ -9,5 +9,5 @@ int main() {
         sum += *(p + i);
     }
 
-    return tb_return(sum);
+    return tb_return(sum, sum);
 }

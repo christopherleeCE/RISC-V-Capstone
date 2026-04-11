@@ -99,8 +99,13 @@ int main() {
 
     float ret[21][2];
 
-    //for(int ii = 0; ii <= 20; ++ii){
-    for(int ii = 0; ii <= 0; ++ii){
+    #ifdef NO_TB
+    int N = 20;
+    #else
+    int N = 0;
+    #endif
+    
+    for(int ii = 0; ii <= N; ++ii){
         magnitude = 7;
         angle = float_pi * (ii*.1);
 
@@ -113,22 +118,24 @@ int main() {
         ret[ii][0] = x_vector;
         ret[ii][1] = y_vector;
     }
+
     // #ifdef X86_BUILD
     //     //printf("float_pi: %f\n", float_pi);
     //     printf("[%f, %f, %f, %f]\n", cos_val, sin_val, x_vector, y_vector);
     //     //printf("%.2f units with an angle of %.2f radians\n", magnitude, angle);
     // #endif
 
-    // for(int ii = 0; ii < 21; ++ii){
-    //     for(int jj = 0; jj < 2; ++jj){
-    //         printf("%f ", ret[ii][jj]);
-    //     }printf("\n");
-    // }
+    // #ifdef X86_BUILD
+    //     for(int ii = 0; ii < 21; ++ii){
+    //         for(int jj = 0; jj < 2; ++jj){
+    //             printf("%f ", ret[ii][jj]);
+    //         }printf("\n");
+    //     }
+    // #endif
 
-    return tb_return(rf2i(ret[0][0]));
-    //return tb_return(pack_ptr((uint32_t)ret, 21*2, false));
+    return tb_return(
+        rf2i(ret[0][0]),
+        pack_ptr((uint32_t*)ret, 21*2, false)
+    );
 }
 
-// int main(){
-//     return tb_return(0);
-// }

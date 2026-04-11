@@ -24,6 +24,11 @@ $diffAnyGlobalErrors = $false
 $ErrorActionPreference = "Stop"
 $runTime = 5000000
 
+$my_gcc_flags = ""
+if($no_run){
+    $my_gcc_flags = "-notb"
+}
+
 if($help){
     Write-Output("
     Usage: GITHOME/Modules >> ../Scripts/direct_master.ps1 myProgram.s -optional_flags
@@ -190,7 +195,7 @@ if(-not $compile){ #no -compile flag ===========================================
             # if ($LASTEXITCODE -ne 0) { exit 1 }
 
             Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
-            wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas"
+            wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas $my_gcc_flags"
             if ($LASTEXITCODE -ne 0) { exit 1 }
             python3 .\hex2mif.py .\instruction_memory.hex instr.mif
             if ($LASTEXITCODE -ne 0) { exit 1 }
@@ -228,7 +233,7 @@ if(-not $compile){ #no -compile flag ===========================================
         # if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
-        wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas"
+        wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas $my_gcc_flags"
         if ($LASTEXITCODE -ne 0) { exit 1 }
         python3 .\hex2mif.py .\instruction_memory.hex instr.mif
         if ($LASTEXITCODE -ne 0) { exit 1 }
@@ -318,7 +323,7 @@ if(-not $compile){ #no -compile flag ===========================================
             Write-Host "Testing $wslPath..."
             
             Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
-            wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc"
+            wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc $my_gcc_flags"
             if ($LASTEXITCODE -ne 0) { exit 1 }
             python3 .\hex2mif.py .\instruction_memory.hex instr.mif
             if ($LASTEXITCODE -ne 0) { exit 1 }
@@ -386,7 +391,7 @@ if(-not $compile){ #no -compile flag ===========================================
         # if ($LASTEXITCODE -ne 0) { exit 1 }
 
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
-        wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc"
+        wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc $my_gcc_flags"
         if ($LASTEXITCODE -ne 0) { exit 1 }
         python3 .\hex2mif.py .\instruction_memory.hex instr.mif
         if ($LASTEXITCODE -ne 0) { exit 1 }

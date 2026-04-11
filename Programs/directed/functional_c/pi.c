@@ -35,5 +35,5 @@ int main() {
     int interations_sim = 1000;
 
     // :)
-    return tb_return(*(int*)&(float){(float)(uint32_t)compute_pi(interations_sim,scale)/(float)scale});
+    return tb_return(*(int*)&(float){(float)(uint32_t)compute_pi(interations_sim,scale)/(float)scale}, *(int*)&(float){(float)(uint32_t)compute_pi(interations_sim,scale)/(float)scale});
 }

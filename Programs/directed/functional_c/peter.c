@@ -7,5 +7,5 @@ int main() {
     a = a + 1;
     a = a + 1;
     a = a + 1;
-    return tb_return(a);
+    return tb_return(a, a);
 }

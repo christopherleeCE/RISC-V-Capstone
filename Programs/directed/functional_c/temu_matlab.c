@@ -28,6 +28,8 @@ int main() {
         }
     }
 
-    return tb_return(C[0][0]);
-    //return tb_return(pack_ptr(C, 9, false));
+    return tb_return(
+        C[0][0],
+        pack_ptr((uint32_t*)C, 9, false)
+    );
 }

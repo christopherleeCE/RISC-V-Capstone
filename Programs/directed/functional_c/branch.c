@@ -10,5 +10,5 @@ int main() {
             x -= 2;
     }
 
-    return tb_return(x);
+    return tb_return(x, x);
 }

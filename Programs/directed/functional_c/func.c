@@ -13,6 +13,6 @@ int accumulate(int n) {
 
 int main() {
 
-    return tb_return( accumulate(5) );
+    return tb_return(accumulate(5), accumulate(5));
 
 }

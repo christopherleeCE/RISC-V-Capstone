@@ -49,8 +49,10 @@ int main()
     //     printf("%d\n", test_array[ii]);
     // #endif
 
-    return tb_return(range(test_array, length)); //return the length of the array
-    //return tb_return(pack_ptr((uint32_t)test_array, length, false));
+    return tb_return(
+        range(test_array, length),
+        pack_ptr((uint32_t*)test_array, length, false)
+    );
 }
 
 void merge_sort(int a[], int length)

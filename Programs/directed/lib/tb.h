@@ -1,5 +1,5 @@
 #ifndef TB_H
-    #define TB_H
+#define TB_H
 
     #ifndef X86_BUILD
 
@@ -42,18 +42,32 @@
         }
 
         //pass through return value
-        static inline int tb_return(int ret) {return ret;}
+        #ifdef NO_TB
+            static inline int tb_return(int tb_ret, int no_tb_ret) {return no_tb_ret;}
+        #else
+            static inline int tb_return(int tb_ret, int no_tb_ret) {return tb_ret;}
+        #endif
+
 
     #else
 
         //only include stdio if on x86 build
         #include <stdio.h>
 
-        //print out return for direct_master.ps1 to parse from output
-        static inline int tb_return(int ret){
-            printf("<%d>\n", ret);
-            return 0; //never forget :wilted_rose:
-        }
 
+        //pass through return value
+        #ifdef NO_TB
+            //print out return for direct_master.ps1 to parse from output
+            static inline int tb_return(int tb_ret, int no_tb_ret){
+                printf("<%d>\n", no_tb_ret);
+                return 0; //never forget :wilted_rose:
+            }
+        #else
+            //print out return for direct_master.ps1 to parse from output
+            static inline int tb_return(int tb_ret, int no_tb_ret){
+                printf("<%d>\n", tb_ret);
+                return 0; //never forget :wilted_rose:
+            }
+        #endif
     #endif
 #endif
