@@ -1,6 +1,7 @@
-//function to solve the linear system
 #include "linalg_float.h"
 
+//function to solve the linear system
+//WARNING: will overwrite parts of both arrays
 void solve(int n, float a[n][n], float b[n])
 {
     gaussian_elim(n, a, b); //overwrites lower triangle w/ multipliers
@@ -54,6 +55,7 @@ void gaussian_elim(int n, float a[n][n], float b[n])
     }
 }
 
+//subroutine for back substitution
 void back_sub(int n, float a[n][n], float b[n])
 {
     float temp_val = 0;
