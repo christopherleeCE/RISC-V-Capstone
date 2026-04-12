@@ -16,11 +16,8 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 Current semester
 ================
 holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
-TODO code coverage
 TODO more demo programs in C
 TODO contact abrams, maybe invite him to see the demo on demo day
-TODO maybe some cool external libs
-TODO clean up inlcudes
 
 
 Out of Semester
