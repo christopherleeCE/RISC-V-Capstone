@@ -85,29 +85,21 @@ if(-not $only_gen_master_log){
 
         Write-Host "Generating random assembly..."
         python3 ..\Scripts\gen_random_prog.py
-        if ($LASTEXITCODE -ne 0) { exit 1 }
-
-        # Write-Host "Assembling in WSL..."
-        # wsl bash -c "riscv64-unknown-elf-as -march=rv32im temp.s -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
-        # if ($LASTEXITCODE -ne 0) { exit 1 }
-
-        # Write-Host "Writing instruction memory file..."
-        # python3 .\load_instr_mem_file.py
-        # if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
 
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
         wsl bash -c "dos2unix ../Scripts/my_gcc.sh"
-        if ($LASTEXITCODE -ne 0) { exit 1 }
-        wsl bash -c "../Scripts/my_gcc.sh temp.s -gas"
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
+        wsl bash -c "../Scripts/my_gcc.sh temp.s -gas > objdump.log 2>&1"
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         python3 .\hex2mif.py .\instruction_memory.hex instr.mif
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         python3 .\hex2mif.py .\data_memory.hex data.mif
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         Write-Host "Running simulation $($ii)/$runs..." -ForegroundColor Magenta
 
         & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         $simScriptArgs.no_compile = $true
 
         Write-Host "Flow complete."

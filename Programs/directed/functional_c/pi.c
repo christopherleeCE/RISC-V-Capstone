@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "tb.h"
+#include "base.h"
 
 // Computes pi scaled by SCALE (fixed-point style)
 int compute_pi(int iterations, int SCALE) {

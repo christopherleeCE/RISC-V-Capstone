@@ -23,6 +23,7 @@ Modules/instruction_memory.txt
 Modules/data_memory.hex
 Modules/instruction_memory.hex
 Modules/dump.vcd
+Modules/objdump.log
 Programs/directed/lib/libdrysoup.a
 Programs/directed/lib/libdrysoup_x86.a
 

@@ -1,4 +1,4 @@
-#include "tb.h"
+#include "base.h"
 
 int findGCD(int a, int b) {
     if (b == 0)

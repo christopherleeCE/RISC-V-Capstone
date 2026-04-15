@@ -112,6 +112,7 @@ if($program_file_name -ne ''){
 }
 #convering all .sh to linux line endings
 wsl bash -c "dos2unix ../Scripts/*.sh"
+if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
 
 $logFolder = "..\Logs\raw_directed"
 $masterLogName = "_master.log"
@@ -146,11 +147,13 @@ if($compile){
         $obj = "$LibDir/$($f.BaseName).o"
 
         wsl bash -c "riscv64-unknown-elf-gcc -march=rv32im -mabi=ilp32 -fno-builtin -ffreestanding -c $cfile -o $obj"
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
     }
 
     $LibDirFullA = "$LibDir/libdrysoup.a"
     $LibDirFullO = "$LibDir/*.o"
     wsl bash -c "riscv64-unknown-elf-ar rcs $LibDirFullA $LibDirFullO"
+    if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
 
     Remove-Item "$LibDir/*.o"
 
@@ -160,11 +163,13 @@ if($compile){
         $obj = "$LibDir/$($f.BaseName).o"
 
         wsl bash -c "gcc -DX86_BUILD -c $cfile -o $obj"
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
     }   
 
     $LibDirFullA = "$LibDir/libdrysoup_x86.a"
     $LibDirFullO = "$LibDir/*.o"
     wsl bash -c "ar rcs $LibDirFullA $LibDirFullO"
+    if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
 
     Remove-Item "$LibDir/*.o"
 }
@@ -186,26 +191,18 @@ if(-not $compile){ #no -compile flag ===========================================
             $wslPath = "../Programs/directed/$directory/$($file.name)"
             Write-Host "Testing $wslPath..."
 
-            # Write-Host "Assembling in WSL..."
-            # wsl bash -c "riscv64-unknown-elf-as -march=rv32im $wslPath -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
-            # if ($LASTEXITCODE -ne 0) { exit 1 }
-
-            # Write-Host "Writing instruction memory file..."
-            # python3 .\load_instr_mem_file.py
-            # if ($LASTEXITCODE -ne 0) { exit 1 }
-
             Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
-            wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas $my_gcc_flags"
-            if ($LASTEXITCODE -ne 0) { exit 1 }
+            wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas $my_gcc_flags > objdump.log 2>&1"
+            if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
             python3 .\hex2mif.py .\instruction_memory.hex instr.mif
-            if ($LASTEXITCODE -ne 0) { exit 1 }
+            if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
             python3 .\hex2mif.py .\data_memory.hex data.mif
-            if ($LASTEXITCODE -ne 0) { exit 1 }
+            if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
 
             Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
 
             & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
-            if ($LASTEXITCODE -ne 0) { exit 1 }
+            if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
             $simScriptArgs.no_compile = $true
 
             Write-Host "Moving results..."
@@ -224,21 +221,13 @@ if(-not $compile){ #no -compile flag ===========================================
         $wslPath = "../Programs/directed/$directory/$($file.name)"
         Write-Host "Testing $wslPath..."
 
-        # Write-Host "Assembling in WSL..."
-        # wsl bash -c "riscv64-unknown-elf-as -march=rv32im $wslPath -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
-        # if ($LASTEXITCODE -ne 0) { exit 1 }
-
-        # Write-Host "Writing instruction memory file..."
-        # python3 .\load_instr_mem_file.py
-        # if ($LASTEXITCODE -ne 0) { exit 1 }
-
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
-        wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas $my_gcc_flags"
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        wsl bash -c "../Scripts/my_gcc.sh $wslPath -gas $my_gcc_flags > objdump.log 2>&1"
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         python3 .\hex2mif.py .\instruction_memory.hex instr.mif
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         python3 .\hex2mif.py .\data_memory.hex data.mif
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
 
         if($no_run){
             $timer.Stop()
@@ -252,7 +241,7 @@ if(-not $compile){ #no -compile flag ===========================================
         Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
         
         & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         $simScriptArgs.no_compile = $true
 
         Write-Host "Moving results..."
@@ -323,17 +312,17 @@ if(-not $compile){ #no -compile flag ===========================================
             Write-Host "Testing $wslPath..."
             
             Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
-            wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc $my_gcc_flags"
-            if ($LASTEXITCODE -ne 0) { exit 1 }
+            wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc $my_gcc_flags > objdump.log 2>&1"
+            if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
             python3 .\hex2mif.py .\instruction_memory.hex instr.mif
-            if ($LASTEXITCODE -ne 0) { exit 1 }
+            if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
             python3 .\hex2mif.py .\data_memory.hex data.mif
-            if ($LASTEXITCODE -ne 0) { exit 1 }
+            if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
 
             Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
 
             & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
-            if ($LASTEXITCODE -ne 0) { exit 1 }
+            if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
             $simScriptArgs.no_compile = $true
 
             #creating log
@@ -352,9 +341,10 @@ if(-not $compile){ #no -compile flag ===========================================
                 Add-Content -Path $diffLog -Value "Error: Could not find return value in sim.log"
             }
 
-            #-I defines the include path, where tb.h is located
+            #-I defines the include path, where base.h is located
             Write-Output("Running program in WSL-x86 and parsing return value`n")
             $x86ReturnValue = wsl bash -c "gcc $wslPath -I../Programs/directed/lib -L../Programs/directed/lib -ldrysoup_x86 -DX86_BUILD -o x86.out && ./x86.out"
+            if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
             $x86ReturnValue = [int]$x86ReturnValue.Trim('<', '>')
 
             if($x86ReturnValue -eq $simReturnValue){
@@ -382,21 +372,13 @@ if(-not $compile){ #no -compile flag ===========================================
         $wslPath = "../Programs/directed/$directory/$($file.name)"
         Write-Host "Testing $wslPath..."
 
-        # Write-Host "Assembling in WSL..."
-        # wsl bash -c "riscv64-unknown-elf-as -march=rv32im $wslPath -o program_asm.o && riscv64-unknown-elf-objdump -d program_asm.o | tee program.log"
-        # if ($LASTEXITCODE -ne 0) { exit 1 }
-
-        # Write-Host "Writing instruction memory file..."
-        # python3 .\load_instr_mem_file.py
-        # if ($LASTEXITCODE -ne 0) { exit 1 }
-
         Write-Host "Assembling in WSL & Loading instruction_mem.txt and data_memory.txt..."
-        wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc $my_gcc_flags"
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        wsl bash -c "../Scripts/my_gcc.sh $wslPath -gcc $my_gcc_flags > objdump.log 2>&1"
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         python3 .\hex2mif.py .\instruction_memory.hex instr.mif
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         python3 .\hex2mif.py .\data_memory.hex data.mif
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
 
         if($no_run){
             $timer.Stop()
@@ -410,7 +392,7 @@ if(-not $compile){ #no -compile flag ===========================================
         Write-Host "Running simulation $($runCount)/$runs..." -ForegroundColor Magenta
         
         & ..\Scripts\simulate_sv.ps1 @simScriptArgs -time $runTime
-        if ($LASTEXITCODE -ne 0) { exit 1 }
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
         $simScriptArgs.no_compile = $true
 
         #creating log
@@ -429,9 +411,10 @@ if(-not $compile){ #no -compile flag ===========================================
             Add-Content -Path $diffLog -Value "Error: Could not find return value in sim.log"
         }
 
-        #-I defines the include path, where tb.h is located
+        #-I defines the include path, where base.h is located
         Write-Output("Running program in WSL-x86 and parsing return value`n")
         $x86ReturnValue = wsl bash -c "gcc $wslPath -I../Programs/directed/lib -L../Programs/directed/lib -ldrysoup_x86 -DX86_BUILD -o x86.out && ./x86.out"
+        if ($LASTEXITCODE -ne 0) { Write-Host "Exit code shows error..." -ForegroundColor Red; exit 1 }
 
         ### a reminder...
         # $x86ReturnValue = $x86ReturnValue | Where-Object {
