@@ -42,7 +42,8 @@ module top_fpga(
     output logic [6:0] hex3,
     output logic [6:0] hex4,
     output logic [6:0] hex5,
-    output logic [5:0] hex_decimal_point
+    output logic [5:0] hex_decimal_point,
+    output logic FPGA_UART_TX
 );
 
     localparam int BASE_CLK_FREQ = 50000000;
@@ -313,6 +314,76 @@ module top_fpga(
         .odone(float_done),
         .dp_en(dp_en),
         .bcd(bcd)
+    );
+
+    // the uart packing module is designed to capture the relevant signals from the CPU at the right time 
+    // (either on every CPU clock tick or only on CPU finish/halt events based on the divided_clk_en signal), 
+    //pack them into a data buffer, and then shift out one byte at a time to the uart_tx module for transmission. 
+    // The state machine ensures that the data is captured and sent in an orderly fashion, 
+    // and the use of local_clk allows for synchronization with the CPU's operation.
+    
+    logic [7:0] uart_data;
+    logic uart_send;
+    logic uart_busy;
+    logic [367:0] signals, dbg_signals, dbg_signals_capture;
+    logic dbg_finish_capture, dbg_halt_capture;    
+    logic dbg_finish, dbg_halt;
+
+    assign signals = {
+        instr_f_out, instr_d_out, instr_e_out, instr_m_out, instr_w_out,
+        pc_f_out, pc_d_out, pc_e_out, pc_m_out, pc_w_out,
+        a0, {7'b0, ofinish}, {7'b0, ohalt}
+    };
+
+    // Clock domain crossing
+    always_ff @(posedge global_clk or negedge global_rst) begin
+        if (!global_rst) begin
+            dbg_signals <= signals;
+            dbg_signals_capture <= signals;
+
+            dbg_finish <= ofinish;
+            dbg_finish_capture <= ofinish;
+
+            dbg_halt <= ohalt;
+            dbg_halt_capture <= ohalt;
+        end else begin
+            dbg_signals_capture <= signals; // Capture the signals in the local clock domain
+            dbg_signals <= dbg_signals_capture; // Transfer the captured signals to the global clock domain
+
+            dbg_finish_capture <= ofinish; // Capture the finish signal in the local clock domain
+            dbg_finish <= dbg_finish_capture; // Transfer the captured finish signal to the global clock domain
+
+            dbg_halt_capture <= ohalt; // Capture the halt signal in the local clock domain
+            dbg_halt <= dbg_halt_capture; // Transfer the captured halt signal to the global clock domain
+        end
+    end
+
+    // State machine for data packing and UART transmission control
+    uart_packing my_uart_packing(
+        .clk(global_clk),
+        .reset(global_rst),
+        .busy(uart_busy), // Receive the busy signal from the uart_tx module to know when it's ready for the next byte
+        .divided_clk_en(divided_clk_en), // Send data on every CPU clock tick or only on CPU finish/halt events based on this signal
+        .local_clk(local_clk), // Send data when the local clock ticks, which is synchronized with the CPU
+        .debug_clk(debug_clk), // Send data on debug clock ticks to capture signals on CPU finish/halt events
+        .cpu_finish(dbg_finish),
+        .cpu_halt(dbg_halt),
+        .dbg_signals(dbg_signals), // Send the captured signals to the UART packing module
+        .send(uart_send), // Output signal to trigger sending data when the uart_tx module is ready
+        .out_byte(uart_data)
+    );
+
+    // Takes the packed data from the uart_packing module and sends it serially over the FPGA_UART_TX line.
+    uart_tx #(
+        .BAUD_RATE(115200),
+        .GLOBAL_CLK_FREQ(50000000)
+    ) my_uart_tx (
+        .clk(global_clk),
+        .reset(global_rst),
+        .in_byte(uart_data),
+        .send(uart_send), // Triggered by the uart_packing module when data is ready to be sent
+        .busy(uart_busy), // Output signal to indicate when the uart_tx module is busy transmitting data
+        .tx(FPGA_UART_TX)
     );
 
     assign hex_sel = switches[3:0];
