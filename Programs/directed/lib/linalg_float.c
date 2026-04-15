@@ -35,14 +35,13 @@ void gaussian_elim(int n, float a[n][n], float b[n])
                 temp_val = a[k][j];
                 a[k][j] = a[max_in][j];
                 a[max_in][j] = temp_val;
-
-                temp_val = b[k];
-                b[k] = b[max_in];
-                b[max_in] = temp_val;
             }
 
+            temp_val = b[k];
+            b[k] = b[max_in];
+            b[max_in] = temp_val;
+
         //GAUSSIAN ELIMINATION
-        //
         for (int i = k+1; i < n; i++) //iterate through each row
         {
             a[i][k] = a[i][k]/a[k][k]; //pivot column in A
