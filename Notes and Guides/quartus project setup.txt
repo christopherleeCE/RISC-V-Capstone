@@ -92,3 +92,4 @@ set_location_assignment PIN_A19 -to hex_decimal_point[2]
 set_location_assignment PIN_D22 -to hex_decimal_point[3]
 set_location_assignment PIN_F17 -to hex_decimal_point[4]
 set_location_assignment PIN_L19 -to hex_decimal_point[5]
+set_location_assignment PIN_AB2 -to FPGA_UART_TX
