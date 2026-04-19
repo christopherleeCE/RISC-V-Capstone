@@ -26,6 +26,7 @@ Modules/dump.vcd
 Modules/objdump.log
 Programs/directed/lib/libdrysoup.a
 Programs/directed/lib/libdrysoup_x86.a
+Scripts/temp.ps1
 
 Logs
 .vscode
