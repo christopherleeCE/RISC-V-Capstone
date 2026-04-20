@@ -1,6 +1,7 @@
 param(
     [switch]$help,
     [string]$project_name,
+    [string]$project_rev,
     [switch]$y
 )
 
@@ -29,14 +30,23 @@ if($help){
 
 #extract relative directory from the cmd line call
 $projectName = $project_name
+$projectRev = $project_rev
 $scriptDir = $PSScriptRoot
 $relativeScriptPath = Resolve-Path $scriptDir -Relative -ErrorAction SilentlyContinue
 
 Write-Host "`nUsing project: $projectName" -ForegroundColor Blue
+
+if($projectRev -eq ""){
+    Write-Host "No project revison given" -ForegroundColor Blue
+}else{
+    Write-Host "Using revision: $projectRev" -ForegroundColor Blue
+    $projectRev = "-revision $projectRev"
+}#projectRev with either contain valid comp flags, or be an emtpy string
+
 Write-Host "Relative path to .tcl files: $relativeScriptPath" -ForegroundColor Blue
 Write-Host "Updating .mif's in Quartus and assembling...`n" -ForegroundColor Magenta
 
-quartus_sh -t "$relativeScriptPath\assemble.tcl" $projectName
+quartus_sh -t "$relativeScriptPath\assemble.tcl" $projectName $projectRev
 if ($LASTEXITCODE -ne 0) {Write-Host "`n'quartus_sh -t "$relativeScriptPath\assemble.tcl" $projectName' threw an error`n" -ForegroundColor Red}
 
 if(-not $y){

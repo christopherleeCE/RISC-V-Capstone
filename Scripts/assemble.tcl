@@ -14,17 +14,18 @@ if { $argc == 0 || [lsearch $argv "-help"] != -1 || [lsearch $argv "-h"] != -1 }
     exit 0
 }
 
-#get arg
+#get args
 set project_name [lindex $argv 0]
+set revision [lindex $argv 1]
 
-
-project_open $project_name
-
+if { $revision eq "" } {
+    project_open $project_name
+} else {
+    project_open $project_name -revision $revision
+}
 
 execute_module -tool cdb -args "--update_mif"
 
-
 execute_module -tool asm
-
 
 project_close
