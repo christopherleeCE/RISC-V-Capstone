@@ -19,6 +19,7 @@ if($help){
 
     -help:          brings up this dialog
     -project_name:  define the project name, flag not needed but the argument is
+    -project_rev:   define a project revision, optional
 
     Usage Example: 
     PS C:\Users\Chris\Documents\Quartus\Quartus Projects\new_capstone> ..\..\Prototype\RISC-V-Capstone\Scripts\build_quartus.ps1 new_capstone

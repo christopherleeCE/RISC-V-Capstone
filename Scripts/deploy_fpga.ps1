@@ -20,6 +20,7 @@ if($help){
 
     -help:          brings up this dialog
     -project_name:  define the project name, flag not needed but the argument is
+    -project_rev:   define a project revision, optional
     -y:             skip confirmation prompt before programming
 
     Usage Example: 
