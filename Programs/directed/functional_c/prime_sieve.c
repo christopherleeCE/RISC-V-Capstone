@@ -43,7 +43,7 @@ int main()
         //start the algorithm
         for(int i = 2; i*i <= LIMIT; i++)
             for(int j = i*i; (j <= LIMIT) && (is_prime[i] != 0); j += i)
-                if(is_prime[j] != 0)
+                if(is_prime[j])
                 {
                     is_prime[j] = 0; //this value of j is not prime
                     prime_count--; //decrement the total
@@ -54,7 +54,7 @@ int main()
         int *prime_list = malloc(prime_count*sizeof(int));
         int *list_track = prime_list; //for indexing
         for(int i = 0; i <= LIMIT; i++)
-            if(is_prime[i] != 0)
+            if(is_prime[i])
             {
                 *list_track = i; //store the prime number
                 list_track++; //increment the pointer
