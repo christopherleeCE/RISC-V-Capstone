@@ -50,7 +50,7 @@ int main()
     // #endif
 
     return tb_return(
-        range(test_array, length),
+        test_array[0],
         pack_ptr((uint32_t*)test_array, length, false)
     );
 }
