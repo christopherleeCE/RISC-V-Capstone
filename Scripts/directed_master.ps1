@@ -41,7 +41,10 @@ if($help){
     -help:      Brings up this dialog
     -v:         verbose .log output
     -no_run:    if you give a file name, followed by no run, it will only load instruction_memory.txt
-                and data_memory.txt, will not run simulation, use this to get an objdump of the program
+                and data_memory.txt, will not run simulation, use this to get an objdump of the program,
+                or to generate .mifs, be sure to use this flag if generating .mifs since it passed the
+                -DNO_TB def to the gcc compilation, telling the tb_return if it should return
+                the tb or no_tb return value
     -compile:   use this flag if you want it to use a c file instead of an s file, if in c mode it will
                 compare the result with that same c file ran natively on x86, only comparasion made is
                 the return value of main(), just like in asm mode, if you dont give it a file name it
