@@ -35,7 +35,7 @@ int main()
     struct component components[] =
     {
         //expected result:
-        //[v1 = 13V, v2 = 14V, v3 = 13V, Is = 0.083 mA]
+        //[v1 = 13.000V, v2 = 13.966V, v3 = 17.925V, Is = 8.05e-5 A]
         {VS, 1, 0, 13},
         {RES, 1, 2, 12e3},
         {RES, 2, 0, 56e3},
