@@ -318,7 +318,7 @@ module top_fpga(
 
     // the uart packing module is designed to capture the relevant signals from the CPU at the right time 
     // (either on every CPU clock tick or only on CPU finish/halt events based on the divided_clk_en signal), 
-    //pack them into a data buffer, and then shift out one byte at a time to the uart_tx module for transmission. 
+    // pack them into a data buffer, and then shift out one byte at a time to the uart_tx module for transmission. 
     // The state machine ensures that the data is captured and sent in an orderly fashion, 
     // and the use of local_clk allows for synchronization with the CPU's operation.
     
@@ -359,7 +359,9 @@ module top_fpga(
     end
 
     // State machine for data packing and UART transmission control
-    uart_packing my_uart_packing(
+    uart_packing #(
+        .SIGNAL_WIDTH(368)
+    ) my_uart_packing(
         .clk(global_clk),
         .reset(global_rst),
         .busy(uart_busy), // Receive the busy signal from the uart_tx module to know when it's ready for the next byte

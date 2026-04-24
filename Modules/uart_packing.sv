@@ -1,4 +1,7 @@
-module uart_packing (
+module uart_packing #(
+    parameter SIGNAL_WIDTH = 368,               //default is 368
+    parameter BUFFER_SIZE = SIGNAL_WIDTH + 32   // Total size of the data buffer, including the debug signals and the end bytes
+)(
     input logic clk,
     input logic reset,
     input logic busy,
@@ -7,13 +10,13 @@ module uart_packing (
     input logic debug_clk,
     input logic cpu_finish,
     input logic cpu_halt,
-    input logic [367:0] dbg_signals,
+    input logic [SIGNAL_WIDTH-1:0] dbg_signals,
 
     output logic send,
     output logic [7:0] out_byte
 ); 
 
-    logic [399:0] data_buffer; // Buffer to hold the data to be sent
+    logic [BUFFER_SIZE-1:0] data_buffer; // Buffer to hold the data to be sent
     logic [31:0] end_bytes; // Register to hold the last bytes sent
 
     logic old_local_clk; // Register to hold the previous state of the CPU clock
@@ -76,7 +79,7 @@ module uart_packing (
             if (state == IDLE) begin
                 data_buffer <= {end_bytes, dbg_signals}; // Load the data buffer with the data to be sent
             end else if (state == SHIFT) begin
-                data_buffer <= {8'b0, data_buffer[399:8]}; // Shift the data buffer to prepare the next byte for sending
+                data_buffer <= {8'b0, data_buffer[BUFFER_SIZE-1:8]}; // Shift the data buffer to prepare the next byte for sending
             end
         end
     end
