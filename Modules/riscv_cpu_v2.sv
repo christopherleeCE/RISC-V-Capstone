@@ -16,6 +16,8 @@ module riscv_cpu_v2
     output logic [31:0] pc_e_out,
     output logic [31:0] pc_m_out,
     output logic [31:0] pc_w_out,
+    output logic control_hazard, 
+
     input logic portb_rst,
     input logic [31:0] portb_addr,
     input logic portb_clk,
@@ -659,6 +661,8 @@ module riscv_cpu_v2
         default : RD_DATA = '0;
         endcase
     end
+
+//====================================================================================================================    
     
     assign instr_f_out = INSTR_F_FLUSH;
     assign instr_d_out = INSTR_D_FLUSH;
@@ -671,5 +675,7 @@ module riscv_cpu_v2
     assign pc_e_out = PC_E;
     assign pc_m_out = PC_M;
     assign pc_w_out = PC_W;
+
+    assign control_hazard = flush_FD;
 
 endmodule
