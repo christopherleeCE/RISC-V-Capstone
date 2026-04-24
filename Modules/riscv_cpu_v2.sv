@@ -16,7 +16,15 @@ module riscv_cpu_v2
     output logic [31:0] pc_e_out,
     output logic [31:0] pc_m_out,
     output logic [31:0] pc_w_out,
-    output logic control_hazard, 
+    
+    output logic control_hazard,
+
+    output logic [4:0] R1_data_hazard_1,
+    output logic [4:0] R1_data_hazard_2,
+    output logic [4:0] R1_data_hazard_3,
+    output logic [4:0] R2_data_hazard_1,
+    output logic [4:0] R2_data_hazard_2,
+    output logic [4:0] R2_data_hazard_3,
 
     input logic portb_rst,
     input logic [31:0] portb_addr,
@@ -677,5 +685,13 @@ module riscv_cpu_v2
     assign pc_w_out = PC_W;
 
     assign control_hazard = flush_FD;
+
+    assign R1_data_hazard_1 = R1_case_dm2alu ? RD_M : (5'b0);
+    assign R1_data_hazard_2 = R1_case_rf2alu ? RD_W : (5'b0);
+    assign R1_data_hazard_3 = R1_case_rf2rf ? RD_W : (5'b0);
+
+    assign R2_data_hazard_1 = R2_case_dm2alu ? RD_M : (5'b0);
+    assign R2_data_hazard_2 = R2_case_rf2alu ? RD_W : (5'b0);
+    assign R2_data_hazard_3 = R2_case_rf2rf ? RD_W : (5'b0);
 
 endmodule

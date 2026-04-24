@@ -76,6 +76,13 @@ module top_fpga(
 
     logic control_hazard;
 
+    logic [4:0] R1_data_hazard_1;
+    logic [4:0] R1_data_hazard_2;
+    logic [4:0] R1_data_hazard_3;
+    logic [4:0] R2_data_hazard_1;
+    logic [4:0] R2_data_hazard_2;
+    logic [4:0] R2_data_hazard_3;
+
     logic [4:0] pre_hex0;
     logic [4:0] pre_hex1;
     logic [4:0] pre_hex2;
@@ -245,6 +252,12 @@ module top_fpga(
         .pc_m_out(pc_m_out),
         .pc_w_out(pc_w_out),
         .control_hazard(control_hazard),
+        .R1_data_hazard_1(R1_data_hazard_1),
+        .R1_data_hazard_2(R1_data_hazard_2),
+        .R1_data_hazard_3(R1_data_hazard_3),
+        .R2_data_hazard_1(R2_data_hazard_1),
+        .R2_data_hazard_2(R2_data_hazard_2),
+        .R2_data_hazard_3(R2_data_hazard_3),
         .portb_rst(!debug_clk_en),
         .portb_addr(portb_addr),
         .portb_clk(manual_clk),
@@ -328,14 +341,16 @@ module top_fpga(
     logic [7:0] uart_data;
     logic uart_send;
     logic uart_busy;
-    logic [375:0] signals, dbg_signals, dbg_signals_capture;
+    logic [423:0] signals, dbg_signals, dbg_signals_capture;
     logic dbg_finish_capture, dbg_halt_capture;    
     logic dbg_finish, dbg_halt;
 
     assign signals = {
         instr_f_out, instr_d_out, instr_e_out, instr_m_out, instr_w_out,
         pc_f_out, pc_d_out, pc_e_out, pc_m_out, pc_w_out,
-        a0, {7'b0, ofinish}, {7'b0, ohalt}, {7'b0, control_hazard}
+        a0, {7'b0, ofinish}, {7'b0, ohalt}, {7'b0, control_hazard},
+        {3'b0, R1_data_hazard_1}, {3'b0, R1_data_hazard_2}, {3'b0, R1_data_hazard_3},
+        {3'b0, R2_data_hazard_1}, {3'b0, R2_data_hazard_2}, {3'b0, R2_data_hazard_3}
     };
 
     // Clock domain crossing
@@ -363,7 +378,7 @@ module top_fpga(
 
     // State machine for data packing and UART transmission control
     uart_packing #(
-        .SIGNAL_WIDTH(376)
+        .SIGNAL_WIDTH(424)
     ) my_uart_packing(
         .clk(global_clk),
         .reset(global_rst),
