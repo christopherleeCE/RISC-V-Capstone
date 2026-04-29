@@ -34,6 +34,15 @@ we can tell c to map a variable that specific addr (the addr of the special reg)
 systime, rng
 tetris.c, bad_apple.c, (doom.c? :)
 
+octave:17> scale2byte1
+scale2byte1 = 76800
+octave:18> scale2byte4
+scale2byte4 = 307200
+octave:19> scale4byte1
+scale4byte1 = 19200
+octave:20> scale4byte4
+scale4byte4 = 76800
+
 
 --------------TEST LOG----------------------------------------------------
 
