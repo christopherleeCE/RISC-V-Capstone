@@ -15,13 +15,13 @@ the graph. - Edgar G.
 #define SRC 3 //source node in graph
 
 //function prototype
-void dijkstra(int map[N][N], int dist_arr[N], int visited[N]);
+void dijkstra(int map[N][N], int dist_arr[2][N], int visited[N]);
 
 //MAIN
 int main()
 {
     //SETUP
-    int dist_arr[N]; //to hold the distance from source node to every other node
+    int dist_arr[2][N]; //to hold the distance from source node to every other node
     int visited[N] = {0}; //to track the nodes that have been traveled
 
     //adjency matrix - row represents a node, column represents the weights of the edges
@@ -40,24 +40,29 @@ int main()
     //distance array to hold the value from source node to all other nodes
     //distances are initialized to a very large number
     for(int i = 0; i <= N-1; i++)
+    {
         if(i == SRC)
-            dist_arr[i] = 0;
+            dist_arr[0][i] = 0;
         else
-            dist_arr[i] = INF;
+            dist_arr[0][i] = INF;
+        dist_arr[1][i] = i;
+    }
+
+    
 
     //update the distance array
     dijkstra(map, dist_arr, visited);
 
     //return the distance array
     return tb_return(
-        dist_arr[0],
-        pack_ptr((uint32_t*)dist_arr, N, false)
+        dist_arr[0][0],
+        pack_ptr((uint32_t*)dist_arr, N*2, false)
     );
 }
 
 
 //DIJKSTRA'S ALGORITHM
-void dijkstra(int map[N][N], int dist_arr[N], int visited[N])
+void dijkstra(int map[N][N], int dist_arr[2][N], int visited[N])
 {
     int current_node = SRC; //start by setting source node as current node
     int dist_from_src = 0; //used to keep track of total distance from source node
@@ -76,9 +81,15 @@ void dijkstra(int map[N][N], int dist_arr[N], int visited[N])
 
                 //update the existing distance from the source node to the other node if the path
                 //via the current node is shorter: this is known as "relaxing" the other node
-                if(dist_from_src + dist_to_neighbor < dist_arr[other_node])
+                //also store the previous node for the other node, so we can trace the path to
+                //the source 
+                if(dist_from_src + dist_to_neighbor < dist_arr[0][other_node])
+                {
 
-                    dist_arr[other_node] = dist_from_src + dist_to_neighbor;
+                    dist_arr[0][other_node] = dist_from_src + dist_to_neighbor;
+                    dist_arr[1][other_node] = current_node;
+
+                }
 
         }
 
@@ -89,10 +100,10 @@ void dijkstra(int map[N][N], int dist_arr[N], int visited[N])
         //determine the unvisited node with the shortest distance to the source node
         int shortest_to_src = INF;
         for(int next_node = 0; next_node <= N-1; next_node++)
-            if(!visited[next_node] && dist_arr[next_node] < shortest_to_src)
+            if(!visited[next_node] && dist_arr[0][next_node] < shortest_to_src)
             {
                 current_node = next_node;
-                shortest_to_src = dist_arr[next_node];
+                shortest_to_src = dist_arr[0][next_node];
             }
 
         //UPDATE DISTANCE FROM SOURCE TO NEXT NODE
