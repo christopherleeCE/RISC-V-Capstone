@@ -93,3 +93,17 @@ set_location_assignment PIN_D22 -to hex_decimal_point[3]
 set_location_assignment PIN_F17 -to hex_decimal_point[4]
 set_location_assignment PIN_L19 -to hex_decimal_point[5]
 set_location_assignment PIN_AB2 -to FPGA_UART_TX
+set_location_assignment PIN_AA1 -to VGA_RED[0]
+set_location_assignment PIN_V1 -to VGA_RED[1]
+set_location_assignment PIN_Y2 -to VGA_RED[2]
+set_location_assignment PIN_Y1 -to VGA_RED[3]
+set_location_assignment PIN_W1 -to VGA_GREEN[0]
+set_location_assignment PIN_T2 -to VGA_GREEN[1]
+set_location_assignment PIN_R2 -to VGA_GREEN[2]
+set_location_assignment PIN_R1 -to VGA_GREEN[3]
+set_location_assignment PIN_P1 -to VGA_BLUE[0]
+set_location_assignment PIN_T1 -to VGA_BLUE[1]
+set_location_assignment PIN_P4 -to VGA_BLUE[2]
+set_location_assignment PIN_N2 -to VGA_BLUE[3]
+set_location_assignment PIN_N3 -to VGA_HS
+set_location_assignment PIN_N1 -to VGA_VS

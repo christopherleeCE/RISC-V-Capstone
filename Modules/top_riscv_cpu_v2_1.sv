@@ -73,7 +73,8 @@ UNSUCCESSFUL TESTS:
 module top_riscv_cpu_v2_1();
 
     //declarations
-    parameter int CLOCK_PERIOD = 20;
+    parameter int CLOCK_PERIOD = 200;
+    parameter int FIFTY_MHZ_PERIOD = 20;
     parameter int DATA_MEM_EC = 1024;
     parameter int LOWEST_DATA_MEM_ADDR = 32'h4000;
 
@@ -111,7 +112,7 @@ module top_riscv_cpu_v2_1();
     static int local_instruction_failure5;
 
     //cpu ports
-    logic clk, rst, ohalt, ofinish;
+    logic clk, clk_50, rst, ohalt, ofinish;
     logic global_rst, middle_rst;
 
     //golden instruction decoded declarations
@@ -205,14 +206,20 @@ module top_riscv_cpu_v2_1();
         .r2_data_hazard_1(),
         .r2_data_hazard_2(),
         .r2_data_hazard_3(),
-        .portb_extern_en(),
+        .portb_extern_en('0),
         .portb_rst('0),
         .portb_addr(32'h4fd0),
         .portb_clk(clk),
         .portb_q(portb_q),
         .portb_addr_byte('0),
         .portb_addr_half('0),
-        .portb_zero_extend('0)
+        .portb_zero_extend('0),
+        .clk_50(clk_50),
+        .VGA_RED(),
+        .VGA_BLUE(),
+        .VGA_GREEN(),
+        .VGA_HS(),
+        .VGA_VS()
     );
 
     //grabing vsim args
@@ -262,8 +269,16 @@ module top_riscv_cpu_v2_1();
     initial begin
         clk = 1'b0;
         forever begin //start the clock
-            #CLOCK_PERIOD
+            #(CLOCK_PERIOD/2)
             clk = ~clk;
+        end
+    end
+
+    initial begin
+        clk_50 = 1'b0;
+        forever begin
+            #(FIFTY_MHZ_PERIOD/2)
+            clk_50 = ~clk_50;
         end
     end
 

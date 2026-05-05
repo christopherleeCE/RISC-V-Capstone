@@ -9,7 +9,7 @@ bottombutton increment the pointer seq engine
 
 sw[9] rst to cpu active low
 sw[8] enable full clk (5mhz)
-sw[7] decimal point status light en, (when high decimal points in hex disp will slow flash on completion of prog)
+sw[7] decimal point status light en, (when high decimal points in hex disp will slow flash on completion of prog), extern_portb_en
 sw[6:5] select the source [11 10 01 00] = [pointer in seq engine, contents of pointer loc, ascii mode (overites sw[4:0]), raw retvalue]
 sw[4] select if we display the upper 6 digits or lower 6 digits
 sw[3:0]...
@@ -43,7 +43,12 @@ module top_fpga(
     output logic [6:0] hex4,
     output logic [6:0] hex5,
     output logic [5:0] hex_decimal_point,
-    output logic FPGA_UART_TX
+    output logic FPGA_UART_TX,
+    output logic [3:0] VGA_RED,
+    output logic [3:0] VGA_BLUE,
+    output logic [3:0] VGA_GREEN,
+    output logic       VGA_HS,
+    output logic       VGA_VS
 );
 
     localparam int BASE_CLK_FREQ = 50000000;
@@ -232,9 +237,6 @@ module top_fpga(
         end
     end
 
-    
-
-
     riscv_cpu_v2 cpu_dut(
         .clk(local_clk),
         .rst(local_rst),
@@ -258,14 +260,20 @@ module top_fpga(
         .r2_data_hazard_1(r2_data_hazard_1),
         .r2_data_hazard_2(r2_data_hazard_2),
         .r2_data_hazard_3(r2_data_hazard_3),
-        .portb_extern_en(1'b1),
+        .portb_extern_en(switches[7]),
         .portb_rst(!debug_clk_en),
         .portb_addr(portb_addr),
         .portb_clk(manual_clk),
         .portb_q(portb_q),
         .portb_addr_byte(ascii_mode),
         .portb_addr_half('0),
-        .portb_zero_extend('0)
+        .portb_zero_extend('0),
+        .clk_50(global_clk),
+        .VGA_RED(VGA_RED),
+        .VGA_BLUE(VGA_BLUE),
+        .VGA_GREEN(VGA_GREEN),
+        .VGA_HS(VGA_HS),
+        .VGA_VS(VGA_VS)
     );
 
     //assign ret_val = portb_q;

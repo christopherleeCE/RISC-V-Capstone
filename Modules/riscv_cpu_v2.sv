@@ -1,7 +1,7 @@
 
 //prototype of basic pattern
-module riscv_cpu_v2
-(
+module riscv_cpu_v2(
+
     input logic clk, rst, //This has to be a wire for explicit net type declaration (according to Questa)
     output logic ohalt, //when this is asserted, CPU should stop execution. Please implement in testbench
     output logic ofinish,
@@ -33,7 +33,14 @@ module riscv_cpu_v2
     output logic [31:0] portb_q,
     input logic portb_addr_byte,
     input logic portb_addr_half,
-    input logic portb_zero_extend
+    input logic portb_zero_extend,
+
+    input logic clk_50, //50mhz
+    output logic [3:0] VGA_RED,
+    output logic [3:0] VGA_BLUE,
+    output logic [3:0] VGA_GREEN,
+    output logic       VGA_HS,
+    output logic       VGA_VS
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
@@ -189,11 +196,20 @@ module riscv_cpu_v2
     logic pre_stall_1, pre_stall_2, pre_stall_3, stall;
 
     logic portb_rst_mux;
-    logic [31:0] portb_addr_mux;
+    logic [31:0] PORTB_ADDR_MUX;
     logic portb_clk_mux;
     logic portb_addr_byte_mux;
     logic portb_addr_half_mux;
     logic portb_zero_extend_mux;
+
+    logic [10-1:0] pix_x;   //x_cord
+    logic [10-1:0] pix_y;   //y_cord
+    logic pix_vis;          //visible
+    logic [6-1:0] frame_id; //frame num/60
+    logic hs;       //horz sync sig
+    logic vs;       //vert sync sig
+    logic [31:0] VRAM_ADDR;
+    logic vga_clk;
 
     //gradually stop pipeline advance as halt moves through pipeline
     assign pipeline_advance_FD = !(halt_D || stall);
@@ -580,16 +596,38 @@ module riscv_cpu_v2
         halt_M
     } = e2m_control_M;     
 
-    assign portb_rst_mux = portb_extern_en ? portb_rst : '0;
-    assign portb_addr_mux = portb_extern_en ? portb_addr : '0;
-    assign portb_clk_mux = portb_extern_en ? portb_clk : '0;
-    assign portb_addr_byte_mux = portb_extern_en ? portb_addr_byte : '0;
-    assign portb_addr_half_mux = portb_extern_en ? portb_addr_half : '0;
-    assign portb_zero_extend_mux = portb_extern_en ? portb_zero_extend : '0;
+	clock_25 my_clock_25(
+        .clk_50(clk_50),
+        .rst(rst),
+        .vga_clk(vga_clk)
+    );
 
-    // synchronous-read data mem, so inputs come straight from EX stage
+    vga_ctrl #(
+        .PIX_AW(10),
+        .FRM_AW(6)
+    )my_vga_ctrl(
+        .pix_x(pix_x),
+        .pix_y(pix_y),
+        .pix_vis(pix_vis),
+        .frame_id(frame_id),
+        .hs(hs),
+        .vs(vs),
+        .clk(vga_clk),//vga_clk
+        .rst(rst)
+    );
+
+    //synchronous-read data mem, so inputs come straight from EX stage
     assign DATA_MEM_ADDR = ALU - LOWEST_DATA_MEM_ADDR;
-    assign DATA_MEM_ADDR_B = portb_addr_mux - LOWEST_DATA_MEM_ADDR;
+    assign DATA_MEM_ADDR_B = portb_addr - LOWEST_DATA_MEM_ADDR;
+    assign VRAM_ADDR = (((pix_y>>2)*32'd160 + (pix_x>>2)) << 1);// + LOWEST_DATA_MEM_ADDR;
+    //assign portb_q = pix_vis ? VRAM_ADDR : '0;
+
+    assign portb_rst_mux = portb_extern_en ? portb_rst : rst;
+    assign PORTB_ADDR_MUX = portb_extern_en ? DATA_MEM_ADDR_B : VRAM_ADDR;
+    assign portb_clk_mux = portb_extern_en ? portb_clk : clk_50;
+    assign portb_addr_byte_mux = portb_extern_en ? portb_addr_byte : 1'b0;
+    assign portb_addr_half_mux = portb_extern_en ? portb_addr_half : 1'b1;
+    assign portb_zero_extend_mux = portb_extern_en ? portb_zero_extend : 1'b1;
 
     data_memory #(
         .BIT_WIDTH(32)
@@ -604,13 +642,40 @@ module riscv_cpu_v2
         .addr_half(addr_half_E),
         .zero_extend(zero_extend_mem_E),
         .portb_rst(portb_rst_mux),
-        .portb_addr(DATA_MEM_ADDR_B),
+        .portb_addr(PORTB_ADDR_MUX),
         .portb_clk(portb_clk_mux),
         .portb_q(portb_q),
         .portb_addr_byte(portb_addr_byte_mux),
         .portb_addr_half(portb_addr_half_mux),
         .portb_zero_extend(portb_zero_extend_mux)
-    ); 
+    );
+
+    assign VGA_RED =   pix_vis ? portb_q[3:0]  : '0;
+    assign VGA_BLUE =  pix_vis ? portb_q[7:4]  : '0;
+    assign VGA_GREEN = pix_vis ? portb_q[11:8] : '0;
+    assign VGA_HS = hs;
+    assign VGA_VS = vs;
+
+    ////////////////////////////////////////////////////////
+    // logic [3:0] color [2:0];
+
+    // // Produce a checker board pattern from pixel addresses
+    // checkers #(10,6,4)
+    // getChecky( .pix_x(pix_x),
+    //     .pix_y(pix_y),
+    //     .pix_v(pix_vis),
+    //     .frame_id(frame_id),
+    //     .color(color),
+    //     .clk(vga_clk),
+    //     .rst(rst)
+    // );
+
+    // assign VGA_RED = color[0];
+    // assign VGA_GREEN = color[1];
+    // assign VGA_BLUE = color[2];
+    // assign VGA_HS = hs;
+    // assign VGA_VS = vs;
+    ////////////////////////////////////////////////////////
 
     //leaving this here in case we need to compare the bram to the lutram behavior at any point
     // logic [31:0] OLD_DATA_MEM_ADDR;
