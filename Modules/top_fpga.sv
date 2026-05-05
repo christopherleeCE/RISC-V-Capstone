@@ -258,14 +258,17 @@ module top_fpga(
         .r2_data_hazard_1(r2_data_hazard_1),
         .r2_data_hazard_2(r2_data_hazard_2),
         .r2_data_hazard_3(r2_data_hazard_3),
-        .portb_extern_en(),
+        .portb_extern_en(1'b1),
         .portb_rst(!debug_clk_en),
         .portb_addr(portb_addr),
         .portb_clk(manual_clk),
         .portb_q(portb_q),
-        .portb_addr_byte(ascii_mode)
+        .portb_addr_byte(ascii_mode),
+        .portb_addr_half('0),
+        .portb_zero_extend('0)
     );
 
+    //assign ret_val = portb_q;
     always_comb begin
         case(switches[6:5])
 
@@ -480,8 +483,8 @@ module top_fpga(
 
     //cnt goes 0, 1, 2, 3, 0, 1, etc.
     counter #(
-        .m(4),
-        .bw(2)
+        .OVERFLOW_VAL(4),
+        .BW(2)
     )my_counter2(
         .inc(1'b1),
         .clk(fast_flash),

@@ -31,7 +31,9 @@ module riscv_cpu_v2
     input logic [31:0] portb_addr,
     input logic portb_clk,
     output logic [31:0] portb_q,
-    input logic portb_addr_byte
+    input logic portb_addr_byte,
+    input logic portb_addr_half,
+    input logic portb_zero_extend
 );
 
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
@@ -185,6 +187,13 @@ module riscv_cpu_v2
     logic pipeline_advance_MW;
 
     logic pre_stall_1, pre_stall_2, pre_stall_3, stall;
+
+    logic portb_rst_mux;
+    logic [31:0] portb_addr_mux;
+    logic portb_clk_mux;
+    logic portb_addr_byte_mux;
+    logic portb_addr_half_mux;
+    logic portb_zero_extend_mux;
 
     //gradually stop pipeline advance as halt moves through pipeline
     assign pipeline_advance_FD = !(halt_D || stall);
@@ -571,9 +580,16 @@ module riscv_cpu_v2
         halt_M
     } = e2m_control_M;     
 
+    assign portb_rst_mux = portb_extern_en ? portb_rst : '0;
+    assign portb_addr_mux = portb_extern_en ? portb_addr : '0;
+    assign portb_clk_mux = portb_extern_en ? portb_clk : '0;
+    assign portb_addr_byte_mux = portb_extern_en ? portb_addr_byte : '0;
+    assign portb_addr_half_mux = portb_extern_en ? portb_addr_half : '0;
+    assign portb_zero_extend_mux = portb_extern_en ? portb_zero_extend : '0;
+
     // synchronous-read data mem, so inputs come straight from EX stage
     assign DATA_MEM_ADDR = ALU - LOWEST_DATA_MEM_ADDR;
-    assign DATA_MEM_ADDR_B = portb_addr - LOWEST_DATA_MEM_ADDR;
+    assign DATA_MEM_ADDR_B = portb_addr_mux - LOWEST_DATA_MEM_ADDR;
 
     data_memory #(
         .BIT_WIDTH(32)
@@ -587,11 +603,13 @@ module riscv_cpu_v2
         .addr_byte(addr_byte_E),
         .addr_half(addr_half_E),
         .zero_extend(zero_extend_mem_E),
-        .portb_rst(portb_rst),
+        .portb_rst(portb_rst_mux),
         .portb_addr(DATA_MEM_ADDR_B),
-        .portb_clk(portb_clk),
+        .portb_clk(portb_clk_mux),
         .portb_q(portb_q),
-        .portb_addr_byte(portb_addr_byte)
+        .portb_addr_byte(portb_addr_byte_mux),
+        .portb_addr_half(portb_addr_half_mux),
+        .portb_zero_extend(portb_zero_extend_mux)
     ); 
 
     //leaving this here in case we need to compare the bram to the lutram behavior at any point
