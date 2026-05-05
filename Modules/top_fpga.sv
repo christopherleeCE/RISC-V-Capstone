@@ -76,12 +76,12 @@ module top_fpga(
 
     logic control_hazard;
 
-    logic [4:0] R1_data_hazard_1;
-    logic [4:0] R1_data_hazard_2;
-    logic [4:0] R1_data_hazard_3;
-    logic [4:0] R2_data_hazard_1;
-    logic [4:0] R2_data_hazard_2;
-    logic [4:0] R2_data_hazard_3;
+    logic [4:0] r1_data_hazard_1;
+    logic [4:0] r1_data_hazard_2;
+    logic [4:0] r1_data_hazard_3;
+    logic [4:0] r2_data_hazard_1;
+    logic [4:0] r2_data_hazard_2;
+    logic [4:0] r2_data_hazard_3;
 
     logic [4:0] pre_hex0;
     logic [4:0] pre_hex1;
@@ -252,12 +252,13 @@ module top_fpga(
         .pc_m_out(pc_m_out),
         .pc_w_out(pc_w_out),
         .control_hazard(control_hazard),
-        .R1_data_hazard_1(R1_data_hazard_1),
-        .R1_data_hazard_2(R1_data_hazard_2),
-        .R1_data_hazard_3(R1_data_hazard_3),
-        .R2_data_hazard_1(R2_data_hazard_1),
-        .R2_data_hazard_2(R2_data_hazard_2),
-        .R2_data_hazard_3(R2_data_hazard_3),
+        .r1_data_hazard_1(r1_data_hazard_1),
+        .r1_data_hazard_2(r1_data_hazard_2),
+        .r1_data_hazard_3(r1_data_hazard_3),
+        .r2_data_hazard_1(r2_data_hazard_1),
+        .r2_data_hazard_2(r2_data_hazard_2),
+        .r2_data_hazard_3(r2_data_hazard_3),
+        .portb_extern_en(),
         .portb_rst(!debug_clk_en),
         .portb_addr(portb_addr),
         .portb_clk(manual_clk),
@@ -349,8 +350,8 @@ module top_fpga(
         instr_f_out, instr_d_out, instr_e_out, instr_m_out, instr_w_out,
         pc_f_out, pc_d_out, pc_e_out, pc_m_out, pc_w_out,
         a0, {7'b0, ofinish}, {7'b0, ohalt}, {7'b0, control_hazard},
-        {3'b0, R1_data_hazard_1}, {3'b0, R1_data_hazard_2}, {3'b0, R1_data_hazard_3},
-        {3'b0, R2_data_hazard_1}, {3'b0, R2_data_hazard_2}, {3'b0, R2_data_hazard_3}
+        {3'b0, r1_data_hazard_1}, {3'b0, r1_data_hazard_2}, {3'b0, r1_data_hazard_3},
+        {3'b0, r2_data_hazard_1}, {3'b0, r2_data_hazard_2}, {3'b0, r2_data_hazard_3}
     };
 
     // Clock domain crossing

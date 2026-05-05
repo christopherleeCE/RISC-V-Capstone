@@ -1,21 +1,20 @@
 
-
 module counter #(
-    parameter int bw=4, //bitwidth for count
-    parameter int m=10  //overflow values, m=10 will go 7, 8, 9, 0, 1, etc
+    parameter int BW=4, //bitwidth for count
+    parameter int OVERFLOW_VAL=10  //overflow value, OVERFLOW_VAL=10 will go 7, 8, 9, 0, 1, etc
 )(
     input  logic         inc,
     input  logic         clk,
     input  logic         rst,
-    output logic [bw-1:0] cnt 
+    output logic [BW-1:0] cnt 
 );
-    logic [bw-1:0] next_cnt;
+    logic [BW-1:0] next_cnt;
 
     always_comb begin
         case(1'b1)
 
-        (inc && (cnt != m-1))   :   next_cnt = cnt + 1'b1;
-        (inc && (cnt == m-1))   :   next_cnt = '0;
+        (inc && (cnt != OVERFLOW_VAL-1))   :   next_cnt = cnt + 1'b1;
+        (inc && (cnt == OVERFLOW_VAL-1))   :   next_cnt = '0;
         default                 :   next_cnt = cnt;
 
         endcase
