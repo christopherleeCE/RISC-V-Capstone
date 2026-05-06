@@ -15,7 +15,7 @@ param(
     [switch]$no_verify,
     [switch]$v,
     [switch]$wave_dump,
-    [switch]$dmem_dump
+    [switch]$mem_dump
 )
 
 $startTime = Get-Date
@@ -63,7 +63,7 @@ if($help){
     -no_verify:         disable verification, script will verify if this argument is NOT given
     -v:                 enables -golden_calc -dut_dump -golden_history -verify_output -continue
     -wave_dump:         include if you need a wave dump, slows down simulation  
-    -dmem_dump:         include if you need a wave dump, does a gold vs dut verifcation, no real preformance impact with single sim
+    -mem_dump:         include if you need a wave dump, does a gold vs dut verifcation, no real preformance impact with single sim
     ")
 
     exit(0)
@@ -81,7 +81,7 @@ if ($verify_output)     { $simScriptArgs.verify_output = $true }
 if ($no_verify)         { $simScriptArgs.no_verify = $true }
 if ($v)                 { $simScriptArgs.v = $true }
 if ($wave_dump)         { $simScriptArgs.wave_dump = $true }
-if ($dmem_dump)         { $simScriptArgs.dmem_dump = $true }
+if ($mem_dump)         { $simScriptArgs.mem_dump = $true }
 
 #check if we are in /modules/
 $currentDirName = Split-Path -Leaf (Get-Location)

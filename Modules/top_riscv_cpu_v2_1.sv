@@ -126,7 +126,7 @@ module top_riscv_cpu_v2_1();
     bit verify_row_flag;
     bit stop_at_instr_failure;
     bit dump_waves;
-    bit dump_dmem;
+    bit dump_mem;
 
     //used for debug output of reg dumps
     string reg_name [32] = '{
@@ -288,7 +288,7 @@ module top_riscv_cpu_v2_1();
         verify_row_flag = ~$test$plusargs("NO_VERIFY");
         stop_at_instr_failure = ~$test$plusargs("CONTINUE");
         dump_waves = $test$plusargs("WAVE_DUMP");
-        dump_dmem = $test$plusargs("DMEM_DUMP");
+        dump_mem = $test$plusargs("MEM_DUMP");
 
         if(dump_waves) begin
             $dumpfile("dump.vcd");
@@ -302,7 +302,7 @@ module top_riscv_cpu_v2_1();
                                                 verify_row_flag,
                                                 stop_at_instr_failure,
                                                 dump_waves,
-                                                dump_dmem);
+                                                dump_mem);
 
     end
 
@@ -360,9 +360,11 @@ module top_riscv_cpu_v2_1();
 
     final begin
 
-        if(dump_dmem) begin
+        if(dump_mem) begin
             $writememh("dmem_gold_dump.hex", top_riscv_cpu_v2_1.DATA_MEM[1]);
             $writememh("dmem_dut_dump.hex", top_riscv_cpu_v2_1.cpu_dut.my_data_mem.my_dual_mk9_ram_mif.altsyncram_component.m_default.altsyncram_inst.mem_data);
+            $writememh("imem_gold_dump.hex", top_riscv_cpu_v2_1.instr_mem.instr_mem);
+            $writememh("imem_dut_dump.hex", top_riscv_cpu_v2_1.cpu_dut.mk9_instr_mem.altsyncram_component.m_default.altsyncram_inst.mem_data);
         end
 
         $display("$finish() called... comparing entire dut with gold regfile\n");

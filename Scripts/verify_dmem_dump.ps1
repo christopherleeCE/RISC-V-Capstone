@@ -10,8 +10,8 @@ if($help){
 python3 ..\Scripts\parse_dmem_dump.py
 
 if((Get-FileHash ".\dmem_dut_dump.log").Hash -eq (Get-FileHash ".\dmem_gold_dump.log").Hash){
-    Write-Host "`nMatching data_mem dumps" -ForegroundColor Green
+    Write-Host "Matching data_mem dumps" -ForegroundColor Green
 }else{
-    Write-Host "`nMismatched data_mem dumps"`n -ForegroundColor Red
+    Write-Host "Mismatched data_mem dumps" -ForegroundColor Red
     exit -1
 }
