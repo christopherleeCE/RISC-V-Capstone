@@ -10,6 +10,7 @@ param(
     [switch]$continue,
     [switch]$v,
     [switch]$wave_dump,
+    [switch]$dmem_dump,
     [switch]$no_compile,    
     [int]$time = 100
 )
@@ -34,6 +35,7 @@ if ($Help) {
     -continue:          continue simulation even on instruction failure
     -v:                 enables -golden_calc -dut_dump -golden_history -verify_output -continue
     -wave_dump:         include if you need a wave dump, slows down simulation
+    -dmem_dump:         include if you need a wave dump, does a gold vs dut verifcation, probably doesnt have any real preformance impact if you are only doing on sim
     -time <INTEGER>     sets the runtime of the questia simulation to be <INTEGER> micro seconds, default is 2us
     "
     exit 0
@@ -47,6 +49,7 @@ if ($no_verify)         { $vsimArgs += " +NO_VERIFY" }
 if ($continue)          { $vsimArgs += " +CONTINUE" }
 if ($v)                 { $vsimArgs += " +GOLDEN_CALC +DUT_DUMP +GOLDEN_HISTORY +VERIFY_OUTPUT +CONTINUE"}
 if ($wave_dump)         { $vsimArgs += " +WAVE_DUMP" }
+if ($dmem_dump)         { $vsimArgs += " +DMEM_DUMP" }
 
 #gpt says this was needed for bram but quartus said it only needs altera_mf
 #vlog $quartus/eda/sim_lib/220model.v
@@ -77,4 +80,13 @@ $do = @"
 vsim -c -do $do
 Remove-Item -Path dump.vcd -ErrorAction SilentlyContinue
 
+}
+
+if(-not $dmem_dump){
+    Remove-Item -Path dmem_dut_dump.hex -ErrorAction SilentlyContinue
+    Remove-Item -Path dmem_gold_dump.hex -ErrorAction SilentlyContinue
+    Remove-Item -Path dmem_dut_dump.log -ErrorAction SilentlyContinue
+    Remove-Item -Path dmem_gold_dump.log -ErrorAction SilentlyContinue
+}else{
+    ../Scripts/verify_dmem_dump.ps1
 }

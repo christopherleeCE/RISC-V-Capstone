@@ -19,7 +19,7 @@ holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like t
 TODO fix vga overflow
 TODO confirm 96 + 80 mk9 will fit
 TODO mem expansion, (aliasing, golden, dut, linker, stack setup, heap setup, addr normalization) and prob more...
-
+TODO expand randtest len after dmem and imem upgrade
 
 Out of Semester
 ===============
@@ -64,6 +64,22 @@ dmem = 0x18000 -> 0x2C000, (80kb), 80mk9 blks
 {vram, stack&heap} = {37.5kb, 42.5kb} //0x22A00 vram boundry
 176mk9 blks total
 (37.5 + 10.5 + 32 + 96)kb split
+
+1. Stack Painting: Before running your code, fill the stack memory area with a "magic"
+pattern (e.g., 0xEE or 0xAA ). After running your worst-case scenarios, check how
+much of the pattern was overwritten to find your peak usage.
+
+2. Static Analysis: Use compiler flags like -fstack-usage (for GCC) to generate .su files
+that show the stack requirements for every function at compile time.
+
+3. Linker Info: Use linker options such as --info=stack to see total stack requirements
+for the entire call graph.
+
+4. Hardware Guarding: If your MCU has a Memory Protection Unit (MPU), use it to set a
+hardware guard at the end of the stack to trigger a fault immediately upon
+overflow.
+
+/////////////////////////////////////////////////////////////////////////////
 
 
 --------------TEST LOG----------------------------------------------------
@@ -110,6 +126,7 @@ module top_riscv_cpu_v2_1();
     bit verify_row_flag;
     bit stop_at_instr_failure;
     bit dump_waves;
+    bit dump_dmem;
 
     //used for debug output of reg dumps
     string reg_name [32] = '{
@@ -271,19 +288,21 @@ module top_riscv_cpu_v2_1();
         verify_row_flag = ~$test$plusargs("NO_VERIFY");
         stop_at_instr_failure = ~$test$plusargs("CONTINUE");
         dump_waves = $test$plusargs("WAVE_DUMP");
+        dump_dmem = $test$plusargs("DMEM_DUMP");
 
         if(dump_waves) begin
             $dumpfile("dump.vcd");
             $dumpvars();
         end
 
-        $display("Flags: %b %b %b %b %b %b %b", show_posedge_golden_calc,
+        $display("Flags: %b %b %b %b %b %b %b %b", show_posedge_golden_calc,
                                                 show_negedge_dut_dump,
                                                 show_negedge_golden_history,
                                                 show_negedge_verify_row,
                                                 verify_row_flag,
                                                 stop_at_instr_failure,
-                                                dump_waves);
+                                                dump_waves,
+                                                dump_dmem);
 
     end
 
@@ -340,6 +359,11 @@ module top_riscv_cpu_v2_1();
     end
 
     final begin
+
+        if(dump_dmem) begin
+            $writememh("dmem_gold_dump.hex", top_riscv_cpu_v2_1.DATA_MEM[1]);
+            $writememh("dmem_dut_dump.hex", top_riscv_cpu_v2_1.cpu_dut.my_data_mem.my_dual_mk9_ram_mif.altsyncram_component.m_default.altsyncram_inst.mem_data);
+        end
 
         $display("$finish() called... comparing entire dut with gold regfile\n");
 
