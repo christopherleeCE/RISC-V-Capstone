@@ -43,6 +43,27 @@ scale4byte1 = 19200
 octave:20> scale4byte4
 scale4byte4 = 76800
 
+//notclean sizes, clean imem/dmem, notclean s&h/vram
+imem = 0 -> 0x18000-1 (96kb), 96mk9 blks
+dmem = 0x18000 -> 0x28000, (64kb), 64mk9 blks
+{vram, stack&heap} = {37.5kb, 26.5kb} //0x1EA00 vran boundry
+160mk9 blks total
+
+//notclean sizes, clean imem/dmem, clean s&h/vram
+imem = 0 -> 0x18000-1 (96kb), 96mk9 blks
+dmem = 0x18000 -> 0x29600, (72ish kb), 72mk9 blks
+{vram, stack&heap} = {37.5kb, 32kb} //0x20000 vram boundry
+168mk9 blks total
+
+//MAX AMOUNT, if dmem is bumped any higher it ballons in to 96kb dmem, going over our limit (i think)
+//still leaves 6kb i think if its ever needed anywere
+//nonsclean sizes, clean imem/dmem, nontclean s&h/vram
+imem = 0 -> 0x18000-1 (96kb), 96mk9 blks
+dmem = 0x18000 -> 0x2C000, (80kb), 80mk9 blks
+{vram, stack&heap} = {37.5kb, 42.5kb} //0x22A00 vram boundry
+176mk9 blks total
+(37.5 + 10.5 + 32 + 96)kb split
+
 
 --------------TEST LOG----------------------------------------------------
 
