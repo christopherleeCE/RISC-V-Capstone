@@ -15,9 +15,10 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 
 Current semester
 ================
-holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
-TODO more demo programs in C
-TODO contact abrams, maybe invite him to see the demo on demo day
+holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like that (LOL)
+TODO fix vga overflow
+TODO confirm 96 + 80 mk9 will fit
+TODO mem expansion, (aliasing, golden, dut, linker, stack setup, heap setup, addr normalization) and prob more...
 
 
 Out of Semester
