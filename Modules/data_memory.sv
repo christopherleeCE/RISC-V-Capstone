@@ -225,8 +225,6 @@ module data_memory
 
    /* < Read from MEM > */ //==================================================================================================== 
 
-   //preventing aliasing
-   // assign readWord = (addr_internal_mirror[31:12] == '0) ? data_out_mem : 32'h0;
    assign readWord = data_out_mem;
    assign readWordb = data_out_memb;    
 
@@ -287,8 +285,9 @@ module data_memory
    //    endcase
    // end
 
-   assign readData = (addr_internal_mirror[31:12] == '0) ? readDataPreMask : 32'h0;
-   assign portb_q = (addr_internal_mirrorb[31:12] == '0) ? readDataPreMaskb : 32'h0;
+   //aliasing mask, less addr < exclusive top of 80kb (this intern_addr is normalized to virtual addr space of dmem blk)
+   assign readData = (addr_internal_mirror < 32'h14000) ? readDataPreMask : 32'h0;
+   assign portb_q = (addr_internal_mirrorb < 32'h14000) ? readDataPreMaskb : 32'h0;
 
    
 endmodule 

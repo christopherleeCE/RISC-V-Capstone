@@ -313,8 +313,8 @@ module riscv_cpu_v2(
         //under stall or rst asserted be force the output of instrmem to a nop, prevents
         assign INSTR_F = ((!rst) || stall) ? 32'h00000013 : INSTR_MEM_OUT;
 
-        //preventing aliasing
-        assign INSTR_F_MASKED = (PC[31:14] == '0) ? INSTR_F : 32'h00000000;
+        //preventing aliasing, ensure addr of instr_mem is below top of imem(exclusive), this is abs address
+        assign INSTR_F_MASKED = (PC < 32'h18000) ? INSTR_F : 32'h00000000;
 
         //deciding whether to flush instruction or not
         assign INSTR_F_FLUSH = flush_FD ? 32'h00000013 : INSTR_F_MASKED; //if flushing, replace instruction with NOP (ADDI x0, x0, 0)
