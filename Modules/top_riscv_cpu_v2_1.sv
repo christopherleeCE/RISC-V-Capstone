@@ -15,10 +15,11 @@ gold[5] then its compared against the dut, which at this point that addi in the 
 
 Current semester
 ================
-holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like that
-TODO more demo programs in C
-TODO contact abrams, maybe invite him to see the demo on demo day
-
+holden TODO bump up mem capacies cus why not we got like 180kb or sumthin like that (LOL)
+TODO fix vga overflow
+TODO confirm 96 + 80 mk9 will fit
+TODO mem expansion, (aliasing, golden, dut, linker, stack setup, heap setup, addr normalization) and prob more...
+TODO expand randtest len after dmem and imem upgrade
 
 Out of Semester
 ===============
@@ -42,6 +43,43 @@ octave:19> scale4byte1
 scale4byte1 = 19200
 octave:20> scale4byte4
 scale4byte4 = 76800
+
+//notclean sizes, clean imem/dmem, notclean s&h/vram
+imem = 0 -> 0x18000-1 (96kb), 96mk9 blks
+dmem = 0x18000 -> 0x28000, (64kb), 64mk9 blks
+{vram, stack&heap} = {37.5kb, 26.5kb} //0x1EA00 vran boundry
+160mk9 blks total
+
+//notclean sizes, clean imem/dmem, clean s&h/vram
+imem = 0 -> 0x18000-1 (96kb), 96mk9 blks
+dmem = 0x18000 -> 0x29600, (72ish kb), 72mk9 blks
+{vram, stack&heap} = {37.5kb, 32kb} //0x20000 vram boundry
+168mk9 blks total
+
+//MAX AMOUNT, if dmem is bumped any higher it ballons in to 96kb dmem, going over our limit (i think)
+//still leaves 6kb i think if its ever needed anywere
+//nonsclean sizes, clean imem/dmem, nontclean s&h/vram
+imem = 0 -> 0x18000-1 (96kb), 96mk9 blks
+dmem = 0x18000 -> 0x2C000, (80kb), 80mk9 blks
+{vram, stack&heap} = {37.5kb, 42.5kb} //0x22A00 vram boundry
+176mk9 blks total
+(37.5 + 10.5 + 32 + 96)kb split
+
+1. Stack Painting: Before running your code, fill the stack memory area with a "magic"
+pattern (e.g., 0xEE or 0xAA ). After running your worst-case scenarios, check how
+much of the pattern was overwritten to find your peak usage.
+
+2. Static Analysis: Use compiler flags like -fstack-usage (for GCC) to generate .su files
+that show the stack requirements for every function at compile time.
+
+3. Linker Info: Use linker options such as --info=stack to see total stack requirements
+for the entire call graph.
+
+4. Hardware Guarding: If your MCU has a Memory Protection Unit (MPU), use it to set a
+hardware guard at the end of the stack to trigger a fault immediately upon
+overflow.
+
+/////////////////////////////////////////////////////////////////////////////
 
 
 --------------TEST LOG----------------------------------------------------
@@ -73,7 +111,8 @@ UNSUCCESSFUL TESTS:
 module top_riscv_cpu_v2_1();
 
     //declarations
-    parameter int CLOCK_PERIOD = 20;
+    parameter int CLOCK_PERIOD = 200;
+    parameter int FIFTY_MHZ_PERIOD = 20;
     parameter int DATA_MEM_EC = 1024;
     parameter int LOWEST_DATA_MEM_ADDR = 32'h4000;
 
@@ -87,6 +126,7 @@ module top_riscv_cpu_v2_1();
     bit verify_row_flag;
     bit stop_at_instr_failure;
     bit dump_waves;
+    bit dump_mem;
 
     //used for debug output of reg dumps
     string reg_name [32] = '{
@@ -111,7 +151,7 @@ module top_riscv_cpu_v2_1();
     static int local_instruction_failure5;
 
     //cpu ports
-    logic clk, rst, ohalt, ofinish;
+    logic clk, clk_50, rst, ohalt, ofinish;
     logic global_rst, middle_rst;
 
     //golden instruction decoded declarations
@@ -174,11 +214,9 @@ module top_riscv_cpu_v2_1();
     logic [31:0] pc_e_out;
     logic [31:0] pc_m_out;
     logic [31:0] pc_w_out;
-    logic portb_rst;
+
     logic [31:0] portb_addr;
-    logic portb_clk;
     logic [31:0] portb_q;
-    logic portb_addr_byte;
 
     assign INSTR_FLUSH = cpu_dut.stall ? 32'h00000013 :  INSTR_ASYNC;
 
@@ -200,11 +238,27 @@ module top_riscv_cpu_v2_1();
         .pc_e_out(pc_e_out),
         .pc_m_out(pc_m_out),
         .pc_w_out(pc_w_out),
-        .portb_rst(portb_rst),
-        .portb_addr(portb_addr),
-        .portb_clk(portb_clk),
+        .control_hazard(),
+        .r1_data_hazard_1(),
+        .r1_data_hazard_2(),
+        .r1_data_hazard_3(),
+        .r2_data_hazard_1(),
+        .r2_data_hazard_2(),
+        .r2_data_hazard_3(),
+        .portb_extern_en('0),
+        .portb_rst('0),
+        .portb_addr(32'h4fd0),
+        .portb_clk(clk),
         .portb_q(portb_q),
-        .portb_addr_byte(portb_addr_byte)
+        .portb_addr_byte('0),
+        .portb_addr_half('0),
+        .portb_zero_extend('0),
+        .clk_50(clk_50),
+        .VGA_RED(),
+        .VGA_BLUE(),
+        .VGA_GREEN(),
+        .VGA_HS(),
+        .VGA_VS()
     );
 
     //grabing vsim args
@@ -234,19 +288,21 @@ module top_riscv_cpu_v2_1();
         verify_row_flag = ~$test$plusargs("NO_VERIFY");
         stop_at_instr_failure = ~$test$plusargs("CONTINUE");
         dump_waves = $test$plusargs("WAVE_DUMP");
+        dump_mem = $test$plusargs("MEM_DUMP");
 
         if(dump_waves) begin
             $dumpfile("dump.vcd");
             $dumpvars();
         end
 
-        $display("Flags: %b %b %b %b %b %b %b", show_posedge_golden_calc,
+        $display("Flags: %b %b %b %b %b %b %b %b", show_posedge_golden_calc,
                                                 show_negedge_dut_dump,
                                                 show_negedge_golden_history,
                                                 show_negedge_verify_row,
                                                 verify_row_flag,
                                                 stop_at_instr_failure,
-                                                dump_waves);
+                                                dump_waves,
+                                                dump_mem);
 
     end
 
@@ -254,8 +310,16 @@ module top_riscv_cpu_v2_1();
     initial begin
         clk = 1'b0;
         forever begin //start the clock
-            #CLOCK_PERIOD
+            #(CLOCK_PERIOD/2)
             clk = ~clk;
+        end
+    end
+
+    initial begin
+        clk_50 = 1'b0;
+        forever begin
+            #(FIFTY_MHZ_PERIOD/2)
+            clk_50 = ~clk_50;
         end
     end
 
@@ -295,6 +359,13 @@ module top_riscv_cpu_v2_1();
     end
 
     final begin
+
+        if(dump_mem) begin
+            $writememh("dmem_gold_dump.hex", top_riscv_cpu_v2_1.DATA_MEM[1]);
+            $writememh("dmem_dut_dump.hex", top_riscv_cpu_v2_1.cpu_dut.my_data_mem.my_dual_mk9_ram_mif.altsyncram_component.m_default.altsyncram_inst.mem_data);
+            $writememh("imem_gold_dump.hex", top_riscv_cpu_v2_1.instr_mem.instr_mem);
+            $writememh("imem_dut_dump.hex", top_riscv_cpu_v2_1.cpu_dut.mk9_instr_mem.altsyncram_component.m_default.altsyncram_inst.mem_data);
+        end
 
         $display("$finish() called... comparing entire dut with gold regfile\n");
 

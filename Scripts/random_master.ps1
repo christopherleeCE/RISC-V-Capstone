@@ -11,7 +11,8 @@ param(
     [switch]$verify_output,
     [switch]$no_verify,
     [switch]$v,
-    [switch]$wave_dump
+    [switch]$wave_dump,
+    [switch]$mem_dump
 )
 
 $startTime = Get-Date
@@ -33,7 +34,8 @@ if($help){
     -verify_output:     shows debug info of verify_row()'s
     -no_verify:         disable verification, script will verify if this argument is NOT given
     -v:                 enables -golden_calc -dut_dump -golden_history -verify_output -continue
-    -wave_dump:         include if you need a wave dump, slows down simulation 
+    -wave_dump:         include if you need a wave dump, slows down simulation
+    -mem_dump:         include if you need a wave dump, does a gold vs dut verifcation, no real preformance impact with single sim
 
     For refrence my home computer (kinda beefy but not really) takes 7 minutes for 100 runs, 1000 took about 75
     on my latop it was it takes 8:50 and 90 minutes respectively
@@ -57,6 +59,7 @@ if ($verify_output)     { $simScriptArgs.verify_output = $true }
 if ($no_verify)         { $simScriptArgs.no_verify = $true }
 if ($v)                 { $simScriptArgs.v = $true }
 if ($wave_dump)         { $simScriptArgs.wave_dump = $true }
+if ($mem_dump)         { $simScriptArgs.mem_dump = $true }
 
 # Get the current directory name
 $currentDirName = Split-Path -Leaf (Get-Location)

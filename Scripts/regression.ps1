@@ -26,38 +26,38 @@ if ($currentDirName -ne "Modules") {
     exit 1
 }
 
-../Scripts/directed_master.ps1
+../Scripts/directed_master.ps1 -mem_dump
 if ($LASTEXITCODE -ne 0) {Write-Host "`n'../Scripts/directed_master.ps1' threw an error, FAIL`n" -ForegroundColor Red}
 Write-Host "Finished running '../Scripts/directed_master.ps1'" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test " -ForegroundColor Yellow -NoNewLine
 Read-Host
 
-../Scripts/directed_master.ps1 -directory opt
+../Scripts/directed_master.ps1 -directory opt -mem_dump
 if ($LASTEXITCODE -ne 0) {Write-Host "`n'../Scripts/directed_master.ps1 -directory opt' threw an error, FAIL`n" -ForegroundColor Red}
 Write-Host "Finished running '../Scripts/directed_master.ps1 -directory opt'" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test " -ForegroundColor Yellow -NoNewLine
 Read-Host
 
-../Scripts/directed_master.ps1 -directory opt -compile
+../Scripts/directed_master.ps1 -directory opt -compile -mem_dump
 if ($LASTEXITCODE -ne 0) {Write-Host "`n'../Scripts/directed_master.ps1 -directory opt -compile' threw an error, FAIL`n" -ForegroundColor Red}
 Write-Host "Finished running '../Scripts/directed_master.ps1 -directory opt -compile'" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test " -ForegroundColor Yellow -NoNewLine
 Read-Host
 
-../Scripts/directed_master.ps1 -directory functional_s
+../Scripts/directed_master.ps1 -directory functional_s -mem_dump
 if ($LASTEXITCODE -ne 0) {Write-Host "`n'../Scripts/directed_master.ps1 -directory functional_s' threw an error, FAIL`n" -ForegroundColor Red}
 Write-Host "Finished running '../Scripts/directed_master.ps1 -directory functional_s'" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test " -ForegroundColor Yellow -NoNewLine
 Read-Host
 
-../Scripts/directed_master.ps1 -directory functional_c -compile
+../Scripts/directed_master.ps1 -directory functional_c -compile -mem_dump
 if ($LASTEXITCODE -ne 0) {Write-Host "`n'../Scripts/directed_master.ps1 -directory functional_c -compile' threw an error, FAIL`n" -ForegroundColor Red}
 Write-Host "Finished running '../Scripts/directed_master.ps1 -directory functional_c -compile'" -ForegroundColor Blue
 Write-Host "Press Enter to continue to the next test " -ForegroundColor Yellow -NoNewLine
 Read-Host
 
 if(-not $no_rand){
-    ../Scripts/random_master.ps1 -runs 100
+    ../Scripts/random_master.ps1 -runs 100 -mem_dump
     if ($LASTEXITCODE -ne 0) {Write-Host "`n'../Scripts/random_master.ps1 -runs 100' threw an error, FAIL`n" -ForegroundColor Red}
     Write-Host "Finished running '../Scripts/random_master.ps1 -runs 100'" -ForegroundColor Blue
     Write-Host "Press Enter to continue to the next test " -ForegroundColor Yellow -NoNewLine

@@ -24,6 +24,14 @@ Modules/data_memory.hex
 Modules/instruction_memory.hex
 Modules/dump.vcd
 Modules/objdump.log
+Modules/dmem_dut_dump.hex
+Modules/dmem_gold_dump.hex
+Modules/dmem_dut_dump.log
+Modules/dmem_gold_dump.log
+Modules/imem_dut_dump.hex
+Modules/imem_gold_dump.hex
+Modules/imem_dut_dump.log
+Modules/imem_gold_dump.log
 Programs/directed/lib/libdrysoup.a
 Programs/directed/lib/libdrysoup_x86.a
 Scripts/temp.ps1

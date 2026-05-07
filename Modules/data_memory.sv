@@ -18,7 +18,9 @@ module data_memory
       input logic [ADDR_WIDTH-1:0] portb_addr,
       input logic portb_clk,
       output logic [BIT_WIDTH-1:0] portb_q,
-      input logic portb_addr_byte
+      input logic portb_addr_byte,
+      input logic portb_addr_half,
+      input logic portb_zero_extend
    );
 
    // byteena and halfena signals for data memory
@@ -44,7 +46,15 @@ module data_memory
    // logic [3:0] byteena_sig_internal_mirror;
    logic addr_byte_internal_mirror;
    logic addr_half_internal_mirror;
-   logic zero_extend_mirror;
+   logic zero_extend_internal_mirror;
+
+   logic [31:0] addr_internal_mirrorb;
+   logic [31:0] data_out_memb;
+   logic [31:0] readWordb;
+   logic [7:0] data_byte_rb;
+   logic [15:0] data_half_rb;
+   logic [31:0] readDataPreMaskb;
+   logic addr_byte_internal_mirrorb, addr_half_internal_mirrorb, zero_extend_internal_mirrorb;
 
    /* < Writing to MEM > */ //====================================================================================================
 
@@ -143,7 +153,7 @@ module data_memory
       .clk(clk),
       .rst(rst),
       .wr_en(1'b1),
-      .q({addr_byte_internal_mirror, addr_half_internal_mirror, zero_extend_mirror})
+      .q({addr_byte_internal_mirror, addr_half_internal_mirror, zero_extend_internal_mirror})
    );
 
    // mk9_ram_mif	mk9_ram_mif_inst (
@@ -156,16 +166,6 @@ module data_memory
    //    .q ( data_out_mem )
    // );
 
-   logic [31:0] addr_internal_mirrorb;
-   logic [31:0] data_out_memb;
-   logic [31:0] readWordb;
-   logic [7:0] data_byte_rb;
-   logic [15:0] data_half_rb;
-   logic [31:0] readDataPreMaskb;
-   logic addr_byteb, addr_byte_internal_mirrorb;
-
-   assign addr_byteb = portb_addr_byte;
-
    dff_async_reset #(
       .WIDTH(32)
    )addr_mirrorb(
@@ -177,13 +177,13 @@ module data_memory
    );
 
    dff_async_reset #(
-      .WIDTH(1)
-   )addr_byte_mirrorb(
-      .d(addr_byteb),
+      .WIDTH(3)
+   )addr_byte_half_mirrorb(
+      .d({portb_addr_byte, portb_addr_half, portb_zero_extend}),
       .clk(portb_clk),
       .rst(portb_rst),
       .wr_en(1'b1),
-      .q(addr_byte_internal_mirrorb)
+      .q({addr_byte_internal_mirrorb, addr_half_internal_mirrorb, zero_extend_internal_mirrorb})
    );
 
 
@@ -238,25 +238,34 @@ module data_memory
    // are we reading a byte, half-word, or word?
    // always_comb begin
    //    unique case ({addr_byte_internal_mirror, addr_half_internal_mirror})
-   //          2'b10	:	readData = zero_extend_mirror ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
-   //          2'b01	:	readData = zero_extend_mirror ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
+   //          2'b10	:	readData = zero_extend_internal_mirror ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
+   //          2'b01	:	readData = zero_extend_internal_mirror ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
    //          default	:	readData = readWord;
    //    endcase
    // end
 
    always_comb begin
       unique case ({addr_byte_internal_mirror, addr_half_internal_mirror})
-            2'b10	:	readDataPreMask = zero_extend_mirror ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
-            2'b01	:	readDataPreMask = zero_extend_mirror ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
+            2'b10	:	readDataPreMask = zero_extend_internal_mirror ? {24'b0, data_byte_r} : {{24{data_byte_r[7]}}, data_byte_r};
+            2'b01	:	readDataPreMask = zero_extend_internal_mirror ? {16'b0, data_half_r} : {{16{data_half_r[15]}}, data_half_r};
             default	:	readDataPreMask = readWord;
       endcase
    end
+
    always_comb begin
-      unique case ({addr_byte_internal_mirrorb})
-            2'b1	:	readDataPreMaskb = {24'b0, data_byte_rb};
+      unique case ({addr_byte_internal_mirrorb, addr_half_internal_mirrorb})
+            2'b10	:	readDataPreMaskb = zero_extend_internal_mirrorb ? {24'b0, data_byte_rb} : {{24{data_byte_rb[7]}}, data_byte_rb};
+            2'b01	:	readDataPreMaskb = zero_extend_internal_mirrorb ? {16'b0, data_half_rb} : {{16{data_half_rb[15]}}, data_half_rb};
             default	:	readDataPreMaskb = readWordb;
       endcase
    end
+
+   // always_comb begin
+   //    unique case ({addr_byte_internal_mirrorb})
+   //          2'b1	:	readDataPreMaskb = {24'b0, data_byte_rb};
+   //          default	:	readDataPreMaskb = readWordb;
+   //    endcase
+   // end
 
    assign readData = (addr_internal_mirror[31:12] == '0) ? readDataPreMask : 32'h0;
    assign portb_q = (addr_internal_mirrorb[31:12] == '0) ? readDataPreMaskb : 32'h0;

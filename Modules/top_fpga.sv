@@ -9,7 +9,7 @@ bottombutton increment the pointer seq engine
 
 sw[9] rst to cpu active low
 sw[8] enable full clk (5mhz)
-sw[7] decimal point status light en, (when high decimal points in hex disp will slow flash on completion of prog)
+sw[7] decimal point status light en, (when high decimal points in hex disp will slow flash on completion of prog), extern_portb_en
 sw[6:5] select the source [11 10 01 00] = [pointer in seq engine, contents of pointer loc, ascii mode (overites sw[4:0]), raw retvalue]
 sw[4] select if we display the upper 6 digits or lower 6 digits
 sw[3:0]...
@@ -43,7 +43,12 @@ module top_fpga(
     output logic [6:0] hex4,
     output logic [6:0] hex5,
     output logic [5:0] hex_decimal_point,
-    output logic FPGA_UART_TX
+    output logic FPGA_UART_TX,
+    output logic [3:0] VGA_RED,
+    output logic [3:0] VGA_BLUE,
+    output logic [3:0] VGA_GREEN,
+    output logic       VGA_HS,
+    output logic       VGA_VS
 );
 
     localparam int BASE_CLK_FREQ = 50000000;
@@ -76,12 +81,12 @@ module top_fpga(
 
     logic control_hazard;
 
-    logic [4:0] R1_data_hazard_1;
-    logic [4:0] R1_data_hazard_2;
-    logic [4:0] R1_data_hazard_3;
-    logic [4:0] R2_data_hazard_1;
-    logic [4:0] R2_data_hazard_2;
-    logic [4:0] R2_data_hazard_3;
+    logic [4:0] r1_data_hazard_1;
+    logic [4:0] r1_data_hazard_2;
+    logic [4:0] r1_data_hazard_3;
+    logic [4:0] r2_data_hazard_1;
+    logic [4:0] r2_data_hazard_2;
+    logic [4:0] r2_data_hazard_3;
 
     logic [4:0] pre_hex0;
     logic [4:0] pre_hex1;
@@ -232,9 +237,6 @@ module top_fpga(
         end
     end
 
-    
-
-
     riscv_cpu_v2 cpu_dut(
         .clk(local_clk),
         .rst(local_rst),
@@ -252,19 +254,29 @@ module top_fpga(
         .pc_m_out(pc_m_out),
         .pc_w_out(pc_w_out),
         .control_hazard(control_hazard),
-        .R1_data_hazard_1(R1_data_hazard_1),
-        .R1_data_hazard_2(R1_data_hazard_2),
-        .R1_data_hazard_3(R1_data_hazard_3),
-        .R2_data_hazard_1(R2_data_hazard_1),
-        .R2_data_hazard_2(R2_data_hazard_2),
-        .R2_data_hazard_3(R2_data_hazard_3),
+        .r1_data_hazard_1(r1_data_hazard_1),
+        .r1_data_hazard_2(r1_data_hazard_2),
+        .r1_data_hazard_3(r1_data_hazard_3),
+        .r2_data_hazard_1(r2_data_hazard_1),
+        .r2_data_hazard_2(r2_data_hazard_2),
+        .r2_data_hazard_3(r2_data_hazard_3),
+        .portb_extern_en(switches[7]),
         .portb_rst(!debug_clk_en),
         .portb_addr(portb_addr),
         .portb_clk(manual_clk),
         .portb_q(portb_q),
-        .portb_addr_byte(ascii_mode)
+        .portb_addr_byte(ascii_mode),
+        .portb_addr_half('0),
+        .portb_zero_extend('0),
+        .clk_50(global_clk),
+        .VGA_RED(VGA_RED),
+        .VGA_BLUE(VGA_BLUE),
+        .VGA_GREEN(VGA_GREEN),
+        .VGA_HS(VGA_HS),
+        .VGA_VS(VGA_VS)
     );
 
+    //assign ret_val = portb_q;
     always_comb begin
         case(switches[6:5])
 
@@ -349,8 +361,8 @@ module top_fpga(
         instr_f_out, instr_d_out, instr_e_out, instr_m_out, instr_w_out,
         pc_f_out, pc_d_out, pc_e_out, pc_m_out, pc_w_out,
         a0, {7'b0, ofinish}, {7'b0, ohalt}, {7'b0, control_hazard},
-        {3'b0, R1_data_hazard_1}, {3'b0, R1_data_hazard_2}, {3'b0, R1_data_hazard_3},
-        {3'b0, R2_data_hazard_1}, {3'b0, R2_data_hazard_2}, {3'b0, R2_data_hazard_3}
+        {3'b0, r1_data_hazard_1}, {3'b0, r1_data_hazard_2}, {3'b0, r1_data_hazard_3},
+        {3'b0, r2_data_hazard_1}, {3'b0, r2_data_hazard_2}, {3'b0, r2_data_hazard_3}
     };
 
     // Clock domain crossing
@@ -479,8 +491,8 @@ module top_fpga(
 
     //cnt goes 0, 1, 2, 3, 0, 1, etc.
     counter #(
-        .m(4),
-        .bw(2)
+        .OVERFLOW_VAL(4),
+        .BW(2)
     )my_counter2(
         .inc(1'b1),
         .clk(fast_flash),
