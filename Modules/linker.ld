@@ -1,9 +1,9 @@
 ENTRY(_start)
-
+/*TODO heap setup*/
 MEMORY
 {
-    IMEM (rx)  : ORIGIN = 0x00000000, LENGTH = 16K
-    DMEM (rw)  : ORIGIN = 0x00004000, LENGTH = 4K
+    IMEM (rx)  : ORIGIN = 0x00000000, LENGTH = 96K
+    DMEM (rw)  : ORIGIN = 0x00018000, LENGTH = 80K
 }
 
 _estack = ORIGIN(DMEM) + LENGTH(DMEM);

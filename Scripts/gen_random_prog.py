@@ -207,7 +207,7 @@ def main():
         f.write("\n")
 
         f.write("main:\n")
-        f.write("li gp, 0x4000\n")
+        f.write("li gp, 0x18000\n")
         f.write("\n")
 
         for ii in range(64):

@@ -10,7 +10,7 @@ def parse_hex(input_file, output_file):
         for _ in range(3): #skip header lines
             next(fin, None)
 
-        addr = 0x4000
+        addr = 0x18000
         for line in fin:
             line = line.strip()
             if not line:

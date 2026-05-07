@@ -2,7 +2,7 @@
     .globl _start
 
 _start:
-li gp, 0x4000
+li gp, 0x18000
 li a0, 0x40302010
 li a1, 0x41312111
 li a2, 0x42322212

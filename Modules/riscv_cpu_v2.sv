@@ -46,7 +46,7 @@ module riscv_cpu_v2(
     //this assigns the SIG's declarred in microcode to corresponding outputs of the ustore
     `include "sig_declare.inc"
 
-    parameter int LOWEST_DATA_MEM_ADDR = 32'h4000;
+    parameter int LOWEST_DATA_MEM_ADDR = 32'h18000;
 
     //new terminology:
     // f=fetch, d=decode, e=execute, m=memory, w=writeback
@@ -292,7 +292,7 @@ module riscv_cpu_v2(
         .q(PC)
     );
 
-    mk9_rom_mif_aclr mk9_instr_mem (
+    mk9_rom_mif_aclr_96k mk9_instr_mem (
         .address(NEXT_PC[13:2]),
         .clock(clk),
         .q(INSTR_MEM_OUT),
@@ -303,7 +303,7 @@ module riscv_cpu_v2(
     //logic [31:0] FAKE_INSTR_F;
     // instruction_memory #(
     //     .BIT_WIDTH(32),
-    //     .ENTRY_COUNT(4096)
+    //     .ENTRY_COUNT(16kb of words)
     // ) instr_mem (
     //     .read_address(PC),
     //     .read_data(FAKE_INSTR_F)
@@ -684,7 +684,7 @@ module riscv_cpu_v2(
 
     // old_data_memory #(
     //     .BIT_WIDTH(32),
-    //     .ENTRY_COUNT(1024)
+    //     .ENTRY_COUNT(4kb of words)
     // ) my_data_mem_old (
     //     .addr(OLD_DATA_MEM_ADDR),
     //     .writeData(RS2_DATA_M),

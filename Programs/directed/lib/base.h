@@ -2,7 +2,7 @@
 #define BASE_H
 
     #ifndef X86_BUILD
-
+        //TODO fix heap setup
         //extern unsigned int _estack; dont think its needed
 
         //init stack point to top of dmem address space, jump to int main, 7 nops to let pipeline settle before calling ebreak

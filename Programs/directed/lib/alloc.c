@@ -26,7 +26,7 @@
     extern uint8_t _heap_start;
     extern uint8_t _heap_end;
 
-
+    //TODO check if this needs updated
     //if payload_size is 0, then ret will point to footer, fuck error handling
     void* malloc(size_t payload_size){
 
