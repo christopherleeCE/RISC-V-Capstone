@@ -293,7 +293,7 @@ module riscv_cpu_v2(
     );
 
     mk9_rom_mif_aclr_96k mk9_instr_mem (
-        .address(NEXT_PC[13:2]),
+        .address(NEXT_PC[16:2]),
         .clock(clk),
         .q(INSTR_MEM_OUT),
         .aclr(!rst)

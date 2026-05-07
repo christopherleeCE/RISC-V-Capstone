@@ -1430,8 +1430,9 @@ module top_riscv_cpu_v2_1();
             $display("[MEM] INSTR_M     = 0x%08h", cpu_dut.INSTR_M);
             $display("[MEM] ADDR_REG    = 0x%08h", cpu_dut.my_data_mem.addr_internal_mirror);
             $display("[MEM] WR_DATA_REG = 0x%08h", cpu_dut.my_data_mem.write_data_internal_mirror);
+            $display("[MEM] WR_WORD_REG = 0x%08h", cpu_dut.my_data_mem.write_word_internal_mirror);
             $display("[MEM] DMEM_OUT    = 0x%08h", cpu_dut.DATA_MEM_OUT);
-            $display("[MEM] MEM_WR_EN   = %0b",    cpu_dut.data_mem_wr_en_M);
+            $display("[MEM] MEM_WR_EN   = %0b",    cpu_dut.my_data_mem.writeEn_internal_mirror);
                         $write("\n");
 
 
@@ -1861,7 +1862,7 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as LW:");
                     if(row == 5) begin
 
-                        // $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                        $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                         assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
@@ -1872,7 +1873,7 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as LH:");
                     if(row == 5) begin
 
-                        // $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                        $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                         assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
@@ -1883,7 +1884,7 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as LB:");
                     if(row == 5) begin
 
-                        // $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                        $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                         assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
@@ -1894,7 +1895,7 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as LHU:");
                     if(row == 5) begin
 
-                        // $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                        $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                         assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 
@@ -1905,7 +1906,7 @@ module top_riscv_cpu_v2_1();
                     if(show_negedge_verify_row) $write("\tIdentified as LBU:");
                     if(row == 5) begin
 
-                        // $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
+                        $display("%h, %h", cpu_dut.my_reg_file.regs_out[rd_v], REG_FILE[5][rd_v]);
                         assert(cpu_dut.my_reg_file.regs_out[rd_v] == REG_FILE[5][rd_v]) $display(" Success: 0x%h", PC[row]);
                         else begin $display(" FAILURE: 0x%h", PC[row]); return 1; end
 

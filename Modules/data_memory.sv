@@ -42,7 +42,7 @@ module data_memory
    logic [BIT_WIDTH-1:0] writeWord;  
 
    logic [ADDR_WIDTH-1:0] addr_internal_mirror;
-   logic [ADDR_WIDTH-1:0] write_data_internal_mirror;
+   logic [BIT_WIDTH-1:0] write_data_internal_mirror, write_word_internal_mirror;
    // logic [3:0] byteena_sig_internal_mirror;
    logic addr_byte_internal_mirror;
    logic addr_half_internal_mirror;
@@ -136,6 +136,26 @@ module data_memory
       .q(write_data_internal_mirror)
    );
 
+   dff_async_reset #(
+      .WIDTH(32)
+   )write_word_mirror(
+      .d(writeData),
+      .clk(clk),
+      .rst(rst),
+      .wr_en(1'b1),
+      .q(write_word_internal_mirror)
+   );
+
+   dff_async_reset #(
+      .WIDTH(1)
+   )writeEn_mirror(
+      .d(writeEn),
+      .clk(clk),
+      .rst(rst),
+      .wr_en(1'b1),
+      .q(writeEn_internal_mirror)
+   );
+
    // dff_async_reset #(
    //    .WIDTH(4)
    // )byte_en_mirror(
@@ -189,14 +209,14 @@ module data_memory
 
    dual_mk9_ram_mif_aclr_80k my_dual_mk9_ram_mif(
       .aclr_a(!rst),
-      .address_a(addr[11:2]),
+      .address_a(addr[16:2]),
       .byteena_a(byteena_sig),
       .clock_a(clk),
       .data_a(writeWord),
       .wren_a(writeEn),
       .q_a(data_out_mem),
       .aclr_b(!portb_rst),
-      .address_b(portb_addr[11:2]),
+      .address_b(portb_addr[16:2]),
       .clock_b(portb_clk),
       .data_b(32'b0),
       .wren_b(1'b0),

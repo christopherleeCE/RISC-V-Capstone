@@ -113,6 +113,18 @@ sw a3, 12(sp)
 0xFFFFFFFF
 */
 
+# nop
+# nop
+# nop
+# nop
+# nop
+# ebreak
+# nop
+# nop
+# nop
+# nop
+# nop
+
 addi sp, gp, 0
 lb x16, 0(sp)
 lb x17, 5(sp)
